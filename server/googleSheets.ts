@@ -1,11 +1,13 @@
 import { google } from "googleapis";
 import path from "path";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const SHEET_NAME = "Convidados";
 
 // ✅ resolve caminho corretamente
-const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
-  ? path.resolve(process.env.GOOGLE_APPLICATION_CREDENTIALS)
+const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
+  ? path.resolve(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
   : "";
 
 console.log("CREDENTIALS PATH:", credentialsPath);
