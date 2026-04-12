@@ -14,7 +14,7 @@ const getBaseUrl = () => {
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: `${getBaseUrl()}/trpc`,
+      url: `https://site-casamento-meod.onrender.com`,
     }),
   ],
 });
