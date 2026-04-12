@@ -1,24 +1,23 @@
 import { google } from "googleapis";
-import path from "path";
-import dotenv from 'dotenv';
-dotenv.config();
+
 
 const SHEET_NAME = "Convidados";
 
-// ✅ resolve caminho corretamente
-const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
-  ? path.resolve(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
-  : "";
+// ✅ pega o JSON direto do Render
+const credentialsJSON = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
 
-console.log("CREDENTIALS PATH:", credentialsPath);
+console.log("CREDENTIALS JSON EXISTS:", !!credentialsJSON);
 
-if (!credentialsPath) {
-  throw new Error("GOOGLE_APPLICATION_CREDENTIALS não configurado");
+if (!credentialsJSON) {
+  throw new Error("GOOGLE_APPLICATION_CREDENTIALS_JSON não configurado");
 }
 
-// ✅ APENAS UMA INSTÂNCIA
+// ✅ converte string -> objeto
+const credentials = JSON.parse(credentialsJSON);
+
+// ✅ usa credentials direto (SEM keyFile)
 const auth = new google.auth.GoogleAuth({
-  keyFile: credentialsPath,
+  credentials,
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
