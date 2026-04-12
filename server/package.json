@@ -1,7 +1,8 @@
 {
   "name": "server",
   "scripts": {
-    "start": "tsx index.ts"
+  "build": "tsc",
+  "start": "tsx index.ts"
   },
   "dependencies": {
     "@trpc/server": "^11.15.0",
