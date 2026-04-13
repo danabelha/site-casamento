@@ -9,7 +9,7 @@ const credentialsJSON = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
 console.log("CREDENTIALS JSON EXISTS:", !!credentialsJSON);
 
 if (!credentialsJSON) {
-  throw new Error("GOOGLE_APPLICATION_CREDENTIALS_JSON não configurado");
+  throw new Error("GOOGLE_APPLICATION_CREDENTIALS não configurado");
 }
 
 // ✅ converte string -> objeto
@@ -17,7 +17,7 @@ const credentials = JSON.parse(credentialsJSON);
 
 // ✅ usa credentials direto (SEM keyFile)
 const auth = new google.auth.GoogleAuth({
-  credentials,
+  credentials: credentials,
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
