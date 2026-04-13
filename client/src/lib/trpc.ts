@@ -14,7 +14,7 @@ export const trpc = createTRPCReact<AppRouter>();
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: `https://site-casamento-meod.onrender.com`,
+      url: `https://site-casamento-meod.onrender.com/trpc`,
     }),
   ],
 });
