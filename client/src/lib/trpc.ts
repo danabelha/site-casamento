@@ -2,6 +2,7 @@ import { createTRPCReact } from "@trpc/react-query";
 import { httpBatchLink } from "@trpc/client";
 import type { AppRouter } from "../../../server/router";
 
+
 export const trpc = createTRPCReact<AppRouter>();
 
 //const getBaseUrl = () => {
@@ -14,7 +15,7 @@ export const trpc = createTRPCReact<AppRouter>();
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: `https://site-casamento-meod.onrender.com/trpc`,
+      url: `${import.meta.env.VITE_API_URL}/trpc`,
     }),
   ],
 });
