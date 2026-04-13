@@ -16,10 +16,6 @@ app.use(
   })
 );
 
-app.listen(3000, "0.0.0.0", () => {
-  console.log("Servidor rodando em http://localhost:3000");
-});
-
 const PORT = parseInt(process.env.PORT || "3001", 10); // Render usa a porta que ele quiser, localmente usa 3001
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor rodando na porta ${PORT}`);
