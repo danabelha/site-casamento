@@ -1,18 +1,19 @@
 import { google } from "googleapis";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 
 const SHEET_NAME = "Convidados";
 
-// ✅ pega o JSON direto do Render
+// ✅ pega JSON direto do ENV
 const credentialsJSON = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
-
-console.log("CREDENTIALS JSON EXISTS:", !!credentialsJSON);
 
 if (!credentialsJSON) {
   throw new Error("GOOGLE_APPLICATION_CREDENTIALS não configurado");
 }
 
-// ✅ converte string -> objeto
+// ✅ converte JSON string → objeto
 const credentials = JSON.parse(credentialsJSON);
 
 // ✅ usa credentials direto (SEM keyFile)
