@@ -302,11 +302,11 @@ export default function Confirmacao() {
         }}
       >
         <Link href="/">
-          <span style={{ fontFamily: "'Great Vibes', cursive", fontSize: "clamp(24px, 4vw, 32px)", color: "#2C2C2C", cursor: "pointer", textDecoration: "none" }}>
+          <span style={{ fontFamily: "'Halimun', cursive", fontSize: "clamp(24px, 4vw, 32px)", color: "#2C2C2C", cursor: "pointer", textDecoration: "none" }}>
             Mariana & Daniel
           </span>
         </Link>
-        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "9px", letterSpacing: "0.3em", color: "#C9A96E", textTransform: "uppercase", marginTop: "4px" }}>
+        <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "11px", letterSpacing: "0.2em", color: "#C9A96E", textTransform: "uppercase", marginTop: "4px" }}>
           05 · 12 · 2026
         </p>
       </header>
@@ -327,16 +327,16 @@ export default function Confirmacao() {
           >
             <div style={{ paddingBottom: "40px" }}>
               <SectionDivider number="01" title="Confirme sua Presença" />
-              <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "14px", color: "#888", marginBottom: "32px", fontWeight: 300 }}>
+              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "16px", color: "#888", marginBottom: "32px", fontWeight: 300 }}>
                 Digite seu nome completo para localizar seu convite.
               </p>
               <div style={{ maxWidth: "400px", margin: "0 auto" }}>
                 <input
                   type="text"
-                  placeholder="Nome Completo..."
+                  placeholder="Nome e Sobrenome..."
                   value={nomeBusca}
                   onChange={(e) => setNomeBusca(e.target.value)}
-                  style={{ width: "100%", padding: "16px", backgroundColor: "transparent", border: "1px solid #E8CECE", fontFamily: "'Lato', sans-serif", fontSize: "14px", color: "#2C2C2C", outline: "none", textAlign: "center", marginBottom: "16px" }}
+                  style={{ width: "100%", padding: "16px", backgroundColor: "transparent", border: "1px solid #E8CECE", fontFamily: "'Montserrat', sans-serif", fontSize: "14px", color: "#2C2C2C", outline: "none", textAlign: "center", marginBottom: "16px" }}
                 />
                 <button onClick={buscarConvidado} disabled={searchConvidados.isPending} className="wedding-btn" style={{ width: "100%" }}>
                   {searchConvidados.isPending ? "Buscando..." : "Verificar Convite"}
@@ -348,12 +348,12 @@ export default function Confirmacao() {
           <div style={{ paddingTop: "40px" }}>
             <FadeSection>
               <div style={{ textAlign: "center", marginBottom: "60px" }}>
-                <h2 style={{ fontFamily: "'Great Vibes', cursive", fontSize: "clamp(32px, 6vw, 42px)", color: "#C4876A", marginBottom: "12px" }}>
+                <h2 style={{ fontFamily: "'Halimun', cursive", fontSize: "clamp(32px, 6vw, 42px)", color: "#C4876A", marginBottom: "12px" }}>
                   Olá, {convidadoSelecionado.nome}!
                 </h2>
-                <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "14px", color: "#888", fontWeight: 300 }}>Ficamos muito felizes em ter você conosco.</p>
+                <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "16px", color: "#888", fontWeight: 300 }}>Nossa história também tem você, por isso queremos viver esse momento único ao seu lado.</p>
                 {convidadoSelecionado.limite > 0 && (
-                  <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "12px", color: "#C9A96E", marginTop: "8px", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                  <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "14px", color: "#C9A96E", marginTop: "8px", textTransform: "uppercase", letterSpacing: "0.1em" }}>
                     Você pode convidar até {convidadoSelecionado.limite} acompanhante(s).
                   </p>
                 )}
@@ -396,21 +396,13 @@ export default function Confirmacao() {
                 <SectionDivider number="04" title="Localização" />
                 <div style={{ textAlign: "center", marginBottom: "24px" }}>
                   <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "20px", color: "#2C2C2C", marginBottom: "4px" }}>Celeiro Quintal</p>
-                  <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "13px", color: "#888", fontWeight: 300 }}>R. Cônego Eugênio Leite, 1098 — Pinheiros, São Paulo — SP</p>
-                  <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "13px", color: "#C4876A", marginTop: "4px" }}>05 de Dezembro de 2026 · 19h00</p>
+                  <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "15px", color: "#888", fontWeight: 300 }}>R. Cônego Eugênio Leite, 1098 — Pinheiros, São Paulo — SP</p>
+                  <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "15px", color: "#C4876A", marginTop: "4px" }}>05 de Dezembro de 2026</p>
                 </div>
-                <div style={{ borderRadius: "2px", overflow: "hidden", border: "1px solid #E8CECE", marginBottom: "20px" }}>
+                <div style={{ borderRadius: "3px", overflow: "hidden", border: "1px solid #E8CECE", marginBottom: "20px" }}>
                   <iframe width="100%" height="300" src="https://maps.google.com/maps?q=R.+C%C3%B4nego+Eug%C3%AAnio+Leite%2C+1098+-+Pinheiros%2C+S%C3%A3o+Paulo+-+SP&t=&z=15&ie=UTF8&iwloc=&output=embed" style={{ border: 0, display: "block" }} title="Localização" loading="lazy" />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "12px" }}>
-                  {[{ label: "Cerimônia", hora: "19h00" }, { label: "Recepção", hora: "20h00" }, { label: "Jantar", hora: "21h00" }, { label: "Festa", hora: "22h00" }].map((item) => (
-                    <div key={item.label} style={{ textAlign: "center", padding: "16px", border: "1px solid #E8CECE" }}>
-                      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "16px", color: "#C4876A", marginBottom: "2px" }}>{item.hora}</p>
-                      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "10px", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em" }}>{item.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
+                </section>
             </FadeSection>
 
             {/* SEÇÃO 5: PRESENTES */}
