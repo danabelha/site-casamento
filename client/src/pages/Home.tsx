@@ -105,8 +105,8 @@ export default function Home() {
         <h1
           style={{
             fontFamily: "'Halimun', cursive",
-            fontSize: "clamp(110px, 10vw, 110px)",
-            letterSpacing: "2px",
+            fontSize: "clamp(48px, 12vw, 110px)",
+            letterSpacing: "1px",
             fontWeight: "normal",
             color: "#FDFAF6",
             lineHeight: 1.1,
@@ -121,10 +121,10 @@ export default function Home() {
         <p
           style={{
             fontFamily: "'Montserrat', serif",
-            fontSize: "clamp(33px, 3vw, 3px)",
+            fontSize: "clamp(20px, 3vw, 3px)",
             color: "rgba(253, 250, 246, 0.85)",
-            letterSpacing: "0.1em",
-            marginBottom: "30px",
+            letterSpacing: "0.25em",
+            marginBottom: "28px",
             fontWeight: 400,
           }}
         >
