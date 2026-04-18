@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-wedding-charcoal max-w-[2000px] mx-auto">
       
-      {/* Background Image */}
+      {/* BackGround Image */}
       <div
         className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55]"
         style={{
