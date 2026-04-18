@@ -221,13 +221,86 @@ export default function Confirmacao() {
                     ))}
                   </div>
                   
-                  {resposta === "Confirmado" && (
-                    <div className="space-y-4 animate-in slide-in-from-top-2">
-                      <textarea placeholder="Deixe uma mensagem para nós..." className="wedding-input h-24 !text-[16px]" value={mensagem} onChange={(e) => setMensagem(e.target.value)} />
-                      {/* Lógica de acompanhantes aqui se desejar adicionar os inputs de nome */}
+                                    {resposta === "Confirmado" && (
+                    <div className="space-y-6 animate-in slide-in-from-top-2">
+                      {/* Mensagem para os Noivos */}
+                      <textarea 
+                        placeholder="Deixe uma mensagem carinhosa para nós..." 
+                        className="wedding-input h-24 !text-[16px]" 
+                        value={mensagem} 
+                        onChange={(e) => setMensagem(e.target.value)} 
+                      />
+
+                      {/* Gestão de Acompanhantes (Adultos) */}
+                      <div className="space-y-4">
+                        <p className="text-[12px] uppercase tracking-widest text-wedding-gold">Acompanhantes Adultos</p>
+                        {adultos.map((a, i) => (
+                          <div key={i} className="flex gap-2">
+                            <input 
+                              type="text" 
+                              placeholder={`Nome do acompanhante ${i + 1}`}
+                              className="wedding-input !text-[16px]"
+                              value={a.nome}
+                              onChange={(e) => {
+                                const newAdultos = [...adultos];
+                                newAdultos[i].nome = e.target.value;
+                                setAdultos(newAdultos);
+                              }}
+                            />
+                            <button onClick={() => setAdultos(adultos.filter((_, idx) => idx !== i))} className="text-red-400 px-2">✕</button>
+                          </div>
+                        ))}
+                        {adultos.length + criancas.length < (convidadoSelecionado?.limite || 0) && (
+                          <button 
+                            onClick={() => setAdultos([...adultos, { nome: "" }])}
+                            className="text-[11px] uppercase tracking-tighter text-wedding-terracotta border border-wedding-terracotta/30 px-4 py-2"
+                          >
+                            + Adicionar Adulto
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Gestão de Crianças */}
+                      <div className="space-y-4">
+                        <p className="text-[12px] uppercase tracking-widest text-wedding-gold">Crianças</p>
+                        {criancas.map((c, i) => (
+                          <div key={i} className="grid grid-cols-[1fr_80px_40px] gap-2">
+                            <input 
+                              type="text" 
+                              placeholder="Nome da criança"
+                              className="wedding-input !text-[16px]"
+                              value={c.nome}
+                              onChange={(e) => {
+                                const newCriancas = [...criancas];
+                                newCriancas[i].nome = e.target.value;
+                                setCriancas(newCriancas);
+                              }}
+                            />
+                            <input 
+                              type="number" 
+                              placeholder="Idade"
+                              className="wedding-input !text-[16px]"
+                              value={c.idade}
+                              onChange={(e) => {
+                                const newCriancas = [...criancas];
+                                newCriancas[i].idade = e.target.value;
+                                setCriancas(newCriancas);
+                              }}
+                            />
+                            <button onClick={() => setCriancas(criancas.filter((_, idx) => idx !== i))} className="text-red-400">✕</button>
+                          </div>
+                        ))}
+                        {adultos.length + criancas.length < (convidadoSelecionado?.limite || 0) && (
+                          <button 
+                            onClick={() => setCriancas([...criancas, { nome: "", idade: "" }])}
+                            className="text-[11px] uppercase tracking-tighter text-wedding-terracotta border border-wedding-terracotta/30 px-4 py-2"
+                          >
+                            + Adicionar Criança
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
-
                   <button onClick={handleSubmit} disabled={!resposta} className="w-full bg-wedding-terracotta text-white py-4 uppercase text-[12px] disabled:opacity-50">Enviar Confirmação</button>
                 </div>
               )}
