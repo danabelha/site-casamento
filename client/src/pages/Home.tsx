@@ -1,9 +1,3 @@
-/*
- * Design Philosophy: Minimalismo Japonês Contemporâneo (Wabi-Sabi + Editorial Japonês)
- * Página inicial — Hero fullscreen com contador regressivo e botão de confirmação
- * Paleta: Cream (#FDFAF6), Blush (#D4A5A5), Terracotta (#C4876A), Charcoal (#2C2C2C), Gold (#C9A96E)
- */
-
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 
@@ -16,7 +10,7 @@ interface TimeLeft {
   segundos: number;
 }
 
-function calcularTempoRestante(): TimeLeft {
+function calcularTempoRestante( ): TimeLeft {
   const dataCasamento = new Date("Dec 5, 2026 19:00:00").getTime();
   const agora = new Date().getTime();
   const distancia = dataCasamento - agora;
@@ -41,105 +35,53 @@ export default function Home() {
     const timer = setInterval(() => {
       setTempoRestante(calcularTempoRestante());
     }, 1000);
-
     setTimeout(() => setLoaded(true), 100);
-
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <div
-  className="relative min-h-screen flex items-center justify-center overflow-hidden"
-  style={{
-    backgroundColor: "#2C2C2C",
-    maxWidth: "2000px",
-    margin: "0 auto",
-  }}
->
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#2C2C2C] max-w-[2000px] mx-auto">
+      
       {/* Background Image */}
       <div
-  className="absolute inset-0"
-  style={{
-    backgroundImage: `url(${HERO_IMAGE})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center 45%",
-    backgroundRepeat: "no-repeat",
-    filter: "brightness(0.55)",
-  }}
-/>
-
-      {/* Subtle grain texture overlay */}
-      <div
-        className="absolute inset-0 opacity-20"
+        className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55]"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E")`,
+          backgroundImage: `url(${HERO_IMAGE})`,
+          backgroundPosition: "center 45%",
         }}
       />
 
-      {/* Content */}
+      {/* Textura de Grão */}
       <div
-        className="relative z-10 text-center px-6"
+        className="absolute inset-0 opacity-20 pointer-events-none"
         style={{
-          opacity: loaded ? 1 : 0,
-          transform: loaded ? "translateY(0)" : "translateY(20px)",
-          transition: "opacity 1.2s ease, transform 1.2s ease",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise )' opacity='0.4'/%3E%3C/svg%3E")`,
         }}
+      />
+
+      {/* Conteúdo Principal */}
+      <div
+        className={`relative z-10 text-center px-4 transition-all duration-[1200ms] ease-out ${
+          loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+        }`}
       >
-        {/* Pre-title */}
-        <p
-          className="mb-6"
-          style={{
-            fontFamily: "'Montserrat', serif",
-            fontSize: "33px",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: "#C9A96E",
-            fontWeight: 400,
-            marginBottom: "32px",
-          }}
-        >
+        {/* Pré-título */}
+        <p className="font-['Montserrat'] text-[14px] md:text-[28px] tracking-[0.15em] uppercase text-[#C9A96E] font-normal mb-6">
           E enfim, o nosso casamento
         </p>
 
-        {/* Couple Name */}
-        <h1
-          style={{
-            fontFamily: "'Halimun', cursive",
-            fontSize: "clamp(48px, 12vw, 110px)",
-            letterSpacing: "1px",
-            fontWeight: "normal",
-            color: "#FDFAF6",
-            lineHeight: 1.1,
-            marginBottom: "32px",
-            textShadow: "0 2px 20px rgba(0,0,0,0.3)",
-          }}
-        >
+        {/* Nomes do Casal - SEM QUEBRA DE LINHA */}
+        <h1 className="font-['Halimun'] text-[32px] sm:text-[42px] md:text-[80px] lg:text-[110px] whitespace-nowrap leading-tight text-[#FDFAF6] mb-8 drop-shadow-2xl">
           Mariana & Daniel
         </h1>
 
-        {/* Date */}
-        <p
-          style={{
-            fontFamily: "'Montserrat', serif",
-            fontSize: "clamp(20px, 3vw, 3px)",
-            color: "rgba(253, 250, 246, 0.85)",
-            letterSpacing: "0.25em",
-            marginBottom: "28px",
-            fontWeight: 400,
-          }}
-        >
+        {/* Data e Local */}
+        <p className="font-['Montserrat'] text-[12px] md:text-[20px] text-[#FDFAF6]/85 tracking-[0.2em] font-normal mb-10">
           05 de Dezembro de 2026 &nbsp;·&nbsp; São Paulo
         </p>
 
-        {/* Countdown */}
-        <div
-          className="inline-flex gap-0 mb-12"
-          style={{
-            borderTop: "3px solid rgba(201, 169, 110, 0.4)",
-            borderBottom: "3px solid rgba(201, 169, 110, 0.4)",
-            padding: "14px 0",
-          }}
-        >
+        {/* Contador Regressivo - TUDO EM UMA LINHA SÓ */}
+        <div className="inline-flex items-center justify-center gap-2 sm:gap-4 md:gap-0 mb-12 py-3 border-y border-[#C9A96E]/40 w-full sm:w-auto">
           {[
             { valor: tempoRestante.dias, label: "Dias" },
             { valor: tempoRestante.horas, label: "Horas" },
@@ -148,126 +90,36 @@ export default function Home() {
           ].map((item, i) => (
             <div
               key={item.label}
-              className="flex flex-col items-center"
-              style={{
-                padding: "0 24px",
-                borderRight: i < 3 ? "3px solid rgba(201, 169, 110, 0.3)" : "none",
-              }}
+              className={`flex flex-col items-center px-2 sm:px-4 md:px-8 ${
+                i < 3 ? "border-r border-[#C9A96E]/30" : ""
+              }`}
             >
-              <span
-                style={{
-                  fontFamily: "'Montserrat', serif",
-                  fontSize: "clamp(33px, 5vw, 48px)",
-                  color: "#FDFAF6",
-                  fontWeight: 300,
-                  lineHeight: 1,
-                  minWidth: "50px",
-                  display: "block",
-                  textAlign: "center",
-                }}
-              >
+              <span className="font-['Montserrat'] text-[22px] sm:text-[28px] md:text-[48px] text-[#FDFAF6] font-light leading-none">
                 {String(item.valor).padStart(2, "0")}
               </span>
-              <span
-                style={{
-                  fontFamily: "'Montserrat', serif",
-                  fontSize: "28px",
-                  letterSpacing: "0.3em",
-                  textTransform: "uppercase",
-                  color: "#C9A96E",
-                  marginTop: "6px",
-                  fontWeight: 400,
-                }}
-              >
+              <span className="font-['Montserrat'] text-[9px] sm:text-[11px] md:text-[18px] tracking-[0.2em] uppercase text-[#C9A96E] mt-1 font-normal">
                 {item.label}
               </span>
             </div>
           ))}
         </div>
 
-        {/* CTA Button */}
-        <div>
+        {/* Botão CTA */}
+        <div className="mt-4">
           <Link href="/confirmacao">
-            <span
-              style={{
-                display: "inline-block",
-                border: "1px solid rgba(253, 250, 246, 0.7)",
-                color: "#FDFAF6",
-                padding: "18px 48px",
-                fontFamily: "'Montserrat', serif",
-                fontSize: "14px",
-                fontWeight: 400,
-                letterSpacing: "0.9em",
-                textTransform: "uppercase",
-                textDecoration: "none",
-                transition: "all 0.4s ease",
-                cursor: "pointer",
-                backdropFilter: "blur(4px)",
-                background: "rgba(253, 250, 246, 0.08)",
-              }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.background = "rgba(253, 250, 246, 0.2)";
-                (e.target as HTMLElement).style.borderColor = "#FDFAF6";
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.background = "rgba(253, 250, 246, 0.08)";
-                (e.target as HTMLElement).style.borderColor = "rgba(253, 250, 246, 0.7)";
-              }}
-            >
+            <span className="inline-block border border-[#FDFAF6]/70 text-[#FDFAF6] px-8 sm:px-12 py-4 font-['Montserrat'] text-[12px] md:text-[14px] font-normal tracking-[0.4em] md:tracking-[0.8em] uppercase cursor-pointer backdrop-blur-sm bg-[#FDFAF6]/10 transition-all hover:bg-[#FDFAF6]/20 hover:border-[#FDFAF6]">
               Confirmar Presença
             </span>
           </Link>
         </div>
-
-        {/* Scroll indicator */}
-        <div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          style={{ animation: "bounce 2s infinite" }}
-        >
-          <div
-            style={{
-              width: "5px",
-              height: "40px",
-              background: "linear-gradient(to bottom, rgba(201,169,110,0.8), transparent)",
-              margin: "0 auto",
-            }}
-          />
-        </div>
       </div>
 
-      {/* Link discreto para painel admin */}
+      {/* Link Admin */}
       <Link href="/admin">
-        <div
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            right: "20px",
-            fontSize: "10px",
-            color: "rgba(201, 169, 110, 0.4)",
-            cursor: "pointer",
-            fontFamily: "'Montserrat', serif",
-            letterSpacing: "0.1em",
-            textDecoration: "none",
-            transition: "color 0.3s ease",
-            zIndex: 50,
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.color = "rgba(201, 169, 110, 0.8)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.color = "rgba(201, 169, 110, 0.4)";
-          }}
-        >
+        <div className="fixed bottom-4 right-4 text-[9px] text-[#C9A96E]/30 cursor-pointer font-['Montserrat'] tracking-widest uppercase hover:text-[#C9A96E]/70 transition-colors z-50">
           admin
         </div>
       </Link>
-
-      <style>{`
-        @keyframes bounce {
-          0%, 100% { transform: translateX(-50%) translateY(0); opacity: 1; }
-          50% { transform: translateX(-50%) translateY(8px); opacity: 0.5; }
-        }
-      `}</style>
     </div>
   );
 }

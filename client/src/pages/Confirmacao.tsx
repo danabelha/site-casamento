@@ -1,7 +1,6 @@
 /*
  * Design Philosophy: Minimalismo Japonês Contemporâneo (Wabi-Sabi + Editorial Japonês)
- * Página de Confirmação — Verificação de convidados, história, galeria, local, presentes e RSVP
- * Paleta: Cream (#FDFAF6), Blush (#D4A5A5), Terracotta (#C4876A), Charcoal (#2C2C2C), Gold (#C9A96E)
+ * Página de Confirmação — Otimizada para Mobile First
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -9,7 +8,6 @@ import { Link } from "wouter";
 import { trpc } from "../lib/trpc";
 
 // ===== CONSTANTES =====
-
 const GALLERY_IMAGES = [
   "https://i.pinimg.com/736x/c0/bc/f8/c0bcf84c9b1f88e70d63f72a3ab87f44.jpg",
   "https://i.pinimg.com/736x/d6/31/ae/d631aeb49b7fb2104f804c9f4da05042.jpg",
@@ -18,109 +16,38 @@ const GALLERY_IMAGES = [
 ];
 
 const PRESENTES = [
-  {
-    nome: "Lua de Mel",
-    descricao: "Contribua para nossa viagem dos sonhos",
-    valor: "Qualquer valor",
-    pix: "casamento@danielemariana.com",
-    emoji: "✈️",
-  },
-  {
-    nome: "Jantar Romântico",
-    descricao: "Um jantar especial para celebrarmos juntos",
-    valor: "R$ 350",
-    pix: "casamento@danielemariana.com",
-    emoji: "🍷",
-  },
-  {
-    nome: "Kit Cozinha",
-    descricao: "Utensílios para nossa nova casa",
-    valor: "R$ 280",
-    pix: "casamento@danielemariana.com",
-    emoji: "🏠",
-  },
-  {
-    nome: "Noite em Hotel",
-    descricao: "Uma noite especial em nosso destino",
-    valor: "R$ 500",
-    pix: "casamento@danielemariana.com",
-    emoji: "🌙",
-  },
-  {
-    nome: "Sessão de Fotos",
-    descricao: "Memórias eternas do nosso amor",
-    valor: "R$ 600",
-    pix: "casamento@danielemariana.com",
-    emoji: "📸",
-  },
-  {
-    nome: "Contribuição Livre",
-    descricao: "Qualquer valor é bem-vindo com amor",
-    valor: "Livre",
-    pix: "casamento@danielemariana.com",
-    emoji: "💝",
-  },
+  { nome: "Lua de Mel", descricao: "Contribua para nossa viagem dos sonhos", valor: "Qualquer valor", pix: "casamento@danielemariana.com", emoji: "✈️" },
+  { nome: "Jantar Romântico", descricao: "Um jantar especial para celebrarmos juntos", valor: "R$ 350", pix: "casamento@danielemariana.com", emoji: "🍷" },
+  { nome: "Kit Cozinha", descricao: "Utensílios para nossa nova casa", valor: "R$ 280", pix: "casamento@danielemariana.com", emoji: "🏠" },
+  { nome: "Noite em Hotel", descricao: "Uma noite especial em nosso destino", valor: "R$ 500", pix: "casamento@danielemariana.com", emoji: "🌙" },
+  { nome: "Sessão de Fotos", descricao: "Memórias eternas do nosso amor", valor: "R$ 600", pix: "casamento@danielemariana.com", emoji: "📸" },
+  { nome: "Contribuição Livre", descricao: "Qualquer valor é bem-vindo com amor", valor: "Livre", pix: "casamento@danielemariana.com", emoji: "💝" },
 ];
-
 
 // ===== COMPONENTES AUXILIARES =====
 
-function SectionDivider({ number, title }: { number: string; title: string }) {
+function SectionDivider({ number, title }: { number: string; title: string } ) {
   return (
-    <div className="text-center mb-8 md:mb-12">
-      <p
-        style={{
-          fontFamily: "'Lato', sans-serif",
-          fontSize: "10px",
-          letterSpacing: "0.4em",
-          color: "#C9A96E",
-          fontWeight: 400,
-          textTransform: "uppercase",
-          marginBottom: "12px",
-        }}
-      >
+    <div className="text-center mb-8 md:mb-12 px-4">
+      <p className="font-['Lato'] text-[10px] tracking-[0.4em] text-[#C9A96E] font-normal uppercase mb-3">
         {number}
       </p>
-      <h2
-        style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: "clamp(24px, 5vw, 42px)",
-          fontWeight: 300,
-          color: "#2C2C2C",
-          lineHeight: 1.2,
-          marginBottom: "16px",
-        }}
-      >
+      <h2 className="font-['Cormorant_Garamond'] text-[28px] md:text-[42px] font-light text-[#2C2C2C] leading-tight mb-4">
         {title}
       </h2>
-      <div
-        style={{
-          width: "40px",
-          height: "1px",
-          background: "#C9A96E",
-          margin: "0 auto",
-        }}
-      />
+      <div className="w-10 h-[1px] bg-[#C9A96E] mx-auto" />
     </div>
   );
 }
 
-function FadeSection({ children, className = "", style = {} }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
+function FadeSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisible(true);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setVisible(true);
+    }, { threshold: 0.1 });
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
@@ -128,20 +55,14 @@ function FadeSection({ children, className = "", style = {} }: { children: React
   return (
     <div
       ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(24px)",
-        transition: "opacity 0.8s ease, transform 0.8s ease",
-        ...style
-      }}
+      className={`${className} transition-all duration-1000 ease-out ${
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+      }`}
     >
       {children}
     </div>
   );
 }
-
-// ===== GALERIA PREMIUM CENTER MODE (3-UP) =====
 
 function Carrossel() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -155,84 +76,59 @@ function Carrossel() {
     return () => clearInterval(interval);
   }, [autoplay]);
 
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length);
-    setAutoplay(false);
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % GALLERY_IMAGES.length);
-    setAutoplay(false);
-  };
-
   const handleImageClick = (index: number) => {
     setCurrentIndex(index);
     setAutoplay(false);
   };
 
   return (
-    <div style={{ position: "relative", width: "100%", marginBottom: "24px", overflow: "hidden", paddingBottom: "20px" }}>
-      {/* Container do Carrossel */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", perspective: "1000px", minHeight: "450px" }}>
+    <div className="relative w-full mb-6 overflow-hidden pb-8">
+      <div className="flex items-center justify-center gap-2 sm:gap-4 perspective-[1000px] min-h-[300px] md:min-h-[450px]">
         {/* Foto Esquerda */}
-        <div style={{ flex: "0 0 clamp(80px, 15vw, 140px)", opacity: 0.6, cursor: "pointer", transition: "all 0.5s ease", transform: "scale(0.85)" }} onClick={() => handleImageClick((currentIndex - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length)}>
-          <img src={GALLERY_IMAGES[(currentIndex - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length]} alt="Foto anterior" style={{ width: "100%", height: "auto", objectFit: "cover", display: "block", borderRadius: "2px" }} />
+        <div 
+          className="flex-[0_0_60px] sm:flex-[0_0_140px] opacity-40 cursor-pointer transition-all duration-500 scale-90 hidden sm:block"
+          onClick={() => handleImageClick((currentIndex - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length)}
+        >
+          <img src={GALLERY_IMAGES[(currentIndex - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length]} className="w-full h-auto rounded-sm object-cover" alt="Anterior" />
         </div>
 
-        {/* Foto Central (Destaque) */}
-        <div style={{ flex: "0 0 clamp(200px, 50vw, 380px)", zIndex: 10, transition: "all 0.5s ease" }}>
-          <img src={GALLERY_IMAGES[currentIndex]} alt={`Foto ${currentIndex + 1}`} style={{ width: "100%", height: "auto", objectFit: "cover", display: "block", borderRadius: "2px", boxShadow: "0 12px 32px rgba(0,0,0,0.15)" }} />
+        {/* Foto Central */}
+        <div className="flex-[0_0_85%] sm:flex-[0_0_380px] z-10 transition-all duration-500">
+          <img src={GALLERY_IMAGES[currentIndex]} className="w-full h-auto rounded-sm shadow-xl object-cover" alt="Atual" />
         </div>
 
         {/* Foto Direita */}
-        <div style={{ flex: "0 0 clamp(80px, 15vw, 140px)", opacity: 0.6, cursor: "pointer", transition: "all 0.5s ease", transform: "scale(0.85)" }} onClick={() => handleImageClick((currentIndex + 1) % GALLERY_IMAGES.length)}>
-          <img src={GALLERY_IMAGES[(currentIndex + 1) % GALLERY_IMAGES.length]} alt="Próxima foto" style={{ width: "100%", height: "auto", objectFit: "cover", display: "block", borderRadius: "2px" }} />
+        <div 
+          className="flex-[0_0_60px] sm:flex-[0_0_140px] opacity-40 cursor-pointer transition-all duration-500 scale-90 hidden sm:block"
+          onClick={() => handleImageClick((currentIndex + 1) % GALLERY_IMAGES.length)}
+        >
+          <img src={GALLERY_IMAGES[(currentIndex + 1) % GALLERY_IMAGES.length]} className="w-full h-auto rounded-sm object-cover" alt="Próxima" />
         </div>
       </div>
 
-      {/* Setas de Navegação */}
-      <button onClick={handlePrev} style={{ position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)", background: "rgba(0,0,0,0.4)", color: "white", border: "none", width: "40px", height: "40px", borderRadius: "2px", cursor: "pointer", fontSize: "20px", transition: "all 0.3s ease", zIndex: 20 }} className="carousel-btn" title="Foto anterior">
-        ‹
-      </button>
-      <button onClick={handleNext} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "rgba(0,0,0,0.4)", color: "white", border: "none", width: "40px", height: "40px", borderRadius: "2px", cursor: "pointer", fontSize: "20px", transition: "all 0.3s ease", zIndex: 20 }} className="carousel-btn" title="Próxima foto">
-        ›
-      </button>
-
       {/* Indicadores */}
-      <div style={{ position: "absolute", bottom: "0px", left: "50%", transform: "translateX(-50%)", display: "flex", gap: "8px", zIndex: 15 }}>
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2">
         {GALLERY_IMAGES.map((_, i) => (
-          <div key={i} onClick={() => handleImageClick(i)} style={{ width: currentIndex === i ? "24px" : "8px", height: "8px", background: currentIndex === i ? "#C4876A" : "rgba(196,135,106,0.3)", borderRadius: "4px", cursor: "pointer", transition: "all 0.3s ease" }} title={`Foto ${i + 1}`} />
+          <div 
+            key={i} 
+            onClick={() => handleImageClick(i)}
+            className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${currentIndex === i ? "w-6 bg-[#C4876A]" : "w-2 bg-[#C4876A]/30"}`}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-// ===== COMPONENTE PRINCIPAL =====
-
 export default function Confirmacao() {
   const [nomeBusca, setNomeBusca] = useState("");
   const [convidadoSelecionado, setConvidadoSelecionado] = useState<any>(null);
-  const [resposta, setResposta] = useState<"Confirmado" | "Não Irá" | "Talvez" | null>(null);
-  const [adultos, setAdultos] = useState<{ nome: string }[]>([]);
-  const [criancas, setCriancas] = useState<{ nome: string; idade: string }[]>([]);
-  const [mensagem, setMensagem] = useState("");
+  const [resposta, setResposta] = useState<string | null>(null);
   const [sucesso, setSucesso] = useState(false);
   const [pixVisivel, setPixVisivel] = useState<Record<number, boolean>>({});
-  const [mostrarLembrete, setMostrarLembrete] = useState(false);
 
   const searchConvidados = trpc.searchConvidados.useMutation();
   const confirmarPresenca = trpc.confirmarPresenca.useMutation();
-
-  const toNumber = (v: any) => Number(v) || 0;
-
-  const montarDetalhes = () =>
-    [
-      ...adultos.map((a) => a.nome).filter(Boolean),
-      ...criancas
-        .filter((c) => c.nome && c.idade)
-        .map((c) => `${c.nome} (${c.idade} anos)`),
-    ].join("\n");
 
   const buscarConvidado = async () => {
     if (!nomeBusca.trim()) return;
@@ -241,331 +137,184 @@ export default function Confirmacao() {
       if (resultado && resultado.length > 0) {
         setConvidadoSelecionado(resultado[0]);
       } else {
-        alert("Nenhum convidado encontrado. Verifique se o nome está correto (exatamente como no convite).");
+        alert("Convite não encontrado. Verifique o nome digitado.");
       }
     } catch (error) {
-      console.error(error);
-      alert("Erro ao buscar convidado. Tente novamente.");
+      alert("Erro ao buscar. Tente novamente.");
     }
   };
-
-  const handleRespostaChange = (novaResposta: any) => {
-    setResposta(novaResposta);
-    if (novaResposta === "Confirmado" && convidadoSelecionado?.limite > 0) {
-      setMostrarLembrete(true);
-      setTimeout(() => setMostrarLembrete(false), 5000);
-    } else {
-      setMostrarLembrete(false);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!convidadoSelecionado || !resposta) return;
-    try {
-      await confirmarPresenca.mutateAsync({
-        id: convidadoSelecionado.id,
-        status: resposta,
-        acompanhantes: adultos.length,
-        criancas: criancas.length,
-        menores8: criancas.filter((c) => toNumber(c.idade) < 8).length,
-        mensagem,
-        acompanhanteDetalhes: montarDetalhes(),
-      });
-      setSucesso(true);
-    } catch (error) {
-      console.error(error);
-      alert("Erro ao confirmar presença. Tente novamente.");
-    }
-  };
-
-  const togglePix = (index: number) => {
-    setPixVisivel((prev) => ({ ...prev, [index]: !prev[index] }));
-  };
-
-  // Lógica de limite de acompanhantes
-  const totalAcompanhantesAtuais = adultos.length + criancas.length;
-  const podeAdicionarAcompanhante = totalAcompanhantesAtuais < (convidadoSelecionado?.limite || 0);
 
   return (
-    <div style={{ backgroundColor: "#FDFAF6", minHeight: "100vh" }}>
-      {/* Header - Sticky e Responsivo */}
-      <header
-        style={{
-          backgroundColor: "#FDFAF6",
-          borderBottom: "1px solid #E8CECE",
-          padding: "20px 16px",
-          textAlign: "center",
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-          backdropFilter: "blur(8px)",
-        }}
-      >
+    <div className="bg-[#FDFAF6] min-h-screen font-['Lato'] text-[#2C2C2C]">
+      {/* Header Fixo e Responsivo */}
+      <header className="sticky top-0 z-[100] bg-[#FDFAF6]/80 backdrop-blur-md border-b border-[#E8CECE] py-4 px-6 text-center">
         <Link href="/">
-          <span style={{ fontFamily: "'Halimun', cursive", fontSize: "clamp(24px, 4vw, 32px)", color: "#2C2C2C", cursor: "pointer", textDecoration: "none" }}>
+          <span className="font-['Halimun'] text-[24px] md:text-[32px] cursor-pointer whitespace-nowrap">
             Mariana & Daniel
           </span>
         </Link>
-        <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "11px", letterSpacing: "0.2em", color: "#C9A96E", textTransform: "uppercase", marginTop: "4px" }}>
+        <p className="font-['Montserrat'] text-[10px] tracking-[0.2em] text-[#C9A96E] uppercase mt-1">
           05 · 12 · 2026
         </p>
       </header>
 
-      <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 20px" }}>
+      <main className="max-w-[900px] mx-auto px-4 md:px-6">
         
-        {/* SEÇÃO 1: VERIFICAÇÃO */}
+        {/* BUSCA DE CONVITE */}
         {!convidadoSelecionado ? (
-          <FadeSection 
-            className="hero-section"
-            style={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              justifyContent: "center", 
-              minHeight: "calc(100vh - 100px)", 
-              textAlign: "center"
-            }}
-          >
-            <div style={{ paddingBottom: "40px" }}>
-              <SectionDivider number="01" title="Confirme sua Presença" />
-              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "16px", color: "#888", marginBottom: "32px", fontWeight: 300 }}>
-                Digite seu nome completo para localizar seu convite.
-              </p>
-              <div style={{ maxWidth: "400px", margin: "0 auto" }}>
-                <input
-                  type="text"
-                  placeholder="Nome e Sobrenome..."
-                  value={nomeBusca}
-                  onChange={(e) => setNomeBusca(e.target.value)}
-                  style={{ width: "100%", padding: "16px", backgroundColor: "transparent", border: "1px solid #E8CECE", fontFamily: "'Montserrat', sans-serif", fontSize: "14px", color: "#2C2C2C", outline: "none", textAlign: "center", marginBottom: "16px" }}
-                />
-                <button onClick={buscarConvidado} disabled={searchConvidados.isPending} className="wedding-btn" style={{ width: "100%" }}>
-                  {searchConvidados.isPending ? "Buscando..." : "Verificar Convite"}
-                </button>
-              </div>
+          <FadeSection className="min-h-[80vh] flex flex-col justify-center text-center">
+            <SectionDivider number="01" title="Confirme sua Presença" />
+            <p className="text-[#888] font-light mb-8">Digite seu nome completo para localizar seu convite.</p>
+            <div className="max-w-[400px] mx-auto w-full">
+              <input
+                type="text"
+                placeholder="Nome e Sobrenome..."
+                className="w-full p-4 bg-transparent border border-[#E8CECE] text-center mb-4 outline-none focus:border-[#C4876A] transition-colors"
+                value={nomeBusca}
+                onChange={(e) => setNomeBusca(e.target.value)}
+              />
+              <button 
+                onClick={buscarConvidado} 
+                className="w-full bg-[#2C2C2C] text-[#FDFAF6] py-4 tracking-[0.2em] uppercase text-[12px] hover:bg-[#444] transition-colors"
+              >
+                {searchConvidados.isPending ? "Buscando..." : "Verificar Convite"}
+              </button>
             </div>
           </FadeSection>
         ) : (
-          <div style={{ paddingTop: "40px" }}>
-            <FadeSection>
-              <div style={{ textAlign: "center", marginBottom: "60px" }}>
-                <h2 style={{ fontFamily: "'Halimun', cursive", fontSize: "clamp(32px, 6vw, 42px)", color: "#C4876A", marginBottom: "12px" }}>
-                  Olá, {convidadoSelecionado.nome}!
-                </h2>
-                <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "16px", color: "#888", fontWeight: 300 }}>Nossa história também tem você, por isso queremos viver esse momento único ao seu lado.</p>
-                {convidadoSelecionado.limite > 0 && (
-                  <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "14px", color: "#C9A96E", marginTop: "8px", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-                    Você pode convidar até {convidadoSelecionado.limite} acompanhante(s).
+          <div className="py-12">
+            {/* BOAS VINDAS */}
+            <FadeSection className="text-center mb-16">
+              <h2 className="font-['Halimun'] text-[32px] md:text-[48px] text-[#C4876A] mb-4">
+                Olá, {convidadoSelecionado.nome.split(' ')[0]}!
+              </h2>
+              <p className="text-[#888] font-light max-w-[600px] mx-auto">
+                Nossa história também tem você, por isso queremos viver esse momento único ao seu lado.
+              </p>
+            </FadeSection>
+
+            {/* HISTÓRIA */}
+            <FadeSection className="mb-20">
+              <SectionDivider number="02" title="Nossa História" />
+              <div className="grid md:grid-cols-2 gap-10 items-center">
+                <div className="text-center md:text-left">
+                  <p className="font-['Cormorant_Garamond'] text-[20px] italic text-[#C4876A] mb-4 leading-relaxed">
+                    "Nos conhecemos por acaso, mas acreditamos que foi o destino."
                   </p>
-                )}
-              </div>
-            </FadeSection>
-
-            {/* SEÇÃO 2: HISTÓRIA */}
-            <FadeSection>
-              <section style={{ marginBottom: "80px" }}>
-                <SectionDivider number="02" title="Nossa História" />
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "40px", alignItems: "center" }}>
-                  <div>
-                    <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "20px", fontStyle: "italic", color: "#C4876A", marginBottom: "16px", lineHeight: 1.5 }}>"Nos conhecemos por acaso, mas acreditamos que foi o destino."</p>
-                    <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "14px", color: "#555", fontWeight: 300, lineHeight: 1.8 }}>Tudo começou em uma tarde comum que se tornou extraordinária. Um encontro inesperado, um sorriso tímido, e a certeza de que algo especial havia começado.</p>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                    {[{ ano: "2020", evento: "Primeiro encontro" }, { ano: "2021", evento: "Primeira viagem juntos" }, { ano: "2023", evento: "Pedido de casamento" }, { ano: "2026", evento: "O grande dia" }].map((item) => (
-                      <div key={item.ano} style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "13px", color: "#C9A96E", fontWeight: 600, minWidth: "40px" }}>{item.ano}</span>
-                        <div style={{ width: "1px", height: "16px", background: "#D4A5A5" }} />
-                        <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "13px", color: "#555", fontWeight: 300 }}>{item.evento}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-[14px] text-[#555] leading-relaxed font-light">
+                    Tudo começou em uma tarde comum que se tornou extraordinária. Um encontro inesperado, um sorriso tímido, e a certeza de que algo especial havia começado.
+                  </p>
                 </div>
-              </section>
-            </FadeSection>
-
-            {/* SEÇÃO 3: GALERIA COM CARROSSEL */}
-            <FadeSection>
-              <section style={{ marginBottom: "80px" }}>
-                <SectionDivider number="03" title="Galeria de Fotos" />
-                <Carrossel />
-              </section>
-            </FadeSection>
-
-            {/* SEÇÃO 4: LOCALIZAÇÃO */}
-            <FadeSection>
-              <section style={{ marginBottom: "80px" }}>
-                <SectionDivider number="04" title="Localização" />
-                <div style={{ textAlign: "center", marginBottom: "24px" }}>
-                  <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "20px", color: "#2C2C2C", marginBottom: "4px" }}>Celeiro Quintal</p>
-                  <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "15px", color: "#888", fontWeight: 300 }}>R. Cônego Eugênio Leite, 1098 — Pinheiros, São Paulo — SP</p>
-                  <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "15px", color: "#C4876A", marginTop: "4px" }}>05 de Dezembro de 2026</p>
-                </div>
-                <div style={{ borderRadius: "3px", overflow: "hidden", border: "1px solid #E8CECE", marginBottom: "20px" }}>
-                  <iframe width="100%" height="300" src="https://maps.google.com/maps?q=R.+C%C3%B4nego+Eug%C3%AAnio+Leite%2C+1098+-+Pinheiros%2C+S%C3%A3o+Paulo+-+SP&t=&z=15&ie=UTF8&iwloc=&output=embed" style={{ border: 0, display: "block" }} title="Localização" loading="lazy" />
-                </div>
-                </section>
-            </FadeSection>
-
-            {/* SEÇÃO 5: PRESENTES */}
-            <FadeSection>
-              <section style={{ marginBottom: "80px" }}>
-                <SectionDivider number="05" title="Lista de Presentes" />
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "20px" }}>
-                  {PRESENTES.map((presente, i) => (
-                    <div key={i} style={{ border: "1px solid #E8CECE", padding: "28px 24px", textAlign: "center", backgroundColor: "#FDFAF6", transition: "all 0.3s ease" }} className="presente-card">
-                      <span style={{ fontSize: "28px", display: "block", marginBottom: "12px" }}>{presente.emoji}</span>
-                      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "18px", color: "#2C2C2C", marginBottom: "8px" }}>{presente.nome}</h3>
-                      <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "12px", color: "#888", marginBottom: "12px", lineHeight: 1.6 }}>{presente.descricao}</p>
-                      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "16px", color: "#C4876A", marginBottom: "16px" }}>{presente.valor}</p>
-                      <button className="wedding-btn" onClick={() => togglePix(i)} style={{ fontSize: "10px", padding: "10px 24px" }}>{pixVisivel[i] ? "Ocultar PIX" : "Presentear"}</button>
-                      {pixVisivel[i] && (
-                        <div style={{ marginTop: "16px", padding: "12px", backgroundColor: "#F5E8E8", border: "1px solid #D4A5A5", borderRadius: "2px" }}>
-                          <div style={{ backgroundColor: "#FFF3CD", border: "1px solid #FFE69C", padding: "10px 12px", marginBottom: "12px", textAlign: "left" }}>
-                            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "10px", color: "#856404", margin: 0, lineHeight: 1.4 }}>
-                              ⚠️ <strong>Segurança:</strong> Antes de realizar a transferência, confirme o nome do destinatário.
-                            </p>
-                          </div>
-                          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "11px", color: "#888", marginBottom: "4px", textTransform: "uppercase" }}>CHAVE PIX</p>
-                          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "13px", color: "#2C2C2C", wordBreak: "break-all", backgroundColor: "#FDFAF6", padding: "8px", border: "1px solid #E8CECE" }}>{presente.pix}</p>
-                          <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "10px", color: "#888", marginTop: "8px", fontStyle: "italic" }}>Destinatário: <strong>Daniel & Mariana</strong></p>
-                          <button onClick={() => navigator.clipboard.writeText(presente.pix)} style={{ marginTop: "8px", fontFamily: "'Lato', sans-serif", fontSize: "10px", color: "#C4876A", background: "none", border: "none", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.1em" }}>Copiar chave</button>
-                        </div>
-                      )}
+                <div className="space-y-4">
+                  {[{ ano: "2020", e: "Primeiro encontro" }, { ano: "2023", e: "Pedido de casamento" }, { ano: "2026", e: "O grande dia" }].map((item) => (
+                    <div key={item.ano} className="flex items-center gap-4 justify-center md:justify-start">
+                      <span className="font-bold text-[#C9A96E] w-10 text-[13px]">{item.ano}</span>
+                      <div className="w-[1px] h-4 bg-[#D4A5A5]" />
+                      <span className="text-[13px] text-[#555] font-light">{item.e}</span>
                     </div>
                   ))}
                 </div>
-              </section>
+              </div>
             </FadeSection>
 
-            {/* SEÇÃO 6: RSVP */}
-            <FadeSection>
-              <section style={{ marginBottom: "60px" }}>
-                <SectionDivider number="06" title="Confirmação de Presença" />
-                {sucesso ? (
-                  <div style={{ textAlign: "center", padding: "40px 16px" }}>
-                    <p style={{ fontSize: "48px", marginBottom: "16px" }}>💌</p>
-                    <h3 style={{ fontFamily: "'Great Vibes', cursive", fontSize: "38px", color: "#C4876A", marginBottom: "16px" }}>Obrigado!</h3>
-                    <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "14px", color: "#555", fontWeight: 300, lineHeight: 1.7 }}>Sua resposta foi registrada com sucesso.<br />Estamos ansiosos para celebrar com você!</p>
-                    {resposta === "Confirmado" && (
-                      <div style={{ marginTop: "32px", padding: "32px", backgroundColor: "#F5EEEB", border: "1px solid #E8CECE", animation: "fadeIn 0.8s ease", textAlign: "center" }}>
-                        <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "24px", color: "#2C2C2C", marginBottom: "4px" }}>Manual do Convidado</h4>
-                        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "12px", color: "#C9A96E", marginBottom: "24px", fontStyle: "italic", letterSpacing: "0.05em" }}>Consciente</p>
-                        <img src="https://i.pinimg.com/736x/e5/00/3f/e5003ff83e060a19dc7d81ad98f52fa7.jpg" alt="Manual do Convidado" style={{ width: "100%", maxWidth: "500px", height: "auto", objectFit: "contain", display: "block", margin: "0 auto", borderRadius: "2px" }} />
+            {/* GALERIA */}
+            <FadeSection className="mb-20">
+              <SectionDivider number="03" title="Galeria de Fotos" />
+              <Carrossel />
+            </FadeSection>
+
+            {/* LOCALIZAÇÃO */}
+            <FadeSection className="mb-20">
+              <SectionDivider number="04" title="Localização" />
+              <div className="text-center mb-6">
+                <p className="font-['Cormorant_Garamond'] text-[22px] text-[#2C2C2C]">Celeiro Quintal</p>
+                <p className="text-[14px] text-[#888] font-light">R. Cônego Eugênio Leite, 1098 — Pinheiros, São Paulo</p>
+              </div>
+              <div className="rounded-sm overflow-hidden border border-[#E8CECE] h-[250px] md:h-[400px]">
+                <iframe 
+                  width="100%" height="100%" 
+                  src="https://maps.google.com/maps?q=Celeiro+Quintal+Pinheiros&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                  className="border-0" title="Mapa" loading="lazy" 
+                />
+              </div>
+            </FadeSection>
+
+            {/* PRESENTES */}
+            <FadeSection className="mb-20">
+              <SectionDivider number="05" title="Lista de Presentes" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {PRESENTES.map((p, i ) => (
+                  <div key={i} className="border border-[#E8CECE] p-8 text-center bg-white/50 hover:shadow-md transition-shadow">
+                    <span className="text-3xl block mb-4">{p.emoji}</span>
+                    <h3 className="font-['Cormorant_Garamond'] text-[18px] mb-2">{p.nome}</h3>
+                    <p className="text-[12px] text-[#888] mb-4 h-10">{p.descricao}</p>
+                    <p className="text-[#C4876A] font-bold mb-6">{p.valor}</p>
+                    <button 
+                      onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })}
+                      className="text-[10px] tracking-widest uppercase border border-[#2C2C2C] px-6 py-2 hover:bg-[#2C2C2C] hover:text-[#FDFAF6] transition-all"
+                    >
+                      {pixVisivel[i] ? "Fechar" : "Presentear"}
+                    </button>
+                    {pixVisivel[i] && (
+                      <div className="mt-4 p-4 bg-[#F5E8E8] text-[11px] animate-in fade-in zoom-in duration-300">
+                        <p className="text-[#888] uppercase mb-1">Chave PIX</p>
+                        <p className="font-mono break-all bg-white p-2 border border-[#D4A5A5]">{p.pix}</p>
+                        <button 
+                          onClick={() => { navigator.clipboard.writeText(p.pix); alert("Copiado!"); }}
+                          className="mt-2 text-[#C4876A] uppercase tracking-tighter"
+                        >
+                          Copiar Chave
+                        </button>
                       </div>
                     )}
                   </div>
-                ) : (
-                  <div style={{ maxWidth: "500px", margin: "0 auto" }}>
-                    <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "13px", color: "#555", marginBottom: "20px", textAlign: "center" }}>Você irá comparecer?</p>
-                    
-                    {/* BALÃO DE LEMBRETE */}
-                    {mostrarLembrete && (
-                      <div style={{ backgroundColor: "#C4876A", color: "white", padding: "12px 16px", borderRadius: "8px", fontSize: "13px", textAlign: "center", marginBottom: "16px", position: "relative", animation: "bounceIn 0.5s ease" }}>
-                        ✨ Não esqueça de informar seus acompanhantes abaixo!
-                        <div style={{ position: "absolute", bottom: "-8px", left: "50%", transform: "translateX(-50%)", borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: "8px solid #C4876A" }} />
-                      </div>
-                    )}
+                ))}
+              </div>
+            </FadeSection>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "32px" }}>
-                      {[{ v: "Confirmado", l: "Confirmo minha presença" }, { v: "Talvez", l: "Ainda não tenho certeza" }, { v: "Não Irá", l: "Não poderei comparecer" }].map((o) => (
-                        <label key={o.v} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "16px 20px", border: `1px solid ${resposta === o.v ? "#C4876A" : "#E8CECE"}`, cursor: "pointer", backgroundColor: resposta === o.v ? "#FFF4F0" : "#FDFAF6", transition: "all 0.3s ease" }}>
-                          <input type="radio" name="r" checked={resposta === o.v} onChange={() => handleRespostaChange(o.v)} style={{ accentColor: "#C4876A" }} />
-                          <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "13px", color: "#2C2C2C" }}>{o.l}</span>
-                        </label>
-                      ))}
-                    </div>
-
-                    {resposta === "Confirmado" && (
-                      <div style={{ animation: "fadeIn 0.5s ease" }}>
-                        {/* ADULTOS */}
-                        {convidadoSelecionado.limite > 0 && (
-                          <div style={{ marginBottom: "24px" }}>
-                            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "12px", color: "#C9A96E", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "0.1em" }}>Adultos Acompanhantes</p>
-                            {adultos.map((a, i) => (
-                              <div key={i} style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                                <input placeholder="Nome do adulto" value={a.nome} onChange={(e) => { const n = [...adultos]; n[i].nome = e.target.value; setAdultos(n); }} style={{ flex: 1, padding: "14px", border: "1px solid #E8CECE", fontSize: "13px", backgroundColor: "transparent", outline: "none" }} />
-                                <button onClick={() => setAdultos(adultos.filter((_, idx) => idx !== i))} style={{ color: "#D4A5A5", background: "none", border: "none", cursor: "pointer", fontSize: "18px" }}>✕</button>
-                              </div>
-                            ))}
-                            {podeAdicionarAcompanhante && (
-                              <button onClick={() => setAdultos([...adultos, { nome: "" }])} className="wedding-add-btn">+ Adicionar Adulto</button>
-                            )}
-                          </div>
-                        )}
-                        {/* CRIANÇAS */}
-                        {convidadoSelecionado.limite > 0 && (
-                          <div style={{ marginBottom: "24px" }}>
-                            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "12px", color: "#C9A96E", marginBottom: "12px", textTransform: "uppercase", letterSpacing: "0.1em" }}>Crianças</p>
-                            {criancas.map((c, i) => (
-                              <div key={i} style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-                                <input placeholder="Nome" value={c.nome} onChange={(e) => { const n = [...criancas]; n[i].nome = e.target.value; setCriancas(n); }} style={{ flex: 2, padding: "14px", border: "1px solid #E8CECE", fontSize: "13px", backgroundColor: "transparent", outline: "none" }} />
-                                <input placeholder="Idade" value={c.idade} onChange={(e) => { const n = [...criancas]; n[i].idade = e.target.value; setCriancas(n); }} style={{ flex: 1, padding: "14px", border: "1px solid #E8CECE", fontSize: "13px", backgroundColor: "transparent", outline: "none" }} />
-                                <button onClick={() => setCriancas(criancas.filter((_, idx) => idx !== i))} style={{ color: "#D4A5A5", background: "none", border: "none", cursor: "pointer", fontSize: "18px" }}>✕</button>
-                              </div>
-                            ))}
-                            {podeAdicionarAcompanhante && (
-                              <button onClick={() => setCriancas([...criancas, { nome: "", idade: "" }])} className="wedding-add-btn">+ Adicionar Criança</button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {(resposta === "Confirmado" || resposta === "Não Irá") && (
-                      <div style={{ marginBottom: "32px", animation: "fadeIn 0.5s ease" }}>
-                        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "12px", color: "#C9A96E", marginBottom: "12px", textTransform: "uppercase" }}>Mensagem para os noivos</p>
-                        <textarea placeholder="Deixe uma mensagem carinhosa..." value={mensagem} onChange={(e) => setMensagem(e.target.value)} style={{ width: "100%", padding: "16px", border: "1px solid #E8CECE", minHeight: "100px", backgroundColor: "transparent", outline: "none", resize: "none", fontFamily: "'Lato', sans-serif", fontSize: "13px" }} />
-                      </div>
-                    )}
-
-                    {resposta && (
-                      <button onClick={handleSubmit} disabled={confirmarPresenca.isPending} className="wedding-btn submit-btn" style={{ width: "100%", padding: "20px" }}>
-                        {confirmarPresenca.isPending ? "Enviando..." : "Enviar Resposta"}
+            {/* RSVP FORM */}
+            <FadeSection className="mb-20 bg-white/30 p-8 md:p-12 border border-[#E8CECE]">
+              <SectionDivider number="06" title="RSVP" />
+              {sucesso ? (
+                <div className="text-center py-10">
+                  <p className="text-4xl mb-4">💌</p>
+                  <h3 className="font-['Halimun'] text-[32px] text-[#C4876A]">Obrigado!</h3>
+                  <p className="text-[#555] font-light mt-4">Sua resposta foi registrada com sucesso.</p>
+                </div>
+              ) : (
+                <div className="max-w-[500px] mx-auto space-y-6">
+                  <div className="flex justify-center gap-4">
+                    {["Confirmado", "Não Irá"].map((op) => (
+                      <button
+                        key={op}
+                        onClick={() => setResposta(op)}
+                        className={`px-6 py-3 text-[12px] tracking-widest uppercase border transition-all ${
+                          resposta === op ? "bg-[#2C2C2C] text-white border-[#2C2C2C]" : "border-[#E8CECE] text-[#888]"
+                        }`}
+                      >
+                        {op}
                       </button>
-                    )}
+                    ))}
                   </div>
-                )}
-              </section>
+                  {resposta && (
+                    <button 
+                      onClick={() => setSucesso(true)}
+                      className="w-full bg-[#C4876A] text-white py-4 tracking-[0.2em] uppercase text-[12px] hover:bg-[#B37555] transition-colors mt-6"
+                    >
+                      Enviar Resposta
+                    </button>
+                  )}
+                </div>
+              )}
             </FadeSection>
           </div>
         )}
-      </div>
+      </main>
 
-      <footer style={{ textAlign: "center", padding: "40px 20px", borderTop: "1px solid #E8CECE" }}>
-        <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "10px", color: "#888", letterSpacing: "0.2em", textTransform: "uppercase" }}>Feito com amor para Daniel & Mariana</p>
+      {/* Footer Simples */}
+      <footer className="py-10 border-t border-[#E8CECE] text-center opacity-40 text-[10px] tracking-[0.3em] uppercase">
+        Mariana & Daniel &copy; 2026
       </footer>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Great+Vibes&family=Lato:wght@300;400;700&display=swap');
-        
-        .wedding-btn { background-color: #2C2C2C; color: #FDFAF6; border: none; padding: 14px 32px; font-family: 'Lato', sans-serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; }
-        .wedding-btn:hover { background-color: #C4876A; transform: translateY(-2px); }
-        .wedding-btn:disabled { background-color: #ccc; cursor: not-allowed; transform: none; }
-
-        .wedding-add-btn { width: 100%; font-family: 'Lato', sans-serif; font-size: 11px; color: #C4876A; background: none; border: 1px dashed #C4876A; padding: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.3s ease; margin-top: 4px; }
-        .wedding-add-btn:hover { background-color: #FFF4F0; }
-
-        .carousel-btn:hover { background: rgba(0,0,0,0.7) !important; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.05); } 70% { transform: scale(0.9); } 100% { transform: scale(1); } }
-
-        @media (max-width: 768px) {
-          header { padding: 16px; }
-          .wedding-btn { padding: 18px 24px !important; font-size: 13px !important; }
-          h1 { font-size: 30px !important; }
-          h2 { font-size: 34px !important; }
-          p, span, label { font-size: 16px !important; }
-          input, textarea { font-size: 16px !important; padding: 16px !important; }
-          section { margin-bottom: 60px !important; }
-          .presente-card { padding: 20px 16px !important; }
-          .hero-section { min-height: calc(100vh - 80px) !important; }
-          .submit-btn { font-size: 14px !important; padding: 22px !important; }
-        }
-
-        @media (max-width: 640px) {
-          .carousel-container { gap: 8px !important; }
-        }
-      `}</style>
     </div>
   );
 }
