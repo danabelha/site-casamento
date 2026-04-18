@@ -40,7 +40,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#2C2C2C] max-w-[2000px] mx-auto">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-wedding-charcoal max-w-[2000px] mx-auto">
       
       {/* Background Image */}
       <div
@@ -66,22 +66,22 @@ export default function Home() {
         }`}
       >
         {/* Pré-título */}
-        <p className="font-['Montserrat'] text-[14px] md:text-[28px] tracking-[0.15em] uppercase text-[#C9A96E] font-normal mb-6">
+        <p className="font-montserrat text-[14px] md:text-[28px] tracking-[0.15em] uppercase text-wedding-gold font-normal mb-6">
           E enfim, o nosso casamento
         </p>
 
-        {/* Nomes do Casal - SEM QUEBRA DE LINHA */}
-        <h1 className="font-['Halimun'] text-[32px] sm:text-[42px] md:text-[80px] lg:text-[110px] whitespace-nowrap leading-tight text-[#FDFAF6] mb-8 drop-shadow-2xl">
+        {/* Nomes do Casal */}
+        <h1 className="font-halimun text-[32px] sm:text-[42px] md:text-[80px] lg:text-[110px] whitespace-nowrap leading-tight text-wedding-cream mb-8 drop-shadow-2xl">
           Mariana & Daniel
         </h1>
 
         {/* Data e Local */}
-        <p className="font-['Montserrat'] text-[12px] md:text-[20px] text-[#FDFAF6]/85 tracking-[0.2em] font-normal mb-10">
+        <p className="font-montserrat text-[12px] md:text-[20px] text-wedding-cream/85 tracking-[0.2em] font-normal mb-10">
           05 de Dezembro de 2026 &nbsp;·&nbsp; São Paulo
         </p>
 
-        {/* Contador Regressivo - TUDO EM UMA LINHA SÓ */}
-        <div className="inline-flex items-center justify-center gap-2 sm:gap-4 md:gap-0 mb-12 py-3 border-y border-[#C9A96E]/40 w-full sm:w-auto">
+        {/* Contador Regressivo */}
+        <div className="inline-flex items-center justify-center gap-2 sm:gap-4 md:gap-0 mb-12 py-3 border-y border-wedding-gold/40 w-full sm:w-auto">
           {[
             { valor: tempoRestante.dias, label: "Dias" },
             { valor: tempoRestante.horas, label: "Horas" },
@@ -91,13 +91,13 @@ export default function Home() {
             <div
               key={item.label}
               className={`flex flex-col items-center px-2 sm:px-4 md:px-8 ${
-                i < 3 ? "border-r border-[#C9A96E]/30" : ""
+                i < 3 ? "border-r border-wedding-gold/30" : ""
               }`}
             >
-              <span className="font-['Montserrat'] text-[22px] sm:text-[28px] md:text-[48px] text-[#FDFAF6] font-light leading-none">
+              <span className="font-montserrat text-[22px] sm:text-[28px] md:text-[48px] text-wedding-cream font-light leading-none">
                 {String(item.valor).padStart(2, "0")}
               </span>
-              <span className="font-['Montserrat'] text-[9px] sm:text-[11px] md:text-[18px] tracking-[0.2em] uppercase text-[#C9A96E] mt-1 font-normal">
+              <span className="font-montserrat text-[9px] sm:text-[11px] md:text-[18px] tracking-[0.2em] uppercase text-wedding-gold mt-1 font-normal">
                 {item.label}
               </span>
             </div>
@@ -107,7 +107,7 @@ export default function Home() {
         {/* Botão CTA */}
         <div className="mt-4">
           <Link href="/confirmacao">
-            <span className="inline-block border border-[#FDFAF6]/70 text-[#FDFAF6] px-8 sm:px-12 py-4 font-['Montserrat'] text-[12px] md:text-[14px] font-normal tracking-[0.4em] md:tracking-[0.8em] uppercase cursor-pointer backdrop-blur-sm bg-[#FDFAF6]/10 transition-all hover:bg-[#FDFAF6]/20 hover:border-[#FDFAF6]">
+            <span className="inline-block border border-wedding-cream/70 text-wedding-cream px-8 sm:px-12 py-4 font-montserrat text-[12px] md:text-[14px] font-normal tracking-[0.4em] md:tracking-[0.8em] uppercase cursor-pointer backdrop-blur-sm bg-wedding-cream/10 transition-all hover:bg-wedding-cream/20 hover:border-wedding-cream">
               Confirmar Presença
             </span>
           </Link>
@@ -116,7 +116,7 @@ export default function Home() {
 
       {/* Link Admin */}
       <Link href="/admin">
-        <div className="fixed bottom-4 right-4 text-[9px] text-[#C9A96E]/30 cursor-pointer font-['Montserrat'] tracking-widest uppercase hover:text-[#C9A96E]/70 transition-colors z-50">
+        <div className="fixed bottom-4 right-4 text-[9px] text-wedding-gold/30 cursor-pointer font-montserrat tracking-widest uppercase hover:text-wedding-gold/70 transition-colors z-50">
           admin
         </div>
       </Link>
