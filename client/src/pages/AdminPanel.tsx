@@ -46,7 +46,7 @@ export default function AdminPanel() {
   const [isLogged, setIsLogged] = useState(!!adminPass);
 
   // Configuração do tRPC
-  const utils = trpc.useUtils();
+  //const utils = trpc.useUtils();
   
   // Atualizado de .admin para .adminRouter conforme mudança no backend
   const { data: convidados, isLoading, error } = trpc.adminRouter.getAllConvidados.useQuery(undefined, {
