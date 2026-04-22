@@ -5,7 +5,7 @@ import heroImage from "../assets/images/home.webp";
 <div
   className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55]"
   style={{
-    backgroundImage: `url(${heroImage})`, // Agora ele usa o arquivo local otimizado
+    backgroundImage: `url(${heroImage})`, 
     backgroundPosition: "center 45%",
   }}
 />

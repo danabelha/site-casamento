@@ -1,20 +1,25 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "commonjs",
+    "module": "ESNext",
     "lib": ["ES2020"],
     "outDir": "./dist",
     "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
-    "composite": false, // Certifique-se de que isso NÃO seja true se não estiver usando project references
-    "moduleResolution": "bundler", // Ou "NodeNext" se estiver usando ESM
+    "composite": false, 
+    "moduleResolution": "node", 
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "declaration": false,
     "declarationMap": false,
-    "sourceMap": true
+    "sourceMap": true,
+     "baseUrl": ".",
+      "paths": {
+      "*": ["node_modules/*"]
+    }
+  
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]
