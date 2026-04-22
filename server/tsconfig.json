@@ -7,11 +7,13 @@
     "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
+    "composite": false, // Certifique-se de que isso NÃO seja true se não estiver usando project references
+    "moduleResolution": "bundler", // Ou "NodeNext" se estiver usando ESM
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
+    "declaration": false,
+    "declarationMap": false,
     "sourceMap": true
   },
   "include": ["**/*.ts"],

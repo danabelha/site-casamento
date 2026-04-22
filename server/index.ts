@@ -16,7 +16,7 @@ app.use(
   '/trpc',
   trpcExpress.createExpressMiddleware({
     router: appRouter,
-    createContext: ({ req, res }) => ({ req, res }), // ISSO É VITAL!
+    createContext: ({ req, res, info }) => ({ req, res, info }),
   }),
 );
 

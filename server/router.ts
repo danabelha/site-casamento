@@ -1,5 +1,7 @@
 import { initTRPC, TRPCError } from "@trpc/server";
+import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import { z } from "zod";
+// @ts-ignore
 import {
   buscarConvidados,
   salvarConfirmacao,
@@ -9,41 +11,39 @@ import {
   deletarConvidado,
 } from "./googleSheets";
 
-// 1. Inicialização do tRPC com definição de contexto básica para evitar erros de tipagem
-// Se estiver usando Express, o contexto geralmente contém { req, res }
-const t = initTRPC.context<any>().create();
+// 1. Definição do Contexto
+export type Context = CreateExpressContextOptions;
 
-// 2. Middleware de Autenticação
+// 2. Inicialização do tRPC
+const t = initTRPC.context<Context>().create();
+
+// 3. Procedures e Middlewares
+const publicProcedure = t.procedure;
+
 const isAdmin = t.middleware(async ({ next, ctx }) => {
-  // O tRPC pega o cabeçalho 'x-admin-password' do contexto (passado pelo adapter do Express)
-  const password = ctx.req?.headers["x-admin-password"];
-  
+  const password = ctx.req.headers["x-admin-password"];
   if (!password || password !== process.env.ADMIN_PASSWORD) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "Acesso negado: Senha administrativa incorreta ou ausente.",
     });
   }
-  
   return next();
 });
 
-// 3. Definição da Procedure Protegida
-const adminProcedure = t.procedure.use(isAdmin);
+const adminProcedure = publicProcedure.use(isAdmin);
 
-// 4. Definição das Rotas (Router)
-export const appRouter = t.router({
-  
-  // --- ROTAS PÚBLICAS ---
-  
-  searchConvidados: t.procedure
+// 4. Definição do Router
+// Para resolver o erro TS2883, definimos o router e exportamos o tipo separadamente.
+// O segredo aqui é não deixar o TS tentar gerar um arquivo .d.ts complexo.
+const appRouter = t.router({
+  searchConvidados: publicProcedure
     .input(z.object({ nome: z.string() }))
     .mutation(async ({ input }) => {
-      const result = await buscarConvidados(input.nome);
-      return result;
+      return await buscarConvidados(input.nome);
     }),
 
-  confirmarPresenca: t.procedure
+  confirmarPresenca: publicProcedure
     .input(
       z.object({
         id: z.string(),
@@ -60,8 +60,6 @@ export const appRouter = t.router({
       return { success: ok };
     }),
 
-  // --- ROTAS PRIVADAS ---
-  // IMPORTANTE: Mudamos de 'admin' para 'adminRouter' para evitar conflito com métodos internos do tRPC
   adminRouter: t.router({
     getAllConvidados: adminProcedure.query(async () => {
       return await buscarTodosConvidados();
@@ -115,7 +113,7 @@ export const appRouter = t.router({
         menores8: 0,
       };
 
-      convidados.forEach((c) => {
+      convidados.forEach((c: any) => {
         if (c.status === "Confirmado") stats.confirmados++;
         else if (c.status === "Não Irá") stats.naoIrao++;
         else if (c.status === "Talvez") stats.talvez++;
@@ -131,4 +129,6 @@ export const appRouter = t.router({
   }),
 });
 
+// Exportamos o router como padrão ou nomeado, mas o tipo é o que importa para o frontend
+export { appRouter };
 export type AppRouter = typeof appRouter;
