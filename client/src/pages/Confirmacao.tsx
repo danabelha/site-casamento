@@ -160,56 +160,87 @@ function Carrossel() {
     if (isRightSwipe) handlePrev();
   };
 
+  // Função para pegar o index correto lidando com o loop
+  const getIndex = (offset: number) => {
+    return (currentIndex + offset + GALLERY_IMAGES.length) % GALLERY_IMAGES.length;
+  };
+
   return (
     <div 
-      className="relative w-full mb-6 overflow-hidden pb-8" 
+      className="relative w-full mb-12 overflow-hidden px-4" 
       onTouchStart={onTouchStart} 
       onTouchMove={onTouchMove} 
       onTouchEnd={onTouchEnd}
     >
-      {/* Container do Carrossel */}
-      <div className="flex items-center justify-center gap-2 sm:gap-4 perspective-[1000px] min-h-[300px] md:min-h-[450px]">
-        {/* Foto Esquerda */}
-        <div className="flex-[0_0_90%] sm:flex-[0_0_380px] z-10 transition-all duration-500">
+      {/* Container Principal do Carrossel */}
+      <div className="relative flex items-center justify-center h-[300px] md:h-[500px] w-full max-w-6xl mx-auto">
+        
+        {/* Foto Esquerda (Preview) */}
+        <div 
+          className="absolute left-0 w-[20%] md:w-[25%] aspect-[3/4] opacity-40 scale-75 blur-[1px] transition-all duration-700 ease-in-out cursor-pointer z-0 hidden sm:block"
+          onClick={handlePrev}
+        >
           <img 
-            src={GALLERY_IMAGES[currentIndex]} 
-            className="w-full h-auto rounded-sm shadow-xl object-cover pointer-events-none" 
-            alt="Nossa Galeria" 
-            loading="lazy" // <-- ISSO É O LAZY LOADING (Performance Pura!)
-            decoding="async" // Ajuda o navegador a não travar a UI durante o decode
+            src={GALLERY_IMAGES[getIndex(-1)]} 
+            alt="Anterior" 
+            className="w-full h-full object-cover rounded-sm shadow-md"
           />
         </div>
 
         {/* Foto Central (Destaque) */}
-        <div className="flex-[0_0_90%] sm:flex-[0_0_380px] z-10 transition-all duration-500">
-          <img src={GALLERY_IMAGES[currentIndex]} alt={`Foto ${currentIndex + 1}`} className="w-full h-auto object-cover rounded-sm shadow-xl pointer-events-none" />
+        <div className="relative w-[85%] sm:w-[50%] md:w-[45%] aspect-[3/4] z-20 transition-all duration-700 ease-in-out">
+          <img 
+            src={GALLERY_IMAGES[currentIndex]} 
+            alt={`Foto ${currentIndex + 1}`} 
+            className="w-full h-full object-cover rounded-sm shadow-2xl border border-white/10" 
+          />
+          
+          {/* Gradiente suave sobre a foto principal para dar profundidade */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20 rounded-sm pointer-events-none" />
         </div>
 
-        {/* Foto Direita */}
+        {/* Foto Direita (Preview) */}
         <div 
-          className="hidden sm:block flex-[0_0_140px] opacity-60 cursor-pointer transition-all duration-500 scale-85"
-          onClick={() => handleImageClick((currentIndex + 1) % GALLERY_IMAGES.length)}
+          className="absolute right-0 w-[20%] md:w-[25%] aspect-[3/4] opacity-40 scale-75 blur-[1px] transition-all duration-700 ease-in-out cursor-pointer z-0 hidden sm:block"
+          onClick={handleNext}
         >
-          <img src={GALLERY_IMAGES[(currentIndex + 1) % GALLERY_IMAGES.length]} alt="Próxima foto" className="w-full h-auto object-cover rounded-sm" />
+          <img 
+            src={GALLERY_IMAGES[getIndex(1)]} 
+            alt="Próxima" 
+            className="w-full h-full object-cover rounded-sm shadow-md"
+          />
         </div>
+
+        {/* Setas de Navegação Estilizadas */}
+        <button 
+          onClick={handlePrev} 
+          className="absolute left-4 md:left-10 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white/80 hover:bg-white text-wedding-charcoal rounded-full shadow-lg z-30 transition-all active:scale-95 group"
+          title="Anterior"
+        >
+          <span className="text-2xl group-hover:-translate-x-0.5 transition-transform">‹</span>
+        </button>
+        
+        <button 
+          onClick={handleNext} 
+          className="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white/80 hover:bg-white text-wedding-charcoal rounded-full shadow-lg z-30 transition-all active:scale-95 group"
+          title="Próxima"
+        >
+          <span className="text-2xl group-hover:translate-x-0.5 transition-transform">›</span>
+        </button>
       </div>
 
-      {/* Setas de Navegação (Visíveis apenas no desktop ou onde o swipe não é o foco principal) */}
-      <button onClick={handlePrev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white border-none w-10 h-10 rounded-sm cursor-pointer text-xl z-20 hover:bg-black/70 transition-all hidden md:block" title="Foto anterior">
-        ‹
-      </button>
-      <button onClick={handleNext} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white border-none w-10 h-10 rounded-sm cursor-pointer text-xl z-20 hover:bg-black/70 transition-all hidden md:block" title="Próxima foto">
-        ›
-      </button>
-
-      {/* Indicadores */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2 z-15">
+      {/* Indicadores Minimalistas */}
+      <div className="flex justify-center gap-3 mt-8">
         {GALLERY_IMAGES.map((_, i) => (
-          <div 
+          <button 
             key={i} 
             onClick={() => handleImageClick(i)} 
-            className={`h-2 rounded-full cursor-pointer transition-all duration-300 ${currentIndex === i ? "w-6 bg-wedding-terracotta" : "w-2 bg-wedding-terracotta/30"}`}
-            title={`Foto ${i + 1}`} 
+            className={`transition-all duration-500 rounded-full ${
+              currentIndex === i 
+                ? "w-8 h-1.5 bg-wedding-gold" 
+                : "w-1.5 h-1.5 bg-wedding-gold/30 hover:bg-wedding-gold/50"
+            }`}
+            aria-label={`Ir para foto ${i + 1}`}
           />
         ))}
       </div>
