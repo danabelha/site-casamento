@@ -8,18 +8,18 @@
     "strict": true,
     "esModuleInterop": true,
     "composite": false, 
-    "moduleResolution": "node", 
+    /* 
+       Mudamos para "bundler" se você usa ferramentas modernas de build, 
+       ou mantemos "node" com o silenciador de depreciação.
+    */
+    "moduleResolution": "bundler", 
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "declaration": false,
     "declarationMap": false,
     "sourceMap": true,
-     "baseUrl": ".",
-      "paths": {
-      "*": ["node_modules/*"]
-    }
-  
+    "ignoreDeprecations": "6.0"
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]
