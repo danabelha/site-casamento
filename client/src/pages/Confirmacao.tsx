@@ -7,15 +7,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "../lib/trpc";
+import img1 from "../assets/images/img1.webp";
+import img2 from "../assets/images/img2.webp";
+import img3 from "../assets/images/img3.webp";
+import img4 from "../assets/images/img4.webp";
+import img5 from "../assets/images/img5.webp";
+import img6 from "../assets/images/img6.webp";
 
 // ===== CONSTANTES =====
 
-const GALLERY_IMAGES = [
-  "https://i.pinimg.com/736x/c0/bc/f8/c0bcf84c9b1f88e70d63f72a3ab87f44.jpg",
-  "https://i.pinimg.com/736x/d6/31/ae/d631aeb49b7fb2104f804c9f4da05042.jpg",
-  "https://i.pinimg.com/736x/25/40/70/254070ff05550f897f4a850e6786c884.jpg",
-  "https://i.pinimg.com/736x/a3/94/f2/a394f25f3491c43b14e44cee714aae35.jpg",
-];
+const GALLERY_IMAGES = [img1, img2, img3, img4, img5, img6];
 
 const PRESENTES = [
   {
@@ -169,11 +170,14 @@ function Carrossel() {
       {/* Container do Carrossel */}
       <div className="flex items-center justify-center gap-2 sm:gap-4 perspective-[1000px] min-h-[300px] md:min-h-[450px]">
         {/* Foto Esquerda */}
-        <div 
-          className="hidden sm:block flex-[0_0_140px] opacity-60 cursor-pointer transition-all duration-500 scale-85"
-          onClick={() => handleImageClick((currentIndex - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length)}
-        >
-          <img src={GALLERY_IMAGES[(currentIndex - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length]} alt="Foto anterior" className="w-full h-auto object-cover rounded-sm" />
+        <div className="flex-[0_0_90%] sm:flex-[0_0_380px] z-10 transition-all duration-500">
+          <img 
+            src={GALLERY_IMAGES[currentIndex]} 
+            className="w-full h-auto rounded-sm shadow-xl object-cover pointer-events-none" 
+            alt="Nossa Galeria" 
+            loading="lazy" // <-- ISSO É O LAZY LOADING (Performance Pura!)
+            decoding="async" // Ajuda o navegador a não travar a UI durante o decode
+          />
         </div>
 
         {/* Foto Central (Destaque) */}

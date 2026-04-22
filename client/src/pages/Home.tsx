@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
+import heroImage from "../assets/images/home.webp";
 
-const HERO_IMAGE = "https://i.pinimg.com/736x/e5/23/2a/e5232aef9f2e9267bb121ea3bb7fc768.jpg";
+<div
+  className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55]"
+  style={{
+    backgroundImage: `url(${heroImage})`, // Agora ele usa o arquivo local otimizado
+    backgroundPosition: "center 45%",
+  }}
+/>
 
 interface TimeLeft {
   dias: number;
@@ -46,7 +53,7 @@ export default function Home() {
       <div
         className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55]"
         style={{
-          backgroundImage: `url(${HERO_IMAGE})`,
+          backgroundImage: `url(${heroImage})`,
           backgroundPosition: "center 45%",
         }}
       />

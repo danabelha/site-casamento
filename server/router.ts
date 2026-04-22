@@ -1,4 +1,4 @@
-import { initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
   buscarConvidados,
@@ -9,19 +9,40 @@ import {
   deletarConvidado,
 } from "./googleSheets";
 
-const t = initTRPC.create();
+// 1. Inicialização do tRPC com definição de contexto básica para evitar erros de tipagem
+// Se estiver usando Express, o contexto geralmente contém { req, res }
+const t = initTRPC.context<any>().create();
 
+// 2. Middleware de Autenticação
+const isAdmin = t.middleware(async ({ next, ctx }) => {
+  // O tRPC pega o cabeçalho 'x-admin-password' do contexto (passado pelo adapter do Express)
+  const password = ctx.req?.headers["x-admin-password"];
+  
+  if (!password || password !== process.env.ADMIN_PASSWORD) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Acesso negado: Senha administrativa incorreta ou ausente.",
+    });
+  }
+  
+  return next();
+});
+
+// 3. Definição da Procedure Protegida
+const adminProcedure = t.procedure.use(isAdmin);
+
+// 4. Definição das Rotas (Router)
 export const appRouter = t.router({
-  // 🔍 Buscar convidado (Site Público)
+  
+  // --- ROTAS PÚBLICAS ---
+  
   searchConvidados: t.procedure
     .input(z.object({ nome: z.string() }))
     .mutation(async ({ input }) => {
-      // A função buscarConvidados em googleSheets.ts já foi alterada para busca EXATA
       const result = await buscarConvidados(input.nome);
       return result;
     }),
 
-  // ✅ Confirmar presença (Site Público)
   confirmarPresenca: t.procedure
     .input(
       z.object({
@@ -39,15 +60,14 @@ export const appRouter = t.router({
       return { success: ok };
     }),
 
-  // 🔐 Painel Administrativo
-  admin: t.router({
-    // Listar todos os convidados
-    getAllConvidados: t.procedure.query(async () => {
+  // --- ROTAS PRIVADAS ---
+  // IMPORTANTE: Mudamos de 'admin' para 'adminRouter' para evitar conflito com métodos internos do tRPC
+  adminRouter: t.router({
+    getAllConvidados: adminProcedure.query(async () => {
       return await buscarTodosConvidados();
     }),
 
-    // Adicionar novo convidado
-    adicionarConvidado: t.procedure
+    adicionarConvidado: adminProcedure
       .input(
         z.object({
           nome: z.string(),
@@ -60,8 +80,7 @@ export const appRouter = t.router({
         return await adicionarConvidado(input);
       }),
 
-    // Atualizar convidado existente
-    atualizarConvidado: t.procedure
+    atualizarConvidado: adminProcedure
       .input(
         z.object({
           id: z.string(),
@@ -77,15 +96,13 @@ export const appRouter = t.router({
         return await atualizarConvidado(id, data);
       }),
 
-    // Remover convidado
-    deletarConvidado: t.procedure
+    deletarConvidado: adminProcedure
       .input(z.object({ id: z.string() }))
       .mutation(async ({ input }) => {
         return await deletarConvidado(input.id);
       }),
 
-    // Obter estatísticas para o dashboard
-    getEstatisticas: t.procedure.query(async () => {
+    getEstatisticas: adminProcedure.query(async () => {
       const convidados = await buscarTodosConvidados();
       const stats = {
         total: convidados.length,

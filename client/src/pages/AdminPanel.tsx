@@ -1,256 +1,145 @@
-/**
- * Admin Panel - Gerenciamento de Convidados
- * Design Philosophy: Minimalismo Japonês Contemporâneo
- * Paleta: Cream (#FDFAF6), Blush (#D4A5A5), Terracotta (#C4876A), Charcoal (#2C2C2C), Gold (#C9A96E)
- */
-
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
 import { trpc } from "../lib/trpc";
+import { Link } from "wouter";
 
+// Interface para o convidado (baseada no googleSheets.ts)
 interface Convidado {
   id: string;
   nome: string;
   email?: string;
-  telefone?: string;
-  status?: "Confirmado" | "Não Irá" | "Talvez" | "Pendente";
+  status?: string;
   acompanhantes?: number;
-  criancas?: number;
-  menores8?: number;
-  dataConfirmacao?: string;
-  acompanhanteDetalhes?: string;
   mensagem?: string;
-  limite?: number;
 }
 
-export default function AdminPanel() {
-  const [senhaDigitada, setSenhaDigitada] = useState("");
-  const [autenticado, setAutenticado] = useState(false);
-  const [convidados, setConvidados] = useState<Convidado[]>([]);
-  const [carregando, setCarregando] = useState(false);
-  const [novoConvidado, setNovoConvidado] = useState({
-    nome: "",
-    email: "",
-    telefone: "",
-    limite: 0,
-  });
-  const [filtroResposta, setFiltroResposta] = useState<"todos" | "Confirmado" | "Não Irá" | "Talvez" | "Pendente">("todos");
-  const [busca, setBusca] = useState("");
-
-  const SENHA_ADMIN = "casamento2026";
-
-  const getAllConvidados = trpc.admin.getAllConvidados.useQuery(undefined, {
-    enabled: autenticado,
-    retry: false,
-  });
-  const getEstatisticas = trpc.admin.getEstatisticas.useQuery(undefined, {
-    enabled: autenticado,
-    retry: false,
-  });
-
-  const adicionarConvidadoMutation = trpc.admin.adicionarConvidado.useMutation();
-  const atualizarConvidadoMutation = trpc.admin.atualizarConvidado.useMutation();
-  const deletarConvidadoMutation = trpc.admin.deletarConvidado.useMutation();
-
-  useEffect(() => {
-    if (autenticado && getAllConvidados.data) {
-      setConvidados((getAllConvidados.data as Convidado[]) || []);
-    }
-  }, [autenticado, getAllConvidados.data]);
-
-  function autenticar() {
-    if (senhaDigitada === SENHA_ADMIN) {
-      setAutenticado(true);
-      setSenhaDigitada("");
-    } else {
-      alert("Senha incorreta!");
-      setSenhaDigitada("");
-    }
-  }
-
-  async function adicionarConvidado() {
-    if (!novoConvidado.nome.trim()) {
-      alert("Digite o nome do convidado");
-      return;
-    }
-
-    try {
-      setCarregando(true);
-      await adicionarConvidadoMutation.mutateAsync({
-        nome: novoConvidado.nome,
-        email: novoConvidado.email || undefined,
-        telefone: novoConvidado.telefone || undefined,
-        limite: Number(novoConvidado.limite) || 0,
-      });
-
-      await getAllConvidados.refetch();
-      await getEstatisticas.refetch();
-      setNovoConvidado({ nome: "", email: "", telefone: "", limite: 0 });
-      alert("Convidado adicionado com sucesso!");
-    } catch (error) {
-      alert("Erro ao adicionar convidado.");
-      console.error(error);
-    } finally {
-      setCarregando(false);
-    }
-  }
-
-  async function removerConvidado(id: string) {
-    if (confirm("Tem certeza que deseja remover este convidado?")) {
-      try {
-        setCarregando(true);
-        await deletarConvidadoMutation.mutateAsync({ id });
-        await getAllConvidados.refetch();
-        await getEstatisticas.refetch();
-        alert("Convidado removido com sucesso!");
-      } catch (error) {
-        alert("Erro ao remover convidado");
-        console.error(error);
-      } finally {
-        setCarregando(false);
-      }
-    }
-  }
-
-  async function atualizarLimite(id: string, novoLimite: number) {
-    try {
-      setCarregando(true);
-      await atualizarConvidadoMutation.mutateAsync({
-        id,
-        limite: novoLimite,
-      });
-      await getAllConvidados.refetch();
-    } catch (error) {
-      alert("Erro ao atualizar limite");
-      console.error(error);
-    } finally {
-      setCarregando(false);
-    }
-  }
-
-  async function atualizarStatus(id: string, novoStatus: string) {
-    try {
-      setCarregando(true);
-      await atualizarConvidadoMutation.mutateAsync({
-        id,
-        status: novoStatus as any,
-      });
-      await getAllConvidados.refetch();
-      await getEstatisticas.refetch();
-    } catch (error) {
-      alert("Erro ao atualizar status");
-      console.error(error);
-    } finally {
-      setCarregando(false);
-    }
-  }
-
-  const stats = getEstatisticas.data || {
-    total: 0, confirmados: 0, naoIrao: 0, talvez: 0, pendentes: 0, acompanhantes: 0, criancas: 0, menores8: 0,
-  };
-
-  let convidadosFiltrados = Array.isArray(convidados) ? convidados : [];
-  if (filtroResposta !== "todos") convidadosFiltrados = convidadosFiltrados.filter((c) => c && c.status === filtroResposta);
-  if (busca) convidadosFiltrados = convidadosFiltrados.filter((c) => c && c.nome && c.nome.toLowerCase().includes(busca.toLowerCase()));
-
-  if (!autenticado) {
-    return (
-      <div style={{ backgroundColor: "#FDFAF6", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-        <div style={{ maxWidth: "400px", width: "100%", textAlign: "center" }}>
-          <h1 style={{ fontFamily: "'Great Vibes', cursive", fontSize: "42px", color: "#2C2C2C", marginBottom: "32px" }}>Painel Admin</h1>
-          <div style={{ border: "1px solid #E8CECE", padding: "32px 24px", backgroundColor: "#FDFAF6" }}>
-            <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "12px", color: "#888", marginBottom: "20px", letterSpacing: "0.1em" }}>Digite a senha para acessar o painel administrativo</p>
-            <input type="password" placeholder="Senha" value={senhaDigitada} onChange={(e) => setSenhaDigitada(e.target.value)} onKeyPress={(e) => e.key === "Enter" && autenticar()} style={{ width: "100%", padding: "12px 16px", border: "1px solid #E8CECE", backgroundColor: "#FDFAF6", fontFamily: "'Lato', sans-serif", fontSize: "14px", marginBottom: "16px", boxSizing: "border-box", outline: "none" }} />
-            <button onClick={autenticar} className="admin-btn-primary" style={{ width: "100%" }}>Entrar</button>
-            <Link href="/"><p style={{ fontFamily: "'Lato', sans-serif", fontSize: "11px", color: "#C9A96E", marginTop: "20px", cursor: "pointer", textDecoration: "underline" }}>Voltar para o site</p></Link>
-          </div>
-        </div>
-        <style>{`.admin-btn-primary { background-color: #C4876A; color: #FDFAF6; border: none; padding: 12px 24px; font-family: 'Lato', sans-serif; font-size: 12px; letter-spacing: 0.1em; cursor: pointer; text-transform: uppercase; transition: all 0.3s ease; }.admin-btn-primary:hover { background-color: #B37555; }`}</style>
-      </div>
-    );
-  }
-
+// Componente de Login Seguro
+function LoginPanel({ onLogin }: { onLogin: (pass: string) => void }) {
+  const [pass, setPass] = useState("");
   return (
-    <div style={{ backgroundColor: "#FDFAF6", minHeight: "100vh" }}>
-      <header style={{ backgroundColor: "#FDFAF6", borderBottom: "1px solid #E8CECE", padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(8px)" }}>
-        <h1 style={{ fontFamily: "'Great Vibes', cursive", fontSize: "28px", color: "#2C2C2C", margin: 0 }}>Admin</h1>
-        <button onClick={() => setAutenticado(false)} className="admin-btn-secondary">Sair</button>
-      </header>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 24px" }}>
-        {getAllConvidados.isError && <div style={{ padding: "20px", backgroundColor: "#FEE2E2", border: "1px solid #EF4444", color: "#B91C1C", marginBottom: "20px", fontFamily: "'Lato', sans-serif", fontSize: "13px" }}>Erro ao carregar dados.</div>}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "16px", marginBottom: "40px" }}>
-          {[ { label: "Total", valor: stats.total, cor: "#2C2C2C" }, { label: "Confirmados", valor: stats.confirmados, cor: "#4CAF50" }, { label: "Não Irão", valor: stats.naoIrao, cor: "#F44336" }, { label: "Talvez", valor: stats.talvez, cor: "#FF9800" }, { label: "Pendentes", valor: stats.pendentes, cor: "#9E9E9E" }, { label: "Acompanhantes", valor: stats.acompanhantes, cor: "#2196F3" }, { label: "Crianças", valor: stats.criancas, cor: "#E91E63" }, { label: "Menores de 8", valor: stats.menores8, cor: "#9C27B0" } ].map((stat) => (
-            <div key={stat.label} style={{ border: "1px solid #E8CECE", padding: "20px", backgroundColor: "#FDFAF6", textAlign: "center" }}>
-              <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "24px", fontWeight: "bold", color: stat.cor, margin: "0 0 8px 0" }}>{stat.valor || 0}</p>
-              <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "10px", color: "#888", letterSpacing: "0.1em", margin: 0, textTransform: "uppercase" }}>{stat.label}</p>
-            </div>
-          ))}
-        </div>
-        <div style={{ border: "1px solid #E8CECE", padding: "24px", marginBottom: "40px", backgroundColor: "#FDFAF6" }}>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "20px", color: "#2C2C2C", marginTop: 0, marginBottom: "20px" }}>Adicionar Novo Convidado</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px", marginBottom: "16px" }}>
-            <input type="text" placeholder="Nome completo" value={novoConvidado.nome} onChange={(e) => setNovoConvidado({ ...novoConvidado, nome: e.target.value })} style={inputStyle} />
-            <input type="email" placeholder="Email" value={novoConvidado.email} onChange={(e) => setNovoConvidado({ ...novoConvidado, email: e.target.value })} style={inputStyle} />
-            <input type="tel" placeholder="Telefone" value={novoConvidado.telefone} onChange={(e) => setNovoConvidado({ ...novoConvidado, telefone: e.target.value })} style={inputStyle} />
-            <input type="number" placeholder="Limite Acompanhantes" value={novoConvidado.limite} onChange={(e) => setNovoConvidado({ ...novoConvidado, limite: parseInt(e.target.value) || 0 })} style={inputStyle} />
-          </div>
-          <button onClick={adicionarConvidado} disabled={carregando} className="admin-btn-primary">{carregando ? "Adicionando..." : "Adicionar Convidado"}</button>
-        </div>
-        <div style={{ display: "flex", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
-          <input type="text" placeholder="Buscar por nome..." value={busca} onChange={(e) => setBusca(e.target.value)} style={{ ...inputStyle, flex: 1, minWidth: "200px" }} />
-          <select value={filtroResposta} onChange={(e) => setFiltroResposta(e.target.value as any)} style={{ ...inputStyle, cursor: "pointer" }}>
-            <option value="todos">Todos</option>
-            <option value="Confirmado">Confirmados</option>
-            <option value="Não Irá">Não Irão</option>
-            <option value="Talvez">Talvez</option>
-            <option value="Pendente">Pendentes</option>
-          </select>
-        </div>
-        <div style={{ overflowX: "auto", border: "1px solid #E8CECE", backgroundColor: "#FDFAF6" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Lato', sans-serif", fontSize: "12px" }}>
-            <thead>
-              <tr style={{ borderBottom: "2px solid #E8CECE", backgroundColor: "#F5EEEB" }}>
-                <th style={thStyle}>ID</th>
-                <th style={thStyle}>Nome</th>
-                <th style={thStyle}>Status</th>
-                <th style={{ ...thStyle, textAlign: "center" }}>Limite</th>
-                <th style={{ ...thStyle, textAlign: "center" }}>Acomp.</th>
-                <th style={{ ...thStyle, textAlign: "center" }}>Crianças</th>
-                <th style={{ ...thStyle, textAlign: "center" }}>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {convidadosFiltrados.map((convidado) => (
-                <tr key={convidado.id} style={{ borderBottom: "1px solid #E8CECE" }}>
-                  <td style={tdStyle}>{convidado.id}</td>
-                  <td style={tdStyle}>{convidado.nome}</td>
-                  <td style={tdStyle}>
-                    <select value={convidado.status || "Pendente"} onChange={(e) => atualizarStatus(convidado.id, e.target.value)} style={{ ...inputStyle, padding: "6px 8px" }}>
-                      <option value="Pendente">Pendente</option>
-                      <option value="Confirmado">Confirmado</option>
-                      <option value="Não Irá">Não Irá</option>
-                      <option value="Talvez">Talvez</option>
-                    </select>
-                  </td>
-                  <td style={{ ...tdStyle, textAlign: "center" }}>
-                    <input type="number" value={convidado.limite || 0} onChange={(e) => atualizarLimite(convidado.id, parseInt(e.target.value) || 0)} style={{ width: "50px", textAlign: "center", border: "1px solid #E8CECE" }} />
-                  </td>
-                  <td style={{ ...tdStyle, textAlign: "center" }}>{convidado.acompanhantes || 0}</td>
-                  <td style={{ ...tdStyle, textAlign: "center" }}>{convidado.criancas || 0}</td>
-                  <td style={{ ...tdStyle, textAlign: "center" }}>
-                    <button onClick={() => removerConvidado(convidado.id)} disabled={carregando} className="admin-btn-delete">Remover</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-wedding-cream p-6">
+      <div className="max-w-md w-full bg-white p-8 rounded-sm shadow-sm border border-wedding-blush/20">
+        <h2 className="font-halimun text-3xl text-wedding-terracotta text-center mb-6">Painel Admin</h2>
+        <input
+          type="password"
+          placeholder="Senha de Acesso"
+          className="wedding-input mb-4 text-center"
+          value={pass}
+          onChange={(e) => setPass(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && onLogin(pass)}
+        />
+        <button 
+          onClick={() => onLogin(pass)}
+          className="w-full bg-wedding-charcoal text-white py-3 uppercase text-xs tracking-widest hover:bg-black transition-colors"
+        >
+          Acessar Painel
+        </button>
+        <Link href="/">
+          <p className="text-center mt-6 text-[10px] uppercase tracking-tighter text-gray-400 cursor-pointer hover:text-wedding-gold">Voltar ao Site</p>
+        </Link>
       </div>
-      <style>{`.admin-btn-primary { background-color: #C4876A; color: #FDFAF6; border: none; padding: 10px 20px; font-family: 'Lato', sans-serif; font-size: 12px; letter-spacing: 0.1em; cursor: pointer; text-transform: uppercase; transition: all 0.3s ease; }.admin-btn-primary:hover { background-color: #B37555; }.admin-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }.admin-btn-secondary { background-color: #D4A5A5; color: #FDFAF6; border: none; padding: 8px 16px; font-family: 'Lato', sans-serif; font-size: 10px; letter-spacing: 0.1em; cursor: pointer; text-transform: uppercase; }.admin-btn-delete { background-color: #F44336; color: #FDFAF6; border: none; padding: 6px 12px; font-family: 'Lato', sans-serif; font-size: 10px; cursor: pointer; text-transform: uppercase; transition: all 0.3s ease; }.admin-btn-delete:hover { background-color: #D32F2F; }`}</style>
     </div>
   );
 }
 
-const inputStyle = { padding: "10px 12px", border: "1px solid #E8CECE", backgroundColor: "#FDFAF6", fontFamily: "'Lato', sans-serif", fontSize: "13px", outline: "none" };
-const thStyle = { padding: "12px", textAlign: "left" as const, fontWeight: "bold", color: "#2C2C2C" };
-const tdStyle = { padding: "12px", color: "#2C2C2C" };
+export default function AdminPanel() {
+  const [adminPass, setAdminPass] = useState<string | null>(localStorage.getItem("admin_secret"));
+  const [isLogged, setIsLogged] = useState(!!adminPass);
+
+  // Configuração do tRPC
+  const utils = trpc.useUtils();
+  
+  // Atualizado de .admin para .adminRouter conforme mudança no backend
+  const { data: convidados, isLoading, error } = trpc.adminRouter.getAllConvidados.useQuery(undefined, {
+    enabled: isLogged,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (error) {
+      handleLogout();
+      alert("Sessão expirada ou senha incorreta.");
+    }
+  }, [error]);
+
+  const handleLogin = (pass: string) => {
+    localStorage.setItem("admin_secret", pass);
+    setAdminPass(pass);
+    setIsLogged(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin_secret");
+    setAdminPass(null);
+    setIsLogged(false);
+  };
+
+  if (!isLogged) return <LoginPanel onLogin={handleLogin} />;
+
+  return (
+    <div className="min-h-screen bg-[#FDFDFD] font-lato text-wedding-charcoal">
+      {/* Header do Admin */}
+      <header className="bg-white border-b border-gray-100 py-4 px-8 flex justify-between items-center sticky top-0 z-50">
+        <div className="flex items-center gap-4">
+          <h1 className="font-halimun text-2xl text-wedding-terracotta">Admin</h1>
+          <span className="bg-wedding-gold/10 text-wedding-gold text-[10px] px-2 py-1 rounded-full uppercase tracking-widest font-bold">Live</span>
+        </div>
+        <button onClick={handleLogout} className="text-[10px] uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors">Sair</button>
+      </header>
+
+      <main className="max-w-7xl mx-auto p-6 md:p-10">
+        {/* Dashboard de Estatísticas */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          {[
+            { label: "Total", value: convidados?.length || 0, color: "border-gray-200" },
+            { label: "Confirmados", value: convidados?.filter((c: Convidado) => c.status === "Confirmado").length || 0, color: "border-green-200" },
+            { label: "Não Irão", value: convidados?.filter((c: Convidado) => c.status === "Não Irá").length || 0, color: "border-red-200" },
+            { label: "Acompanhantes", value: convidados?.reduce((acc: number, c: Convidado) => acc + (c.acompanhantes || 0), 0) || 0, color: "border-wedding-gold/30" },
+          ].map((stat) => (
+            <div key={stat.label} className={`bg-white p-6 border-b-2 ${stat.color} shadow-sm`}>
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">{stat.label}</p>
+              <p className="text-3xl font-light">{stat.value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Tabela de Convidados */}
+        <div className="bg-white border border-gray-100 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50 text-[11px] uppercase tracking-widest text-gray-500 border-b border-gray-100">
+                  <th className="p-4 font-normal">Convidado</th>
+                  <th className="p-4 font-normal">Status</th>
+                  <th className="p-4 font-normal">Acomp.</th>
+                  <th className="p-4 font-normal">Mensagem</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {isLoading ? (
+                  <tr><td colSpan={4} className="p-10 text-center text-gray-400 italic">Carregando lista...</td></tr>
+                ) : convidados?.map((c: Convidado) => (
+                  <tr key={c.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="p-4">
+                      <p className="font-medium text-sm">{c.nome}</p>
+                      <p className="text-[10px] text-gray-400">{c.email || "Sem e-mail"}</p>
+                    </td>
+                    <td className="p-4">
+                      <span className={`text-[10px] px-2 py-1 rounded-full uppercase tracking-tighter font-bold ${
+                        c.status === "Confirmado" ? "bg-green-100 text-green-700" : 
+                        c.status === "Não Irá" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-500"
+                      }`}>
+                        {c.status || "Pendente"}
+                      </span>
+                    </td>
+                    <td className="p-4 text-sm text-gray-500">{c.acompanhantes || 0}</td>
+                    <td className="p-4 text-[12px] text-gray-400 italic max-w-xs truncate">{c.mensagem || "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

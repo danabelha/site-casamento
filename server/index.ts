@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "./router";
+import * as trpcExpress from '@trpc/server/adapters/express';
 
 const app = express();
 
@@ -12,10 +13,11 @@ app.use(cors({
 app.use(express.json());
 
 app.use(
-  "/trpc",
-  createExpressMiddleware({
+  '/trpc',
+  trpcExpress.createExpressMiddleware({
     router: appRouter,
-  })
+    createContext: ({ req, res }) => ({ req, res }), // ISSO É VITAL!
+  }),
 );
 
 const PORT = Number(process.env.PORT) || 3000;
