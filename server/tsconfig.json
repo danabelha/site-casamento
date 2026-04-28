@@ -12,7 +12,7 @@
        Mudamos para "bundler" se você usa ferramentas modernas de build, 
        ou mantemos "node" com o silenciador de depreciação.
     */
-    "moduleResolution": "bundler", 
+    "moduleResolution": "node16", 
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
