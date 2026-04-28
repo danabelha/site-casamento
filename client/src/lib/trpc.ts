@@ -7,7 +7,7 @@ export const trpc = createTRPCReact<AppRouter>( );
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_API_URL || "http://localhost:3001",
+      url: import.meta.env.VITE_API_URL || "https://site-casamento-meod.onrender.com/trpc",
       
       // 🔐 O SEGREDO DA SEGURANÇA:
       // Esta função roda antes de CADA chamada ao servidor.
