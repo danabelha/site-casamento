@@ -14,6 +14,7 @@ interface Convidado {
   menores8?: number;
   limite?: number;
   mensagem?: string;
+  dataConfirmacao?: string;
 }
 
 // Componente de Login Seguro
@@ -143,9 +144,16 @@ export default function AdminPanel() {
 
   if (!isLogged) return <LoginPanel onLogin={handleLogin} />;
 
+  // Estatísticas Detalhadas
+  const confirmados = convidados?.filter((c: Convidado) => c.status === "Confirmado") || [];
+  const totalConfirmados = confirmados.length;
+  const totalAcompanhantesAdultos = confirmados.reduce((acc: number, c: Convidado) => acc + (c.acompanhantes || 0), 0);
+  const totalCriancas = confirmados.reduce((acc: number, c: Convidado) => acc + (c.criancas || 0), 0);
+  const totalGeral = totalConfirmados + totalAcompanhantesAdultos + totalCriancas;
+
   return (
-    <div className="min-h-screen bg-[#FDFDFD] font-lato text-wedding-charcoal">
-      <header className="bg-white border-b border-gray-100 py-4 px-8 flex justify-between items-center sticky top-0 z-50">
+    <div className="min-h-screen bg-[#FDFDFD] font-lato text-wedding-charcoal pb-20">
+      <header className="bg-white border-b border-gray-100 py-4 px-8 flex justify-between items-center sticky top-0 z-50 shadow-sm">
         <div className="flex items-center gap-4">
           <h1 className="font-halimun text-2xl text-wedding-terracotta">Admin</h1>
           <span className="bg-wedding-gold/10 text-wedding-gold text-[10px] px-2 py-1 rounded-full uppercase tracking-widest font-bold">Live</span>
@@ -153,7 +161,7 @@ export default function AdminPanel() {
         <div className="flex gap-4 items-center">
           <button 
             onClick={() => openModal()}
-            className="bg-wedding-gold text-white px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-wedding-gold/80 transition-all"
+            className="bg-wedding-gold text-white px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-wedding-gold/80 transition-all shadow-md"
           >
             + Novo Convidado
           </button>
@@ -162,34 +170,40 @@ export default function AdminPanel() {
       </header>
 
       <main className="max-w-7xl mx-auto p-6 md:p-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        {/* Dashboard de Estatísticas Detalhado */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
           {[
-            { label: "Total", value: convidados?.length || 0, color: "border-gray-200" },
-            { label: "Confirmados", value: convidados?.filter((c: Convidado) => c.status === "Confirmado").length || 0, color: "border-green-200" },
-            { label: "Não Irão", value: convidados?.filter((c: Convidado) => c.status === "Não Irá").length || 0, color: "border-red-200" },
-            { label: "Acompanhantes", value: convidados?.reduce((acc: number, c: Convidado) => acc + (c.acompanhantes || 0), 0) || 0, color: "border-wedding-gold/30" },
+            { label: "Total Lista", value: convidados?.length || 0, color: "border-gray-200" },
+            { label: "Conv. Confirmados", value: totalConfirmados, color: "border-green-300" },
+            { label: "Acomp. Adultos", value: totalAcompanhantesAdultos, color: "border-blue-200" },
+            { label: "Crianças", value: totalCriancas, color: "border-pink-200" },
+            { label: "Total de Pessoas", value: totalGeral, color: "border-wedding-gold" },
           ].map((stat) => (
-            <div key={stat.label} className={`bg-white p-6 border-b-2 ${stat.color} shadow-sm`}>
-              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">{stat.label}</p>
+            <div key={stat.label} className={`bg-white p-6 border-b-4 ${stat.color} shadow-sm rounded-sm`}>
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2 font-bold">{stat.label}</p>
               <p className="text-3xl font-light">{stat.value}</p>
             </div>
           ))}
         </div>
 
-        <div className="bg-white border border-gray-100 shadow-sm overflow-hidden">
+        {/* Tabela de Convidados */}
+        <div className="bg-white border border-gray-100 shadow-md overflow-hidden rounded-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 text-[11px] uppercase tracking-widest text-gray-500 border-b border-gray-100">
                   <th className="p-4 font-normal">Convidado</th>
                   <th className="p-4 font-normal">Status</th>
-                  <th className="p-4 font-normal">Acomp.</th>
+                  <th className="p-4 font-normal">Detalhes (Acomp/Cria)</th>
+                  <th className="p-4 font-normal">Mensagem</th>
                   <th className="p-4 font-normal text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {isLoading ? (
-                  <tr><td colSpan={4} className="p-10 text-center text-gray-400 italic">Carregando lista...</td></tr>
+                  <tr><td colSpan={5} className="p-10 text-center text-gray-400 italic">Carregando lista...</td></tr>
+                ) : convidados?.length === 0 ? (
+                  <tr><td colSpan={5} className="p-10 text-center text-gray-400 italic">Nenhum convidado cadastrado.</td></tr>
                 ) : convidados?.map((c: Convidado) => (
                   <tr key={c.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="p-4">
@@ -204,11 +218,34 @@ export default function AdminPanel() {
                         {c.status || "Pendente"}
                       </span>
                     </td>
-                    <td className="p-4 text-sm text-gray-500">{c.acompanhantes || 0}</td>
+                    <td className="p-4 text-sm text-gray-500">
+                      {c.status === "Confirmado" ? (
+                        <div className="flex flex-col gap-1">
+                          <span className="text-xs">Adultos: <strong>{c.acompanhantes || 0}</strong></span>
+                          <span className="text-xs">Crianças: <strong>{c.criancas || 0}</strong></span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-300">Limite: {c.limite}</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      {c.mensagem ? (
+                        <div className="group relative">
+                          <p className="text-[12px] text-gray-500 italic max-w-[200px] truncate cursor-help" title={c.mensagem}>
+                            "{c.mensagem}"
+                          </p>
+                          <div className="hidden group-hover:block absolute z-10 bg-wedding-charcoal text-white text-[11px] p-3 rounded shadow-xl -left-2 top-6 w-64 leading-relaxed border border-white/10">
+                            {c.mensagem}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-gray-200">-</span>
+                      )}
+                    </td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center gap-3">
-                        <button onClick={() => openModal(c)} className="text-wedding-gold hover:text-wedding-gold/70 text-xs uppercase tracking-tighter">Editar</button>
-                        <button onClick={() => handleDelete(c.id)} className="text-red-400 hover:text-red-600 text-xs uppercase tracking-tighter">Excluir</button>
+                        <button onClick={() => openModal(c)} className="text-wedding-gold hover:text-wedding-gold/70 text-xs uppercase tracking-tighter font-bold">Editar</button>
+                        <button onClick={() => handleDelete(c.id)} className="text-red-400 hover:text-red-600 text-xs uppercase tracking-tighter font-bold">Excluir</button>
                       </div>
                     </td>
                   </tr>
@@ -221,54 +258,54 @@ export default function AdminPanel() {
 
       {/* Modal de Cadastro/Edição */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-100 p-4">
-          <div className="bg-white w-full max-w-md p-8 rounded-sm shadow-2xl">
-            <h2 className="font-cormorant text-2xl mb-6">{editingConvidado ? "Editar Convidado" : "Novo Convidado"}</h2>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md p-8 rounded-sm shadow-2xl border border-wedding-blush/20">
+            <h2 className="font-cormorant text-2xl mb-6 text-wedding-charcoal">{editingConvidado ? "Editar Convidado" : "Novo Convidado"}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1">Nome Completo</label>
+                <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1 font-bold">Nome Completo</label>
                 <input 
                   type="text" 
                   required 
-                  className="w-full border p-2 text-sm focus:border-wedding-gold outline-none"
+                  className="w-full border border-gray-200 p-3 text-sm focus:border-wedding-gold outline-none transition-all"
                   value={formData.nome}
                   onChange={(e) => setFormData({...formData, nome: e.target.value})}
                 />
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1">E-mail (Opcional)</label>
+                <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1 font-bold">E-mail (Opcional)</label>
                 <input 
                   type="email" 
-                  className="w-full border p-2 text-sm focus:border-wedding-gold outline-none"
+                  className="w-full border border-gray-200 p-3 text-sm focus:border-wedding-gold outline-none transition-all"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1">Telefone</label>
+                  <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1 font-bold">Telefone</label>
                   <input 
                     type="text" 
-                    className="w-full border p-2 text-sm focus:border-wedding-gold outline-none"
+                    className="w-full border border-gray-200 p-3 text-sm focus:border-wedding-gold outline-none transition-all"
                     value={formData.telefone}
                     onChange={(e) => setFormData({...formData, telefone: e.target.value})}
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1">Limite Acomp.</label>
+                  <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1 font-bold">Limite Acomp.</label>
                   <input 
                     type="number" 
-                    className="w-full border p-2 text-sm focus:border-wedding-gold outline-none"
+                    className="w-full border border-gray-200 p-3 text-sm focus:border-wedding-gold outline-none transition-all"
                     value={formData.limite}
                     onChange={(e) => setFormData({...formData, limite: parseInt(e.target.value) || 0})}
                   />
                 </div>
               </div>
-              <div className="flex gap-4 pt-4">
-                <button type="submit" className="flex-1 bg-wedding-charcoal text-white py-3 uppercase text-[10px] tracking-widest hover:bg-black">
+              <div className="flex gap-4 pt-6">
+                <button type="submit" className="flex-1 bg-wedding-charcoal text-white py-4 uppercase text-[10px] tracking-widest hover:bg-black transition-all shadow-lg active:scale-95">
                   {editingConvidado ? "Salvar Alterações" : "Cadastrar Convidado"}
                 </button>
-                <button type="button" onClick={closeModal} className="flex-1 border border-gray-200 py-3 uppercase text-[10px] tracking-widest hover:bg-gray-50">
+                <button type="button" onClick={closeModal} className="flex-1 border border-gray-200 py-4 uppercase text-[10px] tracking-widest hover:bg-gray-50 transition-all text-gray-500">
                   Cancelar
                 </button>
               </div>
