@@ -7,8 +7,12 @@ interface Convidado {
   id: string;
   nome: string;
   email?: string;
+  telefone?: string;
   status?: string;
   acompanhantes?: number;
+  criancas?: number;
+  menores8?: number;
+  limite?: number;
   mensagem?: string;
 }
 
@@ -22,7 +26,7 @@ function LoginPanel({ onLogin }: { onLogin: (pass: string) => void }) {
         <input
           type="password"
           placeholder="Senha de Acesso"
-          className="wedding-input mb-4 text-center"
+          className="wedding-input mb-4 text-center border p-2 w-full"
           value={pass}
           onChange={(e) => setPass(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && onLogin(pass)}
@@ -44,14 +48,42 @@ function LoginPanel({ onLogin }: { onLogin: (pass: string) => void }) {
 export default function AdminPanel() {
   const [adminPass, setAdminPass] = useState<string | null>(localStorage.getItem("admin_secret"));
   const [isLogged, setIsLogged] = useState(!!adminPass);
-
-  // Configuração do tRPC
-  //const utils = trpc.useUtils();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingConvidado, setEditingConvidado] = useState<Convidado | null>(null);
   
-  // Atualizado de .admin para .adminRouter conforme mudança no backend
+  // Estados do formulário
+  const [formData, setFormData] = useState({
+    nome: "",
+    email: "",
+    telefone: "",
+    limite: 2,
+  });
+
+  const utils = trpc.useUtils();
+  
   const { data: convidados, isLoading, error } = trpc.adminRouter.getAllConvidados.useQuery(undefined, {
     enabled: isLogged,
     retry: false,
+  });
+
+  const addMutation = trpc.adminRouter.adicionarConvidado.useMutation({
+    onSuccess: () => {
+      utils.adminRouter.getAllConvidados.invalidate();
+      closeModal();
+    }
+  });
+
+  const updateMutation = trpc.adminRouter.atualizarConvidado.useMutation({
+    onSuccess: () => {
+      utils.adminRouter.getAllConvidados.invalidate();
+      closeModal();
+    }
+  });
+
+  const deleteMutation = trpc.adminRouter.deletarConvidado.useMutation({
+    onSuccess: () => {
+      utils.adminRouter.getAllConvidados.invalidate();
+    }
   });
 
   useEffect(() => {
@@ -73,21 +105,63 @@ export default function AdminPanel() {
     setIsLogged(false);
   };
 
+  const openModal = (convidado?: Convidado) => {
+    if (convidado) {
+      setEditingConvidado(convidado);
+      setFormData({
+        nome: convidado.nome,
+        email: convidado.email || "",
+        telefone: convidado.telefone || "",
+        limite: convidado.limite || 0,
+      });
+    } else {
+      setEditingConvidado(null);
+      setFormData({ nome: "", email: "", telefone: "", limite: 2 });
+    }
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingConvidado(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingConvidado) {
+      await updateMutation.mutateAsync({ id: editingConvidado.id, ...formData });
+    } else {
+      await addMutation.mutateAsync(formData);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Tem certeza que deseja excluir este convidado?")) {
+      await deleteMutation.mutateAsync({ id });
+    }
+  };
+
   if (!isLogged) return <LoginPanel onLogin={handleLogin} />;
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] font-lato text-wedding-charcoal">
-      {/* Header do Admin */}
       <header className="bg-white border-b border-gray-100 py-4 px-8 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <h1 className="font-halimun text-2xl text-wedding-terracotta">Admin</h1>
           <span className="bg-wedding-gold/10 text-wedding-gold text-[10px] px-2 py-1 rounded-full uppercase tracking-widest font-bold">Live</span>
         </div>
-        <button onClick={handleLogout} className="text-[10px] uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors">Sair</button>
+        <div className="flex gap-4 items-center">
+          <button 
+            onClick={() => openModal()}
+            className="bg-wedding-gold text-white px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-wedding-gold/80 transition-all"
+          >
+            + Novo Convidado
+          </button>
+          <button onClick={handleLogout} className="text-[10px] uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors">Sair</button>
+        </div>
       </header>
 
       <main className="max-w-7xl mx-auto p-6 md:p-10">
-        {/* Dashboard de Estatísticas */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           {[
             { label: "Total", value: convidados?.length || 0, color: "border-gray-200" },
@@ -102,7 +176,6 @@ export default function AdminPanel() {
           ))}
         </div>
 
-        {/* Tabela de Convidados */}
         <div className="bg-white border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -111,7 +184,7 @@ export default function AdminPanel() {
                   <th className="p-4 font-normal">Convidado</th>
                   <th className="p-4 font-normal">Status</th>
                   <th className="p-4 font-normal">Acomp.</th>
-                  <th className="p-4 font-normal">Mensagem</th>
+                  <th className="p-4 font-normal text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -132,7 +205,12 @@ export default function AdminPanel() {
                       </span>
                     </td>
                     <td className="p-4 text-sm text-gray-500">{c.acompanhantes || 0}</td>
-                    <td className="p-4 text-[12px] text-gray-400 italic max-w-xs truncate">{c.mensagem || "-"}</td>
+                    <td className="p-4 text-center">
+                      <div className="flex justify-center gap-3">
+                        <button onClick={() => openModal(c)} className="text-wedding-gold hover:text-wedding-gold/70 text-xs uppercase tracking-tighter">Editar</button>
+                        <button onClick={() => handleDelete(c.id)} className="text-red-400 hover:text-red-600 text-xs uppercase tracking-tighter">Excluir</button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -140,6 +218,64 @@ export default function AdminPanel() {
           </div>
         </div>
       </main>
+
+      {/* Modal de Cadastro/Edição */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-100 p-4">
+          <div className="bg-white w-full max-w-md p-8 rounded-sm shadow-2xl">
+            <h2 className="font-cormorant text-2xl mb-6">{editingConvidado ? "Editar Convidado" : "Novo Convidado"}</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1">Nome Completo</label>
+                <input 
+                  type="text" 
+                  required 
+                  className="w-full border p-2 text-sm focus:border-wedding-gold outline-none"
+                  value={formData.nome}
+                  onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1">E-mail (Opcional)</label>
+                <input 
+                  type="email" 
+                  className="w-full border p-2 text-sm focus:border-wedding-gold outline-none"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1">Telefone</label>
+                  <input 
+                    type="text" 
+                    className="w-full border p-2 text-sm focus:border-wedding-gold outline-none"
+                    value={formData.telefone}
+                    onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-widest text-gray-400 block mb-1">Limite Acomp.</label>
+                  <input 
+                    type="number" 
+                    className="w-full border p-2 text-sm focus:border-wedding-gold outline-none"
+                    value={formData.limite}
+                    onChange={(e) => setFormData({...formData, limite: parseInt(e.target.value) || 0})}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-4 pt-4">
+                <button type="submit" className="flex-1 bg-wedding-charcoal text-white py-3 uppercase text-[10px] tracking-widest hover:bg-black">
+                  {editingConvidado ? "Salvar Alterações" : "Cadastrar Convidado"}
+                </button>
+                <button type="button" onClick={closeModal} className="flex-1 border border-gray-200 py-3 uppercase text-[10px] tracking-widest hover:bg-gray-50">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
