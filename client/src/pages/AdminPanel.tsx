@@ -12,9 +12,9 @@ interface Convidado {
   email?: string;
   telefone?: string;
   status?: "Confirmado" | "Não Irá" | "Talvez" | "Pendente";
-  acompanhantes?: number; // Representa adultos ou crianças > 8 anos
-  criancas?: number;      // Representa crianças < 8 anos
-  menores8?: number;     // Campo redundante vindo do servidor, vamos focar em 'criancas'
+  acompanhantes?: number; // Adultos ou crianças >= 8 anos
+  criancas?: number;      // Crianças < 8 anos
+  menores8?: number;     
   dataConfirmacao?: string;
   acompanhanteDetalhes?: string; // Nomes dos acompanhantes
   mensagem?: string;
@@ -34,9 +34,7 @@ export default function AdminPanel() {
     email: "", 
     telefone: "", 
     limite: 0, 
-    status: "Pendente" as any,
-    acompanhantes: 0,
-    criancas: 0
+    status: "Pendente" as any
   });
 
   const [filtroResposta, setFiltroResposta] = useState<"todos" | "Confirmado" | "Não Irá" | "Talvez" | "Pendente">("todos");
@@ -97,8 +95,6 @@ export default function AdminPanel() {
           telefone: formConvidado.telefone,
           limite: Number(formConvidado.limite),
           status: formConvidado.status,
-          acompanhantes: Number(formConvidado.acompanhantes),
-          criancas: Number(formConvidado.criancas),
         });
         alert("Convidado Alterado com sucesso");
       } else {
@@ -107,8 +103,6 @@ export default function AdminPanel() {
           email: formConvidado.email,
           telefone: formConvidado.telefone,
           limite: Number(formConvidado.limite),
-          acompanhantes: Number(formConvidado.acompanhantes),
-          criancas: Number(formConvidado.criancas),
         });
         alert("Convidado Cadastrado com sucesso");
       }
@@ -127,9 +121,7 @@ export default function AdminPanel() {
       email: "", 
       telefone: "", 
       limite: 0, 
-      status: "Pendente" as any,
-      acompanhantes: 0,
-      criancas: 0
+      status: "Pendente" as any
     });
     setEditandoId(null);
     setExibirForm(false);
@@ -141,10 +133,8 @@ export default function AdminPanel() {
       nome: c.nome,
       email: c.email || "",
       telefone: c.telefone || "",
-      limite: c.limite || 0,
-      status: c.status as any,
-      acompanhantes: Number(c.acompanhantes) || 0,
-      criancas: Number(c.criancas) || 0,
+      limite: Number(c.limite) || 0,
+      status: c.status as any
     });
     setExibirForm(true);
   }
@@ -167,13 +157,13 @@ export default function AdminPanel() {
   const confirmadosLista = convidados.filter(c => c.status === "Confirmado");
   const stats = {
     total: convidados.length,
-    // Total Evento = Titulares Confirmados + Acompanhantes (> 8 anos)
+    // Total Evento = Titulares Confirmados + Acompanhantes (Adultos/Crianças >= 8 anos)
     confirmados: confirmadosLista.reduce((acc, c) => acc + 1 + (Number(c.acompanhantes) || 0), 0),
     naoIrao: convidados.filter(c => c.status === "Não Irá").length,
     talvez: convidados.filter(c => c.status === "Talvez").length,
-    // Soma total de acompanhantes (> 8 anos) de todos os confirmados
+    // Soma total de acompanhantes (Adultos/Crianças >= 8 anos)
     acompanhantes: confirmadosLista.reduce((acc, c) => acc + (Number(c.acompanhantes) || 0), 0),
-    // Soma total de crianças (< 8 anos) de todos os confirmados
+    // Soma total de crianças (< 8 anos) - Garantindo que só conte se houver valor real
     criancasMenores8: confirmadosLista.reduce((acc, c) => acc + (Number(c.criancas) || 0), 0),
   };
 
@@ -251,19 +241,9 @@ export default function AdminPanel() {
                     <input type="tel" placeholder="(00) 00000-0000" value={formConvidado.telefone} onChange={(e) => setFormConvidado({...formConvidado, telefone: e.target.value})} style={inputStyle} />
                   </div>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <label style={{ fontSize: "10px", color: "#888", textTransform: "uppercase" }}>Limite Acomp.</label>
-                    <input type="number" value={formConvidado.limite} onChange={(e) => setFormConvidado({...formConvidado, limite: parseInt(e.target.value) || 0})} style={inputStyle} />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <label style={{ fontSize: "10px", color: "#888", textTransform: "uppercase" }}>Acomp. (&gt; 8)</label>
-                    <input type="number" value={formConvidado.acompanhantes} onChange={(e) => setFormConvidado({...formConvidado, acompanhantes: parseInt(e.target.value) || 0})} style={inputStyle} />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <label style={{ fontSize: "10px", color: "#888", textTransform: "uppercase" }}>Crianças (&lt; 8)</label>
-                    <input type="number" value={formConvidado.criancas} onChange={(e) => setFormConvidado({...formConvidado, criancas: parseInt(e.target.value) || 0})} style={inputStyle} />
-                  </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <label style={{ fontSize: "10px", color: "#888", textTransform: "uppercase" }}>Limite de Acompanhantes</label>
+                  <input type="number" value={formConvidado.limite} onChange={(e) => setFormConvidado({...formConvidado, limite: parseInt(e.target.value) || 0})} style={inputStyle} />
                 </div>
                 {editandoId && (
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -328,11 +308,12 @@ export default function AdminPanel() {
                   </td>
                   <td style={tdStyle}>
                     <div style={{ fontSize: "11px", marginBottom: "4px" }}>
-                      <strong>{Number(c.acompanhantes) || 0}</strong> acomp. {">"} 8<br/>
-                      <strong>{Number(c.criancas) || 0}</strong> {"<"} 8
+                      {Number(c.acompanhantes) > 0 && <span><strong>{Number(c.acompanhantes)}</strong> acomp. {">"} 8<br/></span>}
+                      {Number(c.criancas) > 0 && <span><strong>{Number(c.criancas)}</strong> {"<"} 8</span>}
+                      {(!c.acompanhantes && !c.criancas) && <span style={{color: "#AAA"}}>-</span>}
                     </div>
                     {c.acompanhanteDetalhes && (
-                      <div style={{ fontSize: "9px", color: "#666", borderTop: "1px solid #F0F0F0", paddingTop: "4px", marginTop: "4px", whiteSpace: "pre-line" }}>
+                      <div style={{ fontSize: "10px", color: "#666", borderTop: "1px solid #F0F0F0", paddingTop: "6px", marginTop: "6px", whiteSpace: "pre-line", lineHeight: "1.4" }}>
                         {c.acompanhanteDetalhes}
                       </div>
                     )}
