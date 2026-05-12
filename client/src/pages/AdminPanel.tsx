@@ -182,7 +182,7 @@ export default function AdminPanel() {
   return (
     <div style={{ backgroundColor: "#FDFAF6", minHeight: "100vh" }}>
       <header style={{ borderBottom: "1px solid #E8CECE", padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, backgroundColor: "#FDFAF6", zIndex: 100 }}>
-        <h1 style={{ fontFamily: "'Great Vibes', cursive", fontSize: "28px", color: "#2C2C2C", margin: 0 }}>Admin</h1>
+        <h1 style={{ fontFamily: "'Great Vibes', cursive", fontSize: "28px", color: "#2C2C2C", margin: 0 }}>Painel Administrativo</h1>
         <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
           <button onClick={() => setExibirForm(true)} style={{ backgroundColor: "#C9A96E", color: "#FFF", border: "none", padding: "8px 16px", fontSize: "10px", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.1em" }}>+ Novo Convidado</button>
           <button onClick={sair} style={{ background: "none", border: "none", color: "#C4876A", cursor: "pointer", fontSize: "12px", textTransform: "uppercase" }}>Sair</button>
