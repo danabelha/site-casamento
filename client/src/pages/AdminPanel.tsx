@@ -12,11 +12,11 @@ interface Convidado {
   email?: string;
   telefone?: string;
   status?: "Confirmado" | "Não Irá" | "Talvez" | "Pendente";
-  acompanhantes?: number;
-  criancas?: number;
-  menores8?: number;
+  acompanhantes?: number; // Representa adultos ou crianças > 8 anos
+  criancas?: number;      // Representa crianças < 8 anos
+  menores8?: number;     // Campo redundante vindo do servidor, vamos focar em 'criancas'
   dataConfirmacao?: string;
-  acompanpanteDetalhes?: string;
+  acompanhanteDetalhes?: string; // Nomes dos acompanhantes
   mensagem?: string;
   limite?: number;
 }
@@ -143,8 +143,8 @@ export default function AdminPanel() {
       telefone: c.telefone || "",
       limite: c.limite || 0,
       status: c.status as any,
-      acompanhantes: c.acompanhantes || 0,
-      criancas: c.criancas || 0,
+      acompanhantes: Number(c.acompanhantes) || 0,
+      criancas: Number(c.criancas) || 0,
     });
     setExibirForm(true);
   }
@@ -167,11 +167,14 @@ export default function AdminPanel() {
   const confirmadosLista = convidados.filter(c => c.status === "Confirmado");
   const stats = {
     total: convidados.length,
-    confirmados: confirmadosLista.reduce((acc, c) => acc + 1 + (c.acompanhantes || 0), 0),
+    // Total Evento = Titulares Confirmados + Acompanhantes (> 8 anos)
+    confirmados: confirmadosLista.reduce((acc, c) => acc + 1 + (Number(c.acompanhantes) || 0), 0),
     naoIrao: convidados.filter(c => c.status === "Não Irá").length,
     talvez: convidados.filter(c => c.status === "Talvez").length,
-    acompanhantes: confirmadosLista.reduce((acc, c) => acc + (c.acompanhantes || 0), 0),
-    criancasMenores8: confirmadosLista.reduce((acc, c) => acc + (c.criancas || 0), 0),
+    // Soma total de acompanhantes (> 8 anos) de todos os confirmados
+    acompanhantes: confirmadosLista.reduce((acc, c) => acc + (Number(c.acompanhantes) || 0), 0),
+    // Soma total de crianças (< 8 anos) de todos os confirmados
+    criancasMenores8: confirmadosLista.reduce((acc, c) => acc + (Number(c.criancas) || 0), 0),
   };
 
   let convidadosFiltrados = Array.isArray(convidados) ? convidados : [];
@@ -324,10 +327,15 @@ export default function AdminPanel() {
                     </span>
                   </td>
                   <td style={tdStyle}>
-                    <div style={{ fontSize: "11px" }}>
-                      <strong>{c.acompanhantes || 0}</strong> acomp. {">"} 8<br/>
-                      <strong>{c.criancas || 0}</strong> {"<"} 8
+                    <div style={{ fontSize: "11px", marginBottom: "4px" }}>
+                      <strong>{Number(c.acompanhantes) || 0}</strong> acomp. {">"} 8<br/>
+                      <strong>{Number(c.criancas) || 0}</strong> {"<"} 8
                     </div>
+                    {c.acompanhanteDetalhes && (
+                      <div style={{ fontSize: "9px", color: "#666", borderTop: "1px solid #F0F0F0", paddingTop: "4px", marginTop: "4px", whiteSpace: "pre-line" }}>
+                        {c.acompanhanteDetalhes}
+                      </div>
+                    )}
                   </td>
                   <td style={tdStyle}>
                     <div style={{ fontSize: "11px", maxWidth: "200px", color: "#666", fontStyle: "italic" }}>
