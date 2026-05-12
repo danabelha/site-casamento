@@ -127,7 +127,7 @@ export default function AdminPanel() {
       email: "", 
       telefone: "", 
       limite: 0, 
-      status: "Pendente",
+      status: "Pendente" as any,
       acompanhantes: 0,
       criancas: 0
     });
@@ -142,7 +142,9 @@ export default function AdminPanel() {
       email: c.email || "",
       telefone: c.telefone || "",
       limite: c.limite || 0,
-      status: c.status || "Pendente",
+      status: c.status as any,
+      acompanhantes: c.acompanhantes || 0,
+      criancas: c.criancas || 0,
     });
     setExibirForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -72,6 +72,8 @@ const appRouter = t.router({
           email: z.string().optional(),
           telefone: z.string().optional(),
           limite: z.number().optional(),
+          acompanhantes: z.number().optional(),
+          criancas: z.number().optional(),
         })
       )
       .mutation(async ({ input }) => {
