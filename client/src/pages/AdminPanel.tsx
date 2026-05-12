@@ -227,11 +227,11 @@ export default function AdminPanel() {
 	                <input type="number" placeholder="Limite" value={formConvidado.limite} onChange={(e) => setFormConvidado({...formConvidado, limite: parseInt(e.target.value) || 0})} style={inputStyle} />
 	              </div>
 	              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-	                <label style={{ fontSize: "9px", color: "#888", textTransform: "uppercase" }}>Acomp. (> 8 anos)</label>
-	                <input type="number" placeholder="Adultos / > 8 anos" value={formConvidado.acompanhantes} onChange={(e) => setFormConvidado({...formConvidado, acompanhantes: parseInt(e.target.value) || 0})} style={inputStyle} />
+	                <label style={{ fontSize: "9px", color: "#888", textTransform: "uppercase" }}>Acomp. (&gt; 8 anos)</label>
+	                <input type="number" placeholder="Adultos / &gt; 8 anos" value={formConvidado.acompanhantes} onChange={(e) => setFormConvidado({...formConvidado, acompanhantes: parseInt(e.target.value) || 0})} style={inputStyle} />
 	              </div>
 	              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-	                <label style={{ fontSize: "9px", color: "#888", textTransform: "uppercase" }}>Crianças (< 8 anos)</label>
+	                <label style={{ fontSize: "9px", color: "#888", textTransform: "uppercase" }}>Crianças (&lt; 8 anos)</label>
 	                <input type="number" placeholder="Menores de 8 anos" value={formConvidado.criancas} onChange={(e) => setFormConvidado({...formConvidado, criancas: parseInt(e.target.value) || 0})} style={inputStyle} />
 	              </div>
 	              {editandoId && (
