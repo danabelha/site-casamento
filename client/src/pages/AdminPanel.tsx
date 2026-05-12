@@ -29,12 +29,14 @@ export default function AdminPanel() {
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [exibirForm, setExibirForm] = useState(false);
   
-  const [formConvidado, setFormConvidado] = useState({
-    nome: "",
-    email: "",
-    telefone: "",
-    limite: 0,
+  const [formConvidado, setFormConvidado] = useState({ 
+    nome: "", 
+    email: "", 
+    telefone: "", 
+    limite: 0, 
     status: "Pendente" as any,
+    acompanhantes: 0,
+    criancas: 0
   });
 
   const [filtroResposta, setFiltroResposta] = useState<"todos" | "Confirmado" | "Não Irá" | "Talvez" | "Pendente">("todos");
@@ -95,14 +97,18 @@ export default function AdminPanel() {
           telefone: formConvidado.telefone,
           limite: Number(formConvidado.limite),
           status: formConvidado.status,
+          acompanhantes: Number(formConvidado.acompanhantes),
+          criancas: Number(formConvidado.criancas),
         });
         alert("Convidado Alterado com sucesso");
       } else {
         await adicionarConvidadoMutation.mutateAsync({
           nome: formConvidado.nome,
-          email: formConvidado.email || undefined,
-          telefone: formConvidado.telefone || undefined,
-          limite: Number(formConvidado.limite) || 0,
+          email: formConvidado.email,
+          telefone: formConvidado.telefone,
+          limite: Number(formConvidado.limite),
+          acompanhantes: Number(formConvidado.acompanhantes),
+          criancas: Number(formConvidado.criancas),
         });
         alert("Convidado Cadastrado com sucesso");
       }
@@ -116,7 +122,15 @@ export default function AdminPanel() {
   }
 
   function limparForm() {
-    setFormConvidado({ nome: "", email: "", telefone: "", limite: 0, status: "Pendente" });
+    setFormConvidado({ 
+      nome: "", 
+      email: "", 
+      telefone: "", 
+      limite: 0, 
+      status: "Pendente",
+      acompanhantes: 0,
+      criancas: 0
+    });
     setEditandoId(null);
     setExibirForm(false);
   }
