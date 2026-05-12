@@ -12,11 +12,11 @@ interface Convidado {
   email?: string;
   telefone?: string;
   status?: "Confirmado" | "Não Irá" | "Talvez" | "Pendente";
-  acompanhantes?: number; // Adultos ou crianças >= 8 anos
-  criancas?: number;      // Crianças < 8 anos
+  acompanhantes?: number; 
+  criancas?: number;      
   menores8?: number;     
   dataConfirmacao?: string;
-  acompanhanteDetalhes?: string; // Nomes dos acompanhantes
+  acompanhanteDetalhes?: string; 
   mensagem?: string;
   limite?: number;
 }
@@ -33,7 +33,7 @@ export default function AdminPanel() {
     nome: "", 
     email: "", 
     telefone: "", 
-    limite: 0, 
+    limite: "" as string | number, // Usar string para permitir campo vazio ao digitar
     status: "Pendente" as any
   });
 
@@ -87,23 +87,22 @@ export default function AdminPanel() {
     }
     try {
       setCarregando(true);
+      const payload = {
+        nome: formConvidado.nome,
+        email: formConvidado.email,
+        telefone: formConvidado.telefone,
+        limite: Number(formConvidado.limite) || 0,
+        status: formConvidado.status,
+      };
+
       if (editandoId) {
         await atualizarConvidadoMutation.mutateAsync({
           id: editandoId,
-          nome: formConvidado.nome,
-          email: formConvidado.email,
-          telefone: formConvidado.telefone,
-          limite: Number(formConvidado.limite),
-          status: formConvidado.status,
+          ...payload
         });
         alert("Convidado Alterado com sucesso");
       } else {
-        await adicionarConvidadoMutation.mutateAsync({
-          nome: formConvidado.nome,
-          email: formConvidado.email,
-          telefone: formConvidado.telefone,
-          limite: Number(formConvidado.limite),
-        });
+        await adicionarConvidadoMutation.mutateAsync(payload);
         alert("Convidado Cadastrado com sucesso");
       }
       await getAllConvidados.refetch();
@@ -120,7 +119,7 @@ export default function AdminPanel() {
       nome: "", 
       email: "", 
       telefone: "", 
-      limite: 0, 
+      limite: "", 
       status: "Pendente" as any
     });
     setEditandoId(null);
@@ -133,7 +132,7 @@ export default function AdminPanel() {
       nome: c.nome,
       email: c.email || "",
       telefone: c.telefone || "",
-      limite: Number(c.limite) || 0,
+      limite: c.limite ?? 0,
       status: c.status as any
     });
     setExibirForm(true);
@@ -157,13 +156,10 @@ export default function AdminPanel() {
   const confirmadosLista = convidados.filter(c => c.status === "Confirmado");
   const stats = {
     total: convidados.length,
-    // Total Evento = Titulares Confirmados + Acompanhantes (Adultos/Crianças >= 8 anos)
     confirmados: confirmadosLista.reduce((acc, c) => acc + 1 + (Number(c.acompanhantes) || 0), 0),
     naoIrao: convidados.filter(c => c.status === "Não Irá").length,
     talvez: convidados.filter(c => c.status === "Talvez").length,
-    // Soma total de acompanhantes (Adultos/Crianças >= 8 anos)
     acompanhantes: confirmadosLista.reduce((acc, c) => acc + (Number(c.acompanhantes) || 0), 0),
-    // Soma total de crianças (< 8 anos) - Garantindo que só conte se houver valor real
     criancasMenores8: confirmadosLista.reduce((acc, c) => acc + (Number(c.criancas) || 0), 0),
   };
 
@@ -243,7 +239,7 @@ export default function AdminPanel() {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                   <label style={{ fontSize: "10px", color: "#888", textTransform: "uppercase" }}>Limite de Acompanhantes</label>
-                  <input type="number" value={formConvidado.limite} onChange={(e) => setFormConvidado({...formConvidado, limite: parseInt(e.target.value) || 0})} style={inputStyle} />
+                  <input type="number" value={formConvidado.limite} onChange={(e) => setFormConvidado({...formConvidado, limite: e.target.value === "" ? "" : parseInt(e.target.value)})} style={inputStyle} />
                 </div>
                 {editandoId && (
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -307,15 +303,12 @@ export default function AdminPanel() {
                     </span>
                   </td>
                   <td style={tdStyle}>
-                    <div style={{ fontSize: "11px", marginBottom: "4px" }}>
-                      {Number(c.acompanhantes) > 0 && <span><strong>{Number(c.acompanhantes)}</strong> acomp. {">"} 8<br/></span>}
-                      {Number(c.criancas) > 0 && <span><strong>{Number(c.criancas)}</strong> {"<"} 8</span>}
-                      {(!c.acompanhantes && !c.criancas) && <span style={{color: "#AAA"}}>-</span>}
-                    </div>
-                    {c.acompanhanteDetalhes && (
-                      <div style={{ fontSize: "10px", color: "#666", borderTop: "1px solid #F0F0F0", paddingTop: "6px", marginTop: "6px", whiteSpace: "pre-line", lineHeight: "1.4" }}>
+                    {c.acompanhanteDetalhes ? (
+                      <div style={{ fontSize: "10px", color: "#666", whiteSpace: "pre-line", lineHeight: "1.4" }}>
                         {c.acompanhanteDetalhes}
                       </div>
+                    ) : (
+                      <span style={{color: "#AAA"}}>-</span>
                     )}
                   </td>
                   <td style={tdStyle}>
