@@ -66,6 +66,7 @@ export default function AdminPanel() {
     if (senhaDigitada === SENHA_ADMIN) {
       setAutenticado(true);
       sessionStorage.setItem("admin_auth", "true");
+      sessionStorage.setItem("admin_auth_pass", senhaDigitada); // Salva a senha para o tRPC usar
       setSenhaDigitada("");
     } else {
       alert("Senha incorreta!");
@@ -76,6 +77,7 @@ export default function AdminPanel() {
   function sair() {
     setAutenticado(false);
     sessionStorage.removeItem("admin_auth");
+    sessionStorage.removeItem("admin_auth_pass");
   }
 
   async function salvarConvidado() {

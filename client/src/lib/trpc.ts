@@ -12,9 +12,9 @@ export const trpcClient = trpc.createClient({
       // 🔐 O SEGREDO DA SEGURANÇA:
       // Esta função roda antes de CADA chamada ao servidor.
       headers( ) {
-        const adminPass = localStorage.getItem("admin_secret");
+        const adminPass = sessionStorage.getItem("admin_auth_pass");
         return {
-          // Se houver uma senha no localStorage, enviamos no header
+          // Se houver uma senha no sessionStorage, enviamos no header
           "x-admin-password": adminPass || "",
         };
       },
