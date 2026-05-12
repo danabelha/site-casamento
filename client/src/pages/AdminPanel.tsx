@@ -27,6 +27,7 @@ export default function AdminPanel() {
   const [convidados, setConvidados] = useState<Convidado[]>([]);
   const [carregando, setCarregando] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [exibirForm, setExibirForm] = useState(false);
   
   const [formConvidado, setFormConvidado] = useState({
     nome: "",
@@ -50,7 +51,6 @@ export default function AdminPanel() {
   const atualizarConvidadoMutation = trpc.adminRouter.atualizarConvidado.useMutation();
   const deletarConvidadoMutation = trpc.adminRouter.deletarConvidado.useMutation();
 
-  // Segurança: Sessão expira ao fechar a aba (Ponto 2)
   useEffect(() => {
     const isAuth = sessionStorage.getItem("admin_auth") === "true";
     if (isAuth) setAutenticado(true);
@@ -86,7 +86,6 @@ export default function AdminPanel() {
     try {
       setCarregando(true);
       if (editandoId) {
-        // Alteração (Ponto 7 e 8)
         await atualizarConvidadoMutation.mutateAsync({
           id: editandoId,
           nome: formConvidado.nome,
@@ -97,7 +96,6 @@ export default function AdminPanel() {
         });
         alert("Convidado Alterado com sucesso");
       } else {
-        // Inclusão (Ponto 6)
         await adicionarConvidadoMutation.mutateAsync({
           nome: formConvidado.nome,
           email: formConvidado.email || undefined,
@@ -118,6 +116,7 @@ export default function AdminPanel() {
   function limparForm() {
     setFormConvidado({ nome: "", email: "", telefone: "", limite: 0, status: "Pendente" });
     setEditandoId(null);
+    setExibirForm(false);
   }
 
   function iniciarEdicao(c: Convidado) {
@@ -129,6 +128,7 @@ export default function AdminPanel() {
       limite: c.limite || 0,
       status: c.status || "Pendente",
     });
+    setExibirForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -138,7 +138,7 @@ export default function AdminPanel() {
         setCarregando(true);
         await deletarConvidadoMutation.mutateAsync({ id });
         await getAllConvidados.refetch();
-        alert("Convidado Removido com sucesso"); // Ponto 9
+        alert("Convidado Removido com sucesso");
       } catch (error) {
         alert("Erro ao remover convidado");
       } finally {
@@ -147,7 +147,6 @@ export default function AdminPanel() {
     }
   }
 
-  // Estatísticas Detalhadas (Ponto 3)
   const confirmados = convidados.filter(c => c.status === "Confirmado");
   const stats = {
     total: convidados.length,
@@ -184,12 +183,15 @@ export default function AdminPanel() {
     <div style={{ backgroundColor: "#FDFAF6", minHeight: "100vh" }}>
       <header style={{ borderBottom: "1px solid #E8CECE", padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, backgroundColor: "#FDFAF6", zIndex: 100 }}>
         <h1 style={{ fontFamily: "'Great Vibes', cursive", fontSize: "28px", color: "#2C2C2C", margin: 0 }}>Admin</h1>
-        <button onClick={sair} style={{ background: "none", border: "none", color: "#C4876A", cursor: "pointer", fontSize: "12px", textTransform: "uppercase" }}>Sair</button>
+        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+          <button onClick={() => setExibirForm(true)} style={{ backgroundColor: "#C9A96E", color: "#FFF", border: "none", padding: "8px 16px", fontSize: "10px", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.1em" }}>+ Novo Convidado</button>
+          <button onClick={sair} style={{ background: "none", border: "none", color: "#C4876A", cursor: "pointer", fontSize: "12px", textTransform: "uppercase" }}>Sair</button>
+        </div>
       </header>
 
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 24px" }}>
-        {/* Dashboard de Estatísticas (Ponto 3) */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "16px", marginBottom: "40px" }}>
+        {/* Dashboard de Estatísticas */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "16px", marginBottom: "40px" }}>
           {[
             { label: "Total", valor: stats.total, cor: "#2C2C2C" },
             { label: "Confirmados", valor: stats.confirmados, cor: "#4CAF50" },
@@ -205,34 +207,34 @@ export default function AdminPanel() {
           ))}
         </div>
 
-        {/* Formulário de Adição/Edição (Ponto 6, 7, 8) */}
-        <div style={{ border: "1px solid #E8CECE", padding: "24px", backgroundColor: "#FFF", marginBottom: "40px" }}>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "20px", marginBottom: "20px" }}>
-            {editandoId ? "Editar Convidado" : "Incluir Novo Convidado"}
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: "16px" }}>
-            <input type="text" placeholder="Nome Completo" value={formConvidado.nome} onChange={(e) => setFormConvidado({...formConvidado, nome: e.target.value})} style={inputStyle} />
-            <input type="email" placeholder="E-mail" value={formConvidado.email} onChange={(e) => setFormConvidado({...formConvidado, email: e.target.value})} style={inputStyle} />
-            <input type="tel" placeholder="Telefone" value={formConvidado.telefone} onChange={(e) => setFormConvidado({...formConvidado, telefone: e.target.value})} style={inputStyle} />
-            <input type="number" placeholder="Limite Acomp." value={formConvidado.limite} onChange={(e) => setFormConvidado({...formConvidado, limite: parseInt(e.target.value) || 0})} style={inputStyle} />
-            {editandoId && (
-              <select value={formConvidado.status} onChange={(e) => setFormConvidado({...formConvidado, status: e.target.value as any})} style={inputStyle}>
-                <option value="Pendente">Pendente</option>
-                <option value="Confirmado">Confirmado</option>
-                <option value="Não Irá">Não Irá</option>
-                <option value="Talvez">Talvez</option>
-              </select>
-            )}
-          </div>
-          <div style={{ display: "flex", gap: "12px" }}>
-            <button onClick={salvarConvidado} disabled={carregando} style={{ backgroundColor: "#2C2C2C", color: "#FFF", border: "none", padding: "12px 24px", fontSize: "11px", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-              {carregando ? "Processando..." : editandoId ? "Salvar Alterações" : "Incluir Convidado"}
-            </button>
-            {editandoId && (
+        {/* Formulário de Adição/Edição */}
+        {exibirForm && (
+          <div style={{ border: "1px solid #E8CECE", padding: "24px", backgroundColor: "#FFF", marginBottom: "40px", animation: "fadeIn 0.3s ease" }}>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "20px", marginBottom: "20px" }}>
+              {editandoId ? "Editar Convidado" : "Incluir Novo Convidado"}
+            </h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: "16px" }}>
+              <input type="text" placeholder="Nome Completo" value={formConvidado.nome} onChange={(e) => setFormConvidado({...formConvidado, nome: e.target.value})} style={inputStyle} />
+              <input type="email" placeholder="E-mail" value={formConvidado.email} onChange={(e) => setFormConvidado({...formConvidado, email: e.target.value})} style={inputStyle} />
+              <input type="tel" placeholder="Telefone" value={formConvidado.telefone} onChange={(e) => setFormConvidado({...formConvidado, telefone: e.target.value})} style={inputStyle} />
+              <input type="number" placeholder="Limite Acomp." value={formConvidado.limite} onChange={(e) => setFormConvidado({...formConvidado, limite: parseInt(e.target.value) || 0})} style={inputStyle} />
+              {editandoId && (
+                <select value={formConvidado.status} onChange={(e) => setFormConvidado({...formConvidado, status: e.target.value as any})} style={inputStyle}>
+                  <option value="Pendente">Pendente</option>
+                  <option value="Confirmado">Confirmado</option>
+                  <option value="Não Irá">Não Irá</option>
+                  <option value="Talvez">Talvez</option>
+                </select>
+              )}
+            </div>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button onClick={salvarConvidado} disabled={carregando} style={{ backgroundColor: "#2C2C2C", color: "#FFF", border: "none", padding: "12px 24px", fontSize: "11px", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                {carregando ? "Processando..." : editandoId ? "Salvar Alterações" : "Incluir Convidado"}
+              </button>
               <button onClick={limparForm} style={{ backgroundColor: "#FDFAF6", color: "#888", border: "1px solid #E8CECE", padding: "12px 24px", fontSize: "11px", cursor: "pointer", textTransform: "uppercase" }}>Cancelar</button>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Filtros e Busca */}
         <div style={{ display: "flex", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
@@ -246,7 +248,7 @@ export default function AdminPanel() {
           </select>
         </div>
 
-        {/* Lista de Convidados (Ponto 4) */}
+        {/* Lista de Convidados */}
         <div style={{ backgroundColor: "#FFF", border: "1px solid #E8CECE", overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
