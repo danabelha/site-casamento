@@ -149,14 +149,17 @@ export default function AdminPanel() {
     }
   }
 
-  const confirmados = convidados.filter(c => c.status === "Confirmado");
+  const confirmadosLista = convidados.filter(c => c.status === "Confirmado");
   const stats = {
     total: convidados.length,
-    confirmados: confirmados.length,
+    // Total Evento = Titulares Confirmados + Acompanhantes (Adultos/Crianças > 8)
+    confirmados: confirmadosLista.reduce((acc, c) => acc + 1 + (c.acompanhantes || 0), 0),
     naoIrao: convidados.filter(c => c.status === "Não Irá").length,
     talvez: convidados.filter(c => c.status === "Talvez").length,
-    acompanhantes: confirmados.reduce((acc, c) => acc + (c.acompanhantes || 0), 0),
-    criancas: confirmados.reduce((acc, c) => acc + (c.criancas || 0), 0),
+    // Acompanhantes (Adultos/Crianças > 8)
+    acompanhantes: confirmadosLista.reduce((acc, c) => acc + (c.acompanhantes || 0), 0),
+    // Crianças menores de 8 anos (Não contam no total do evento)
+    criancasMenores8: confirmadosLista.reduce((acc, c) => acc + (c.criancas || 0), 0),
   };
 
   let convidadosFiltrados = Array.isArray(convidados) ? convidados : [];
@@ -195,12 +198,12 @@ export default function AdminPanel() {
         {/* Dashboard de Estatísticas */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "16px", marginBottom: "40px" }}>
           {[
-            { label: "Total", valor: stats.total, cor: "#2C2C2C" },
-            { label: "Confirmados", valor: stats.confirmados, cor: "#4CAF50" },
+            { label: "Total Lista", valor: stats.total, cor: "#2C2C2C" },
+            { label: "Total Evento", valor: stats.confirmados, cor: "#4CAF50" },
             { label: "Não Irão", valor: stats.naoIrao, cor: "#F44336" },
             { label: "Talvez", valor: stats.talvez, cor: "#FF9800" },
-            { label: "Acompanhantes", valor: stats.acompanhantes, cor: "#2196F3" },
-            { label: "Crianças < 9", valor: stats.criancas, cor: "#E91E63" }
+            { label: "Acomp. (> 8 anos)", valor: stats.acompanhantes, cor: "#2196F3" },
+            { label: "Crianças (< 8 anos)", valor: stats.criancasMenores8, cor: "#E91E63" }
           ].map((s) => (
             <div key={s.label} style={{ border: "1px solid #E8CECE", padding: "20px", textAlign: "center", backgroundColor: "#FFF" }}>
               <p style={{ fontSize: "24px", fontWeight: "bold", color: s.cor, margin: "0 0 4px 0" }}>{s.valor}</p>
@@ -219,16 +222,30 @@ export default function AdminPanel() {
               <input type="text" placeholder="Nome Completo" value={formConvidado.nome} onChange={(e) => setFormConvidado({...formConvidado, nome: e.target.value})} style={inputStyle} />
               <input type="email" placeholder="E-mail" value={formConvidado.email} onChange={(e) => setFormConvidado({...formConvidado, email: e.target.value})} style={inputStyle} />
               <input type="tel" placeholder="Telefone" value={formConvidado.telefone} onChange={(e) => setFormConvidado({...formConvidado, telefone: e.target.value})} style={inputStyle} />
-              <input type="number" placeholder="Limite Acomp." value={formConvidado.limite} onChange={(e) => setFormConvidado({...formConvidado, limite: parseInt(e.target.value) || 0})} style={inputStyle} />
-              {editandoId && (
-                <select value={formConvidado.status} onChange={(e) => setFormConvidado({...formConvidado, status: e.target.value as any})} style={inputStyle}>
-                  <option value="Pendente">Pendente</option>
-                  <option value="Confirmado">Confirmado</option>
-                  <option value="Não Irá">Não Irá</option>
-                  <option value="Talvez">Talvez</option>
-                </select>
-              )}
-            </div>
+	              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+	                <label style={{ fontSize: "9px", color: "#888", textTransform: "uppercase" }}>Limite Acomp.</label>
+	                <input type="number" placeholder="Limite" value={formConvidado.limite} onChange={(e) => setFormConvidado({...formConvidado, limite: parseInt(e.target.value) || 0})} style={inputStyle} />
+	              </div>
+	              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+	                <label style={{ fontSize: "9px", color: "#888", textTransform: "uppercase" }}>Acomp. (> 8 anos)</label>
+	                <input type="number" placeholder="Adultos / > 8 anos" value={formConvidado.acompanhantes} onChange={(e) => setFormConvidado({...formConvidado, acompanhantes: parseInt(e.target.value) || 0})} style={inputStyle} />
+	              </div>
+	              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+	                <label style={{ fontSize: "9px", color: "#888", textTransform: "uppercase" }}>Crianças (< 8 anos)</label>
+	                <input type="number" placeholder="Menores de 8 anos" value={formConvidado.criancas} onChange={(e) => setFormConvidado({...formConvidado, criancas: parseInt(e.target.value) || 0})} style={inputStyle} />
+	              </div>
+	              {editandoId && (
+	                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+	                  <label style={{ fontSize: "9px", color: "#888", textTransform: "uppercase" }}>Status</label>
+	                  <select value={formConvidado.status} onChange={(e) => setFormConvidado({...formConvidado, status: e.target.value as any})} style={inputStyle}>
+	                    <option value="Pendente">Pendente</option>
+	                    <option value="Confirmado">Confirmado</option>
+	                    <option value="Não Irá">Não Irá</option>
+	                    <option value="Talvez">Talvez</option>
+	                  </select>
+	                </div>
+	              )}
+	            </div>
             <div style={{ display: "flex", gap: "12px" }}>
               <button onClick={salvarConvidado} disabled={carregando} style={{ backgroundColor: "#2C2C2C", color: "#FFF", border: "none", padding: "12px 24px", fontSize: "11px", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.1em" }}>
                 {carregando ? "Processando..." : editandoId ? "Salvar Alterações" : "Incluir Convidado"}
