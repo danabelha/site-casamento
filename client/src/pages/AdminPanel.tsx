@@ -27,12 +27,16 @@ export default function AdminPanel() {
   const [autenticado, setAutenticado] = useState(false);
   const [convidados, setConvidados] = useState<Convidado[]>([]);
   const [carregando, setCarregando] = useState(false);
-  const [novoConvidado, setNovoConvidado] = useState({
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  
+  const [formConvidado, setFormConvidado] = useState({
     nome: "",
     email: "",
     telefone: "",
     limite: 0,
+    status: "Pendente" as any,
   });
+
   const [filtroResposta, setFiltroResposta] = useState<"todos" | "Confirmado" | "Não Irá" | "Talvez" | "Pendente">("todos");
   const [busca, setBusca] = useState("");
 
@@ -47,6 +51,12 @@ export default function AdminPanel() {
   const atualizarConvidadoMutation = trpc.adminRouter.atualizarConvidado.useMutation();
   const deletarConvidadoMutation = trpc.adminRouter.deletarConvidado.useMutation();
 
+  // Segurança: Sessão expira ao fechar a aba (Ponto 2)
+  useEffect(() => {
+    const isAuth = sessionStorage.getItem("admin_auth") === "true";
+    if (isAuth) setAutenticado(true);
+  }, []);
+
   useEffect(() => {
     if (autenticado && getAllConvidados.data) {
       setConvidados((getAllConvidados.data as Convidado[]) || []);
@@ -56,6 +66,7 @@ export default function AdminPanel() {
   function autenticar() {
     if (senhaDigitada === SENHA_ADMIN) {
       setAutenticado(true);
+      sessionStorage.setItem("admin_auth", "true");
       setSenhaDigitada("");
     } else {
       alert("Senha incorreta!");
@@ -63,65 +74,87 @@ export default function AdminPanel() {
     }
   }
 
-  async function adicionarConvidado() {
-    if (!novoConvidado.nome.trim()) {
+  function sair() {
+    setAutenticado(false);
+    sessionStorage.removeItem("admin_auth");
+  }
+
+  async function salvarConvidado() {
+    if (!formConvidado.nome.trim()) {
       alert("Digite o nome do convidado");
       return;
     }
     try {
       setCarregando(true);
-      await adicionarConvidadoMutation.mutateAsync({
-        nome: novoConvidado.nome,
-        email: novoConvidado.email || undefined,
-        telefone: novoConvidado.telefone || undefined,
-        limite: Number(novoConvidado.limite) || 0,
-      });
+      if (editandoId) {
+        // Alteração (Ponto 7 e 8)
+        await atualizarConvidadoMutation.mutateAsync({
+          id: editandoId,
+          nome: formConvidado.nome,
+          email: formConvidado.email,
+          telefone: formConvidado.telefone,
+          limite: Number(formConvidado.limite),
+          status: formConvidado.status,
+        });
+        alert("Convidado Alterado com sucesso");
+      } else {
+        // Inclusão (Ponto 6)
+        await adicionarConvidadoMutation.mutateAsync({
+          nome: formConvidado.nome,
+          email: formConvidado.email || undefined,
+          telefone: formConvidado.telefone || undefined,
+          limite: Number(formConvidado.limite) || 0,
+        });
+        alert("Convidado Cadastrado com sucesso");
+      }
       await getAllConvidados.refetch();
-      setNovoConvidado({ nome: "", email: "", telefone: "", limite: 0 });
-      alert("Convidado adicionado!");
+      limparForm();
     } catch (error) {
-      alert("Erro ao adicionar.");
-      console.error(error);
+      alert("Erro ao processar solicitação.");
     } finally {
       setCarregando(false);
     }
   }
 
+  function limparForm() {
+    setFormConvidado({ nome: "", email: "", telefone: "", limite: 0, status: "Pendente" });
+    setEditandoId(null);
+  }
+
+  function iniciarEdicao(c: Convidado) {
+    setEditandoId(c.id);
+    setFormConvidado({
+      nome: c.nome,
+      email: c.email || "",
+      telefone: c.telefone || "",
+      limite: c.limite || 0,
+      status: c.status || "Pendente",
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   async function removerConvidado(id: string) {
-    if (confirm("Tem certeza que deseja remover?")) {
+    if (confirm("Tem certeza que deseja remover este convidado?")) {
       try {
         setCarregando(true);
         await deletarConvidadoMutation.mutateAsync({ id });
         await getAllConvidados.refetch();
+        alert("Convidado Removido com sucesso"); // Ponto 9
       } catch (error) {
-        alert("Erro ao remover");
+        alert("Erro ao remover convidado");
       } finally {
         setCarregando(false);
       }
     }
   }
 
-  async function atualizarStatus(id: string, novoStatus: string) {
-    try {
-      setCarregando(true);
-      await atualizarConvidadoMutation.mutateAsync({
-        id,
-        status: novoStatus as any,
-      });
-      await getAllConvidados.refetch();
-    } catch (error) {
-      alert("Erro ao atualizar status");
-    } finally {
-      setCarregando(false);
-    }
-  }
-
-  // Estatísticas Detalhadas
+  // Estatísticas Detalhadas (Ponto 3)
   const confirmados = convidados.filter(c => c.status === "Confirmado");
   const stats = {
     total: convidados.length,
     confirmados: confirmados.length,
     naoIrao: convidados.filter(c => c.status === "Não Irá").length,
+    talvez: convidados.filter(c => c.status === "Talvez").length,
     acompanhantes: confirmados.reduce((acc, c) => acc + (c.acompanhantes || 0), 0),
     criancas: confirmados.reduce((acc, c) => acc + (c.criancas || 0), 0),
   };
@@ -131,7 +164,7 @@ export default function AdminPanel() {
   if (busca) convidadosFiltrados = convidadosFiltrados.filter((c) => c && c.nome && c.nome.toLowerCase().includes(busca.toLowerCase()));
 
   const thStyle: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontWeight: "normal", color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "10px" };
-  const tdStyle: React.CSSProperties = { padding: "16px", borderTop: "1px solid #E8CECE", color: "#2C2C2C", verticalAlign: "middle" };
+  const tdStyle: React.CSSProperties = { padding: "16px", borderTop: "1px solid #E8CECE", color: "#2C2C2C", verticalAlign: "top", fontSize: "12px" };
   const inputStyle: React.CSSProperties = { padding: "10px 12px", border: "1px solid #E8CECE", backgroundColor: "#FDFAF6", fontFamily: "'Lato', sans-serif", fontSize: "13px", outline: "none" };
 
   if (!autenticado) {
@@ -152,70 +185,128 @@ export default function AdminPanel() {
     <div style={{ backgroundColor: "#FDFAF6", minHeight: "100vh" }}>
       <header style={{ borderBottom: "1px solid #E8CECE", padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, backgroundColor: "#FDFAF6", zIndex: 100 }}>
         <h1 style={{ fontFamily: "'Great Vibes', cursive", fontSize: "28px", color: "#2C2C2C", margin: 0 }}>Admin</h1>
-        <button onClick={() => setAutenticado(false)} style={{ background: "none", border: "none", color: "#C4876A", cursor: "pointer", fontSize: "12px", textTransform: "uppercase" }}>Sair</button>
+        <button onClick={sair} style={{ background: "none", border: "none", color: "#C4876A", cursor: "pointer", fontSize: "12px", textTransform: "uppercase" }}>Sair</button>
       </header>
 
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 24px" }}>
-        {/* Dashboard de Estatísticas */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "40px" }}>
+        {/* Dashboard de Estatísticas (Ponto 3) */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "16px", marginBottom: "40px" }}>
           {[
-            { label: "Total Lista", valor: stats.total, cor: "#2C2C2C" },
-            { label: "Conv. Confirmados", valor: stats.confirmados, cor: "#4CAF50" },
-            { label: "Acomp. Adultos", valor: stats.acompanhantes, cor: "#2196F3" },
-            { label: "Crianças", valor: stats.criancas, cor: "#E91E63" },
-            { label: "Total Pessoas", valor: stats.confirmados + stats.acompanhantes + stats.criancas, cor: "#C9A96E" }
+            { label: "Total", valor: stats.total, cor: "#2C2C2C" },
+            { label: "Confirmados", valor: stats.confirmados, cor: "#4CAF50" },
+            { label: "Não Irão", valor: stats.naoIrao, cor: "#F44336" },
+            { label: "Talvez", valor: stats.talvez, cor: "#FF9800" },
+            { label: "Acompanhantes", valor: stats.acompanhantes, cor: "#2196F3" },
+            { label: "Crianças < 9", valor: stats.criancas, cor: "#E91E63" }
           ].map((s) => (
-            <div key={s.label} style={{ border: "1px solid #E8CECE", padding: "24px", textAlign: "center", backgroundColor: "#FFF" }}>
-              <p style={{ fontSize: "28px", fontWeight: "bold", color: s.cor, margin: "0 0 4px 0" }}>{s.valor}</p>
-              <p style={{ fontSize: "10px", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em" }}>{s.label}</p>
+            <div key={s.label} style={{ border: "1px solid #E8CECE", padding: "20px", textAlign: "center", backgroundColor: "#FFF" }}>
+              <p style={{ fontSize: "24px", fontWeight: "bold", color: s.cor, margin: "0 0 4px 0" }}>{s.valor}</p>
+              <p style={{ fontSize: "9px", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em" }}>{s.label}</p>
             </div>
           ))}
         </div>
 
-        {/* Formulário de Adição */}
+        {/* Formulário de Adição/Edição (Ponto 6, 7, 8) */}
         <div style={{ border: "1px solid #E8CECE", padding: "24px", backgroundColor: "#FFF", marginBottom: "40px" }}>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "20px", marginBottom: "20px" }}>Adicionar Convidado</h2>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "20px", marginBottom: "20px" }}>
+            {editandoId ? "Editar Convidado" : "Incluir Novo Convidado"}
+          </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: "16px" }}>
-            <input type="text" placeholder="Nome" value={novoConvidado.nome} onChange={(e) => setNovoConvidado({...novoConvidado, nome: e.target.value})} style={inputStyle} />
-            <input type="number" placeholder="Limite Acomp." value={novoConvidado.limite} onChange={(e) => setNovoConvidado({...novoConvidado, limite: parseInt(e.target.value) || 0})} style={inputStyle} />
+            <input type="text" placeholder="Nome Completo" value={formConvidado.nome} onChange={(e) => setFormConvidado({...formConvidado, nome: e.target.value})} style={inputStyle} />
+            <input type="email" placeholder="E-mail" value={formConvidado.email} onChange={(e) => setFormConvidado({...formConvidado, email: e.target.value})} style={inputStyle} />
+            <input type="tel" placeholder="Telefone" value={formConvidado.telefone} onChange={(e) => setFormConvidado({...formConvidado, telefone: e.target.value})} style={inputStyle} />
+            <input type="number" placeholder="Limite Acomp." value={formConvidado.limite} onChange={(e) => setFormConvidado({...formConvidado, limite: parseInt(e.target.value) || 0})} style={inputStyle} />
+            {editandoId && (
+              <select value={formConvidado.status} onChange={(e) => setFormConvidado({...formConvidado, status: e.target.value as any})} style={inputStyle}>
+                <option value="Pendente">Pendente</option>
+                <option value="Confirmado">Confirmado</option>
+                <option value="Não Irá">Não Irá</option>
+                <option value="Talvez">Talvez</option>
+              </select>
+            )}
           </div>
-          <button onClick={adicionarConvidado} disabled={carregando} style={{ backgroundColor: "#2C2C2C", color: "#FFF", border: "none", padding: "12px 24px", fontSize: "12px", cursor: "pointer", textTransform: "uppercase" }}>{carregando ? "..." : "Adicionar"}</button>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <button onClick={salvarConvidado} disabled={carregando} style={{ backgroundColor: "#2C2C2C", color: "#FFF", border: "none", padding: "12px 24px", fontSize: "11px", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+              {carregando ? "Processando..." : editandoId ? "Salvar Alterações" : "Incluir Convidado"}
+            </button>
+            {editandoId && (
+              <button onClick={limparForm} style={{ backgroundColor: "#FDFAF6", color: "#888", border: "1px solid #E8CECE", padding: "12px 24px", fontSize: "11px", cursor: "pointer", textTransform: "uppercase" }}>Cancelar</button>
+            )}
+          </div>
         </div>
 
-        {/* Tabela */}
+        {/* Filtros e Busca */}
+        <div style={{ display: "flex", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
+          <input type="text" placeholder="Buscar por nome..." value={busca} onChange={(e) => setBusca(e.target.value)} style={{ ...inputStyle, flex: 1, minWidth: "200px" }} />
+          <select value={filtroResposta} onChange={(e) => setFiltroResposta(e.target.value as any)} style={{ ...inputStyle, cursor: "pointer" }}>
+            <option value="todos">Todos os Status</option>
+            <option value="Confirmado">Confirmados</option>
+            <option value="Não Irá">Não Irão</option>
+            <option value="Talvez">Talvez</option>
+            <option value="Pendente">Pendentes</option>
+          </select>
+        </div>
+
+        {/* Lista de Convidados (Ponto 4) */}
         <div style={{ backgroundColor: "#FFF", border: "1px solid #E8CECE", overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ backgroundColor: "#F9F6F2" }}>
-                <th style={thStyle}>Nome</th>
+                <th style={thStyle}>Convidado</th>
+                <th style={thStyle}>E-mail / Telefone</th>
                 <th style={thStyle}>Status</th>
-                <th style={thStyle}>Acomp/Cria</th>
+                <th style={thStyle}>Acompanhantes (Nomes)</th>
                 <th style={thStyle}>Mensagem</th>
                 <th style={{ ...thStyle, textAlign: "center" }}>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {convidadosFiltrados.map((c) => (
-                <tr key={c.id}>
-                  <td style={tdStyle}>{c.nome}</td>
-                  <td style={tdStyle}>
-                    <select value={c.status || "Pendente"} onChange={(e) => atualizarStatus(c.id, e.target.value)} style={{ ...inputStyle, padding: "4px 8px" }}>
-                      <option value="Pendente">Pendente</option>
-                      <option value="Confirmado">Confirmado</option>
-                      <option value="Não Irá">Não Irá</option>
-                    </select>
-                  </td>
-                  <td style={tdStyle}>
-                    <span style={{ fontSize: "11px" }}>{c.acompanhantes || 0}A / {c.criancas || 0}C</span>
-                  </td>
-                  <td style={{ ...tdStyle, fontSize: "11px", fontStyle: "italic", color: "#666", maxWidth: "200px" }}>
-                    {c.mensagem || "-"}
-                  </td>
-                  <td style={{ ...tdStyle, textAlign: "center" }}>
-                    <button onClick={() => removerConvidado(c.id)} style={{ color: "#D4A5A5", background: "none", border: "none", cursor: "pointer", fontSize: "11px", textTransform: "uppercase" }}>Remover</button>
-                  </td>
-                </tr>
-              ))}
+              {convidadosFiltrados.length === 0 ? (
+                <tr><td colSpan={6} style={{ padding: "40px", textAlign: "center", color: "#888", fontSize: "12px" }}>Nenhum convidado encontrado.</td></tr>
+              ) : (
+                convidadosFiltrados.map((c) => (
+                  <tr key={c.id}>
+                    <td style={tdStyle}>
+                      <span style={{ fontWeight: "bold" }}>{c.nome}</span>
+                      <div style={{ fontSize: "9px", color: "#C9A96E", marginTop: "4px" }}>ID: {c.id} | Limite: {c.limite}</div>
+                    </td>
+                    <td style={tdStyle}>
+                      <div style={{ marginBottom: "4px" }}>{c.email || "-"}</div>
+                      <div style={{ color: "#888" }}>{c.telefone || "-"}</div>
+                    </td>
+                    <td style={tdStyle}>
+                      <span style={{ 
+                        padding: "4px 8px", 
+                        borderRadius: "2px", 
+                        fontSize: "10px", 
+                        textTransform: "uppercase",
+                        backgroundColor: c.status === "Confirmado" ? "#E8F5E9" : c.status === "Não Irá" ? "#FFEBEE" : "#F5F5F5",
+                        color: c.status === "Confirmado" ? "#2E7D32" : c.status === "Não Irá" ? "#C62828" : "#616161"
+                      }}>
+                        {c.status || "Pendente"}
+                      </span>
+                    </td>
+                    <td style={tdStyle}>
+                      <div style={{ maxWidth: "250px", fontSize: "11px", lineHeight: "1.4" }}>
+                        {c.acompanhanteDetalhes ? (
+                          <div style={{ whiteSpace: "pre-wrap" }}>{c.acompanhanteDetalhes}</div>
+                        ) : (
+                          <span style={{ color: "#CCC" }}>Nenhum acompanhante</span>
+                        )}
+                      </div>
+                    </td>
+                    <td style={{ ...tdStyle, fontStyle: "italic", color: "#666", maxWidth: "200px" }}>
+                      {c.mensagem || "-"}
+                    </td>
+                    <td style={{ ...tdStyle, textAlign: "center" }}>
+                      <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+                        <button onClick={() => iniciarEdicao(c)} style={{ color: "#C9A96E", background: "none", border: "none", cursor: "pointer", fontSize: "11px", textTransform: "uppercase" }}>Editar</button>
+                        <button onClick={() => removerConvidado(c.id)} style={{ color: "#D4A5A5", background: "none", border: "none", cursor: "pointer", fontSize: "11px", textTransform: "uppercase" }}>Remover</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

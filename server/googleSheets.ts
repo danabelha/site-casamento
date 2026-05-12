@@ -3,20 +3,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-
 const SHEET_NAME = "Convidados";
-
-// ✅ pega JSON direto do ENV
 const credentialsJSON = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
 
 if (!credentialsJSON) {
   throw new Error("GOOGLE_APPLICATION_CREDENTIALS não configurado");
 }
 
-// ✅ converte JSON string → objeto
 const credentials = JSON.parse(credentialsJSON);
-
-// ✅ usa credentials direto (SEM keyFile)
 const auth = new google.auth.GoogleAuth({
   credentials: credentials,
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
@@ -27,7 +21,11 @@ const sheets = google.sheets({
   auth,
 });
 
-// ===== TYPES =====
+// Cache temporário em memória para acelerar leituras repetitivas (Ponto 5)
+let cacheConvidados: ConvidadoRow[] | null = null;
+let lastCacheTime = 0;
+const CACHE_DURATION = 10000; // 10 segundos de cache
+
 export interface ConvidadoRow {
   id: string;
   nome: string;
@@ -40,10 +38,9 @@ export interface ConvidadoRow {
   dataConfirmacao: string;
   acompanhanteDetalhes?: string;
   mensagem?: string;
-  limite: number; // Nova coluna L
+  limite: number;
 }
 
-// ===== HELPERS =====
 function normalizar(texto: string) {
   return texto
     .toLowerCase()
@@ -58,19 +55,20 @@ function getSheetId() {
   return id;
 }
 
-// ===== CORE =====
-export async function buscarTodosConvidados(): Promise<ConvidadoRow[]> {
-  const sheetId = getSheetId();
+export async function buscarTodosConvidados(forceRefresh = false): Promise<ConvidadoRow[]> {
+  const now = Date.now();
+  if (!forceRefresh && cacheConvidados && (now - lastCacheTime < CACHE_DURATION)) {
+    return cacheConvidados;
+  }
 
-  // Range expandido para incluir a coluna L (limite)
+  const sheetId = getSheetId();
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
     range: `${SHEET_NAME}!A:L`,
   });
 
   const rows = response.data.values || [];
-
-  return rows.slice(1).map((row) => ({
+  const data = rows.slice(1).map((row) => ({
     id: row[0] || "",
     nome: row[1] || "",
     email: row[2] || "",
@@ -82,18 +80,18 @@ export async function buscarTodosConvidados(): Promise<ConvidadoRow[]> {
     dataConfirmacao: row[8] || "",
     acompanhanteDetalhes: row[9] || "",
     mensagem: row[10] || "",
-    limite: parseInt(row[11]) || 0, // Coluna L
+    limite: parseInt(row[11]) || 0,
   }));
+
+  cacheConvidados = data;
+  lastCacheTime = now;
+  return data;
 }
 
 export async function buscarConvidados(nome: string) {
   const lista = await buscarTodosConvidados();
   const termo = normalizar(nome);
-
-  // Busca EXATA (conforme solicitado pelo usuário)
-  return lista.filter((c) =>
-    normalizar(c.nome) === termo
-  );
+  return lista.filter((c) => normalizar(c.nome) === termo);
 }
 
 export async function salvarConfirmacao(data: {
@@ -106,34 +104,26 @@ export async function salvarConfirmacao(data: {
   mensagem?: string;
 }) {
   const sheetId = getSheetId();
-
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: sheetId,
-    range: `${SHEET_NAME}!A:L`,
-  });
-
-  const rows = response.data.values || [];
-
-  const index = rows.findIndex((row, i) => i > 0 && row[0] === data.id);
+  const lista = await buscarTodosConvidados(true); // Força refresh para garantir posição correta
+  const index = lista.findIndex(c => c.id === data.id);
   if (index === -1) return false;
 
-  const rowNumber = index + 1;
-  const linha = rows[index];
+  const rowNumber = index + 2; 
+  const current = lista[index];
 
-  // Mantém os valores originais e atualiza apenas o RSVP
   const novosValores = [
-    linha[0], // ID
-    linha[1], // NOME
-    linha[2], // EMAIL
-    linha[3], // TELEFONE
+    current.id,
+    current.nome,
+    current.email,
+    current.telefone,
     data.status,
     data.acompanhantes,
     data.criancas,
     data.menores8,
-    new Date().toISOString(),
+    new Date().toLocaleString("pt-BR"),
     data.acompanhanteDetalhes || "",
     data.mensagem || "",
-    linha[11] || 0, // LIMITE (Mantém o valor original da coluna L)
+    current.limite || 0,
   ];
 
   await sheets.spreadsheets.values.update({
@@ -143,10 +133,9 @@ export async function salvarConfirmacao(data: {
     requestBody: { values: [novosValores] },
   });
 
+  cacheConvidados = null; // Limpa cache após alteração
   return true;
 }
-
-// ===== ADMIN FUNCTIONS =====
 
 export async function adicionarConvidado(data: {
   nome: string;
@@ -155,15 +144,12 @@ export async function adicionarConvidado(data: {
   limite?: number;
 }) {
   const sheetId = getSheetId();
-  const lista = await buscarTodosConvidados();
+  const lista = await buscarTodosConvidados(true);
   
-  // Lógica de ID Sequencial
   let novoId = 1;
   if (lista.length > 0) {
     const ids = lista.map(c => parseInt(c.id)).filter(id => !isNaN(id));
-    if (ids.length > 0) {
-      novoId = Math.max(...ids) + 1;
-    }
+    if (ids.length > 0) novoId = Math.max(...ids) + 1;
   }
   
   const novaLinha = [
@@ -173,7 +159,7 @@ export async function adicionarConvidado(data: {
     data.telefone || "",
     "Pendente",
     0, 0, 0, "", "", "",
-    data.limite || 0 // Coluna L
+    data.limite || 0
   ];
 
   await sheets.spreadsheets.values.append({
@@ -183,31 +169,33 @@ export async function adicionarConvidado(data: {
     requestBody: { values: [novaLinha] },
   });
 
+  cacheConvidados = null;
   return true;
 }
 
 export async function atualizarConvidado(id: string, data: Partial<ConvidadoRow>) {
   const sheetId = getSheetId();
-  const lista = await buscarTodosConvidados();
+  const lista = await buscarTodosConvidados(true);
   const index = lista.findIndex(c => c.id === id);
   if (index === -1) return false;
 
   const rowNumber = index + 2; 
-  
   const current = lista[index];
+
+  // Garantindo que todos os campos sejam preservados ou atualizados corretamente (Ponto 7)
   const novosValores = [
     current.id,
-    data.nome || current.nome,
-    data.email || current.email,
-    data.telefone || current.telefone,
-    data.status || current.status,
+    data.nome !== undefined ? data.nome : current.nome,
+    data.email !== undefined ? data.email : current.email,
+    data.telefone !== undefined ? data.telefone : current.telefone,
+    data.status !== undefined ? data.status : current.status,
     data.acompanhantes !== undefined ? data.acompanhantes : current.acompanhantes,
     data.criancas !== undefined ? data.criancas : current.criancas,
     data.menores8 !== undefined ? data.menores8 : current.menores8,
-    current.dataConfirmacao,
-    current.acompanhanteDetalhes,
-    current.mensagem,
-    data.limite !== undefined ? data.limite : current.limite // Coluna L
+    current.dataConfirmacao || "",
+    data.acompanhanteDetalhes !== undefined ? data.acompanhanteDetalhes : current.acompanhanteDetalhes,
+    data.mensagem !== undefined ? data.mensagem : current.mensagem,
+    data.limite !== undefined ? data.limite : current.limite
   ];
 
   await sheets.spreadsheets.values.update({
@@ -217,6 +205,7 @@ export async function atualizarConvidado(id: string, data: Partial<ConvidadoRow>
     requestBody: { values: [novosValores] },
   });
 
+  cacheConvidados = null;
   return true;
 }
 
@@ -251,5 +240,6 @@ export async function deletarConvidado(id: string) {
     }
   });
 
+  cacheConvidados = null;
   return true;
 }
