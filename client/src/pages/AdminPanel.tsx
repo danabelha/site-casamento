@@ -4,7 +4,6 @@
  */
 
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
 import { trpc } from "../lib/trpc";
 
 interface Convidado {

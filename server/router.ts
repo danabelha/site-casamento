@@ -82,6 +82,9 @@ const appRouter = t.router({
       .input(
         z.object({
           id: z.string(),
+          nome: z.string().optional(),
+          email: z.string().optional(),
+          telefone: z.string().optional(),
           status: z.string().optional(),
           acompanhantes: z.number().optional(),
           criancas: z.number().optional(),
