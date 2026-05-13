@@ -24,12 +24,14 @@ const PRESENTES = [
 
 // ===== COMPONENTES AUXILIARES =====
 
-function SectionDivider({ number, title }: { number: string; title: string } ) {
+function SectionDivider({ number, title }: { number?: string; title: string } ) {
   return (
     <div className="text-center mb-8 md:mb-12 px-4">
-      <p className="font-lato text-[10px] tracking-[0.4em] text-wedding-gold font-normal uppercase mb-3">
-        {number}
-      </p>
+      {number && (
+        <p className="font-lato text-[10px] tracking-[0.4em] text-wedding-gold font-normal uppercase mb-3">
+          {number}
+        </p>
+      )}
       <h2 className="font-cormorant text-[28px] md:text-[42px] font-light text-wedding-charcoal leading-tight mb-4">
         {title}
       </h2>
@@ -131,13 +133,15 @@ export default function Confirmacao() {
   const [sucesso, setSucesso] = useState(false);
   const [pixVisivel, setPixVisivel] = useState<Record<number, boolean>>({});
   const [pixCopiado, setPixCopiado] = useState<number | null>(null);
+  const [carregandoBusca, setCarregandoBusca] = useState(false);
 
   const searchConvidados = trpc.searchConvidados.useMutation();
   const confirmarPresenca = trpc.confirmarPresenca.useMutation();
 
   const buscarConvidado = async () => {
-    if (!nomeBusca.trim()) return;
+    if (!nomeBusca.trim() || carregandoBusca) return;
     try {
+      setCarregandoBusca(true);
       const resultado = await searchConvidados.mutateAsync({ nome: nomeBusca });
       if (resultado && (resultado as any).length > 0) {
         setConvidadoSelecionado((resultado as any)[0]);
@@ -147,6 +151,8 @@ export default function Confirmacao() {
     } catch (error) {
       console.error(error);
       alert("Erro ao buscar convidado.");
+    } finally {
+      setCarregandoBusca(false);
     }
   };
 
@@ -185,13 +191,13 @@ export default function Confirmacao() {
       <main className="max-w-4xl mx-auto pt-20 pb-20">
         {/* Cabeçalho (Nomes do Casal) - Sempre visível */}
         <FadeSection className="px-6 text-center mb-20">
-          <p className="font-lato text-[10px] tracking-[0.6em] text-wedding-gold uppercase mb-6">20 de Setembro de 2025</p>
-          <h1 className="font-halimun text-[42px] md:text-[60px] text-wedding-terracotta leading-tight">Daniele & Mariana</h1>
+          <p className="font-lato text-[10px] tracking-[0.6em] text-wedding-gold uppercase mb-6">05 de Dezembro de 2026</p>
+          <h1 className="font-halimun text-[42px] md:text-[60px] text-wedding-terracotta leading-tight">Mariana & Daniel</h1>
         </FadeSection>
 
         {/* Seção de Busca de Convidado - Sempre visível */}
         <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
-          <SectionDivider number="01" title="Confirmar Presença" />
+          <SectionDivider title="Verificação de Convidado" />
           <p className="font-light text-[#888] mb-8 text-sm">Informe seu nome conforme o convite</p>
           <input 
             type="text" 
@@ -203,22 +209,23 @@ export default function Confirmacao() {
           />
           <button 
             onClick={buscarConvidado}
-            className="w-full bg-wedding-charcoal text-white py-4 tracking-[0.2em] uppercase text-[12px]"
+            disabled={carregandoBusca}
+            className={`w-full bg-wedding-charcoal text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
           >
-            Verificar Convite
+            {carregandoBusca ? "Verificando..." : "Verificar Convite"}
           </button>
         </FadeSection>
 
         {/* Conteúdo adicional - Visível apenas após o convidado ser selecionado */}
         {convidadoSelecionado && (
-          <div className="px-6">
+          <div className="px-6 animate-in fade-in duration-1000">
             <FadeSection className="mb-24">
-              <SectionDivider number="02" title="Galeria" />
+              <SectionDivider number="01" title="Galeria" />
               <Carrossel />
             </FadeSection>
 
             <FadeSection className="mb-24">
-              <SectionDivider number="03" title="Localização" />
+              <SectionDivider number="02" title="Localização" />
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="text-center md:text-right space-y-4">
                   <h3 className="font-cormorant text-2xl text-wedding-terracotta">Espaço das Águas</h3>
@@ -232,7 +239,7 @@ export default function Confirmacao() {
             </FadeSection>
 
             <FadeSection className="mb-24">
-              <SectionDivider number="04" title="Presentes" />
+              <SectionDivider number="03" title="Presentes" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {PRESENTES.map((p, i) => (
                   <div key={i} className="p-6 border border-wedding-blush/20 bg-white/50 hover:bg-white transition-all">
@@ -267,7 +274,7 @@ export default function Confirmacao() {
 
             {/* Formulário de Confirmação */}
             <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
-              <SectionDivider number="05" title="Sua Confirmação" />
+              <SectionDivider number="04" title="Sua Confirmação" />
               {sucesso ? (
                 <div className="p-8 bg-wedding-blush/10 text-wedding-charcoal">
                   <h3 className="font-cormorant text-2xl mb-4">Obrigado por confirmar, {convidadoSelecionado.nome}!</h3>
