@@ -34,7 +34,6 @@ export default function Home() {
     const timer = setInterval(() => {
       setTempoRestante(calcularTempoRestante());
     }, 1000);
-    // Atraso para a animação de entrada escalonada
     setTimeout(() => setLoaded(true), 100);
     return () => clearInterval(timer);
   }, []);
@@ -42,15 +41,12 @@ export default function Home() {
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-wedding-charcoal max-w-[2000px] mx-auto">
       
-      {/* BackGround Image com Parallax Sutil */}
+      {/* BackGround Image - Otimizada para Qualidade e Posicionamento */}
       <div
-        className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55] transform translate-y-0 transition-transform duration-1000 ease-out"
+        className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55]"
         style={{
           backgroundImage: `url(${heroImage})`,
-          backgroundPosition: "center 45%",
-          // Adicionar um pequeno movimento no scroll para efeito parallax
-          // Isso pode ser aprimorado com JS para mousemove/tilt
-          backgroundAttachment: "fixed", 
+          backgroundPosition: "center center", // Ajustado para centralizar melhor a imagem
         }}
       />
 
@@ -62,9 +58,9 @@ export default function Home() {
         }}
       />
 
-      {/* Conteúdo Principal com Moldura de Convite */}
+      {/* Conteúdo Principal - Sem o quadro de linha branco */}
       <div
-        className={`relative z-10 text-center px-4 py-12 sm:px-8 sm:py-16 md:px-16 md:py-20 border border-wedding-cream/30 transition-all duration-[1200ms] ease-out 
+        className={`relative z-10 text-center px-4 py-12 transition-all duration-[1200ms] ease-out 
           ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
       >
         {/* Pré-título */}
@@ -79,7 +75,7 @@ export default function Home() {
         <h1 
           className={`font-halimun text-[32px] sm:text-[42px] md:text-[80px] lg:text-[110px] leading-tight text-wedding-cream mb-8 drop-shadow-2xl 
             transition-all duration-700 ease-out ${loaded ? "opacity-100 translate-y-0 delay-300" : "opacity-0 translate-y-5"}`}
-          style={{ whiteSpace: "normal", wordBreak: "break-word" }} // Permitir quebra de linha para mobile
+          style={{ whiteSpace: "normal", wordBreak: "break-word" }}
         >
           Mariana & Daniel
         </h1>
@@ -108,7 +104,7 @@ export default function Home() {
               className={`flex flex-col items-center px-2 sm:px-4 md:px-8 
                 ${i < 3 ? "border-r border-wedding-gold/30" : ""}`}
             >
-              <span className="font-montserrat text-[22px] sm:text-[28px] md:text-[48px] text-wedding-cream font-extralight leading-none"> {/* font-extralight para refinamento */}
+              <span className="font-montserrat text-[22px] sm:text-[28px] md:text-[48px] text-wedding-cream font-extralight leading-none">
                 {String(item.valor).padStart(2, "0")}
               </span>
               <span className="font-montserrat text-[9px] sm:text-[11px] md:text-[18px] tracking-[0.2em] uppercase text-wedding-gold mt-1 font-normal">
