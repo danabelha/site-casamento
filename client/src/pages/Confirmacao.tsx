@@ -24,7 +24,7 @@ const PRESENTES = [
 
 // ===== COMPONENTES AUXILIARES =====
 
-function SectionDivider({ number, title }: { number?: string; title: string } ) {
+function SectionDivider({ number, title, isVerification = false }: { number?: string; title: string; isVerification?: boolean } ) {
   return (
     <div className="text-center mb-8 md:mb-12 px-4">
       {number && (
@@ -32,7 +32,8 @@ function SectionDivider({ number, title }: { number?: string; title: string } ) 
           {number}
         </p>
       )}
-      <h2 className="font-cormorant text-[28px] md:text-[42px] font-light text-wedding-charcoal leading-tight mb-4">
+      <h2 className={`font-cormorant font-light text-wedding-charcoal leading-tight mb-4 whitespace-nowrap
+        ${isVerification ? 'text-[22px] sm:text-[28px] md:text-[42px]' : 'text-[28px] md:text-[42px]'}`}>
         {title}
       </h2>
       <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />
@@ -197,12 +198,12 @@ export default function Confirmacao() {
 
         {/* Seção de Busca de Convidado - Sempre visível */}
         <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
-          <SectionDivider title="Verificação de Convidado" />
+          <SectionDivider title="Verificação de Convidado" isVerification={true} />
           <p className="font-light text-[#888] mb-8 text-sm">Informe seu nome conforme o convite</p>
           <input 
             type="text" 
             placeholder="Nome do Convidado" 
-            className="wedding-input mb-6"
+            className="wedding-input mb-6 !text-[16px]" // !text-[16px] impede o zoom no mobile
             value={nomeBusca}
             onChange={(e) => setNomeBusca(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && buscarConvidado()}
@@ -308,7 +309,7 @@ export default function Confirmacao() {
                           <input
                             type="text"
                             placeholder={`Nome do Acompanhante ${index + 1}`}
-                            className="wedding-input flex-grow"
+                            className="wedding-input flex-grow !text-[16px]"
                             value={adultos[index]?.nome || ""}
                             onChange={(e) => {
                               const newAdultos = [...adultos];
@@ -341,7 +342,7 @@ export default function Confirmacao() {
                           <input
                             type="text"
                             placeholder="Nome da Criança"
-                            className="wedding-input flex-grow"
+                            className="wedding-input flex-grow !text-[16px]"
                             value={crianca.nome}
                             onChange={(e) => {
                               const newCriancas = [...criancas];
@@ -352,7 +353,7 @@ export default function Confirmacao() {
                           <input
                             type="number"
                             placeholder="Idade"
-                            className="wedding-input w-20"
+                            className="wedding-input w-20 !text-[16px]"
                             value={crianca.idade}
                             onChange={(e) => {
                               const newCriancas = [...criancas];
@@ -382,7 +383,7 @@ export default function Confirmacao() {
                       <textarea
                         placeholder="Deixe uma mensagem para os noivos (opcional)"
                         rows={4}
-                        className="wedding-input"
+                        className="wedding-input !text-[16px]"
                         value={mensagem}
                         onChange={(e) => setMensagem(e.target.value)}
                       ></textarea>
