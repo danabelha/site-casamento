@@ -24,14 +24,9 @@ const PRESENTES = [
 
 // ===== COMPONENTES AUXILIARES =====
 
-function SectionDivider({ number, title, isVerification = false }: { number?: string; title: string; isVerification?: boolean } ) {
+function SectionDivider({ title, isVerification = false }: { title: string; isVerification?: boolean } ) {
   return (
     <div className="text-center mb-8 md:mb-12 px-4">
-      {number && (
-        <p className="font-lato text-[10px] tracking-[0.4em] text-wedding-gold font-normal uppercase mb-3">
-          {number}
-        </p>
-      )}
       <h2 className={`font-cormorant font-light text-wedding-charcoal leading-tight mb-4 whitespace-nowrap
         ${isVerification ? 'text-[22px] sm:text-[28px] md:text-[42px]' : 'text-[28px] md:text-[42px]'}`}>
         {title}
@@ -203,7 +198,7 @@ export default function Confirmacao() {
           <input 
             type="text" 
             placeholder="Nome do Convidado" 
-            className="wedding-input mb-6 !text-[16px]" // !text-[16px] impede o zoom no mobile
+            className="wedding-input mb-6 !text-[16px]"
             value={nomeBusca}
             onChange={(e) => setNomeBusca(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && buscarConvidado()}
@@ -220,13 +215,24 @@ export default function Confirmacao() {
         {/* Conteúdo adicional - Visível apenas após o convidado ser selecionado */}
         {convidadoSelecionado && (
           <div className="px-6 animate-in fade-in duration-1000">
+            
+            {/* Boas-vindas Personalizada (Segmento #02) */}
+            <FadeSection className="text-center mb-24 px-6">
+              <h2 className="font-halimun text-[32px] md:text-[48px] text-wedding-terracotta mb-6">
+                Olá, {convidadoSelecionado.nome}!
+              </h2>
+              <p className="font-montserrat text-[14px] md:text-[18px] text-wedding-charcoal/70 leading-relaxed max-w-[600px] mx-auto">
+                Nossa história também tem você, por isso queremos viver esse momento único ao seu lado.
+              </p>
+            </FadeSection>
+
             <FadeSection className="mb-24">
-              <SectionDivider number="01" title="Galeria" />
+              <SectionDivider title="Galeria" />
               <Carrossel />
             </FadeSection>
 
             <FadeSection className="mb-24">
-              <SectionDivider number="02" title="Localização" />
+              <SectionDivider title="Localização" />
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="text-center md:text-right space-y-4">
                   <h3 className="font-cormorant text-2xl text-wedding-terracotta">Espaço das Águas</h3>
@@ -240,7 +246,7 @@ export default function Confirmacao() {
             </FadeSection>
 
             <FadeSection className="mb-24">
-              <SectionDivider number="03" title="Presentes" />
+              <SectionDivider title="Presentes" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {PRESENTES.map((p, i) => (
                   <div key={i} className="p-6 border border-wedding-blush/20 bg-white/50 hover:bg-white transition-all">
@@ -275,7 +281,7 @@ export default function Confirmacao() {
 
             {/* Formulário de Confirmação */}
             <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
-              <SectionDivider number="04" title="Sua Confirmação" />
+              <SectionDivider title="Sua Confirmação" />
               {sucesso ? (
                 <div className="p-8 bg-wedding-blush/10 text-wedding-charcoal">
                   <h3 className="font-cormorant text-2xl mb-4">Obrigado por confirmar, {convidadoSelecionado.nome}!</h3>
