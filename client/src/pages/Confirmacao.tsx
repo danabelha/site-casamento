@@ -187,34 +187,34 @@ export default function Confirmacao() {
               </p>
             </FadeSection>
 
-            {/* Sticky Stacking Gallery Section - TEXTO COM FUNDO OPACO */}
+            {/* Sticky Stacking Gallery Section - OTIMIZADA MOBILE */}
             <section className="relative px-4 sm:px-6 mb-32">
               <SectionDivider title="Nossa História" />
               <div className="relative max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
                   <div 
                     key={index} 
-                    className="sticky top-0 min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 py-20"
+                    className="sticky top-0 min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20"
                   >
-                    {/* Texto Narrativo - Com fundo opaco para não atropelar */}
-                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] bg-wedding-cream/95 md:bg-wedding-cream p-6 md:p-0 z-20">
-                      <h3 className="font-cormorant text-[28px] md:text-[36px] text-wedding-terracotta mb-6">
+                    {/* Texto Narrativo - Otimizado Mobile */}
+                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] bg-wedding-cream md:bg-transparent p-6 md:p-0 z-20 shadow-sm md:shadow-none rounded-sm">
+                      <h3 className="font-cormorant text-[24px] md:text-[36px] text-wedding-terracotta mb-4 md:mb-6">
                         {item.titulo}
                       </h3>
-                      <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/65 leading-relaxed">
+                      <p className="font-montserrat text-[13px] md:text-[16px] text-wedding-charcoal/65 leading-relaxed">
                         {item.texto}
                       </p>
                     </div>
 
-                    {/* Foto Estilo Polaroid */}
+                    {/* Foto Estilo Polaroid - Otimizada Mobile */}
                     <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
                       <div 
-                        className="bg-white p-3 pb-12 shadow-2xl transform transition-transform duration-500 hover:scale-105"
+                        className="bg-white p-2 pb-8 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500"
                         style={{ 
                           transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)`,
                         }}
                       >
-                        <div className="relative w-[260px] h-[320px] sm:w-[320px] sm:h-[400px] overflow-hidden">
+                        <div className="relative w-[220px] h-[280px] sm:w-[320px] sm:h-[400px] overflow-hidden">
                           <img 
                             src={item.url} 
                             alt={item.titulo} 
