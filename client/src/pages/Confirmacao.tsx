@@ -38,6 +38,9 @@ const PRESENTES = [
   { nome: "Contribuição Livre", descricao: "Qualquer valor é bem-vindo com amor", pix: "casamento@danielemariana.com", emoji: "💝" },
 ];
 
+const ENDERECO_COMPLETO = "R. Cônego Eugênio Leite, 1098 - Pinheiros, São Paulo - SP, 05414-012";
+const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Celeiro Quintal " + ENDERECO_COMPLETO)}`;
+
 // ===== COMPONENTES AUXILIARES =====
 
 function SectionDivider({ title, isVerification = false }: { title: string; isVerification?: boolean } ) {
@@ -187,7 +190,7 @@ export default function Confirmacao() {
               </p>
             </FadeSection>
 
-            {/* Sticky Stacking Gallery Section - OTIMIZADA MOBILE */}
+            {/* Sticky Stacking Gallery Section */}
             <section className="relative px-4 sm:px-6 mb-32">
               <SectionDivider title="Nossa História" />
               <div className="relative max-w-5xl mx-auto">
@@ -196,7 +199,6 @@ export default function Confirmacao() {
                     key={index} 
                     className="sticky top-0 min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20"
                   >
-                    {/* Texto Narrativo - Otimizado Mobile */}
                     <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] bg-wedding-cream md:bg-transparent p-6 md:p-0 z-20 shadow-sm md:shadow-none rounded-sm">
                       <h3 className="font-cormorant text-[24px] md:text-[36px] text-wedding-terracotta mb-4 md:mb-6">
                         {item.titulo}
@@ -206,7 +208,6 @@ export default function Confirmacao() {
                       </p>
                     </div>
 
-                    {/* Foto Estilo Polaroid - Otimizada Mobile */}
                     <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
                       <div 
                         className="bg-white p-2 pb-8 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500"
@@ -228,16 +229,33 @@ export default function Confirmacao() {
               </div>
             </section>
 
+            {/* Localização - ATUALIZADA */}
             <FadeSection className="mb-32 px-6">
               <SectionDivider title="Localização" />
               <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
                 <div className="text-center md:text-right space-y-4">
-                  <h3 className="font-cormorant text-2xl text-wedding-terracotta">Espaço das Águas</h3>
-                  <p className="text-sm font-light text-[#888]">Rua das Palmeiras, 123 — São Paulo</p>
-                  <a href="#" className="inline-block border-b border-wedding-gold text-wedding-gold py-1 text-[10px] uppercase tracking-widest">Abrir no Maps</a>
+                  <h3 className="font-cormorant text-[28px] text-wedding-terracotta">Celeiro Quintal</h3>
+                  <p className="text-[14px] font-light text-wedding-charcoal/70 leading-relaxed">
+                    R. Cônego Eugênio Leite, 1098<br />
+                    Pinheiros, São Paulo - SP<br />
+                    CEP: 05414-012
+                  </p>
+                  <a 
+                    href={MAPS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block border-b border-wedding-gold text-wedding-gold py-1 text-[10px] uppercase tracking-[0.2em] hover:text-wedding-terracotta hover:border-wedding-terracotta transition-all"
+                  >
+                    Abrir no GPS (Waze/Maps)
+                  </a>
                 </div>
-                <div className="h-[300px] bg-gray-100 rounded-sm grayscale shadow-lg">
-                  <iframe width="100%" height="100%" frameBorder="0" src="https://maps.google.com/maps?q=-23.5505,-46.6333&z=15&output=embed" />
+                <div className="h-[300px] bg-gray-100 rounded-sm grayscale shadow-lg overflow-hidden">
+                  <iframe 
+                    width="100%" 
+                    height="100%" 
+                    frameBorder="0" 
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_COMPLETO)}&z=17&output=embed`} 
+                  />
                 </div>
               </div>
             </FadeSection>
