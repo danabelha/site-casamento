@@ -259,20 +259,10 @@ export default function Confirmacao() {
               </div>
             </FadeSection>
 
-            {/* Presentes - CARROSSEL MOBILE E AVISO PIX */}
+            {/* Presentes - CARROSSEL MOBILE E AVISO PIX CONTEXTUAL */}
             <FadeSection className="mb-24 md:mb-32">
               <SectionDivider title="Presentes" />
               
-              {/* Aviso de Segurança PIX */}
-              <div className="max-w-3xl mx-auto px-6 mb-10">
-                <div className="bg-wedding-terracotta/5 border border-wedding-terracotta/20 p-4 rounded-sm flex items-center gap-4">
-                  <span className="text-xl">⚠️</span>
-                  <p className="text-[12px] md:text-[13px] text-wedding-charcoal/80 font-montserrat leading-relaxed">
-                    <strong>Atenção:</strong> Antes de confirmar o pagamento via PIX, por favor, verifique se o destinatário aparece como <strong>Daniel e Mariana</strong>.
-                  </p>
-                </div>
-              </div>
-
               {/* Carrossel Mobile / Grade Desktop */}
               <div className="relative px-4 md:px-6">
                 <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible pb-8 md:pb-0 scrollbar-hide snap-x snap-mandatory max-w-5xl mx-auto">
@@ -299,14 +289,21 @@ export default function Confirmacao() {
                         </button>
                         
                         {pixVisivel[i] && (
-                          <div className="mt-4 p-4 bg-wedding-blush/10 text-[11px] animate-in fade-in zoom-in duration-300">
-                            <p className="text-[#888] uppercase mb-1 tracking-widest">Chave PIX</p>
+                          <div className="mt-4 p-4 bg-wedding-terracotta/5 border border-wedding-terracotta/10 text-[11px] animate-in fade-in zoom-in duration-300 rounded-sm">
+                            <div className="flex items-start gap-2 mb-3 text-wedding-terracotta/80">
+                              <span className="text-xs">⚠️</span>
+                              <p className="font-montserrat leading-tight">
+                                Confirme o destinatário:<br/>
+                                <strong>Daniel e Mariana</strong>
+                              </p>
+                            </div>
+                            <p className="text-[#888] uppercase mb-1 tracking-widest text-[9px]">Chave PIX</p>
                             <p className="font-mono break-all bg-white p-2 border border-wedding-blush/30">{p.pix}</p>
                             <button 
                               onClick={() => copiarPix(i, p.pix)}
-                              className={`mt-2 uppercase tracking-widest transition-all text-[9px] ${pixCopiado === i ? 'text-green-600 font-bold' : 'text-wedding-terracotta'}`}
+                              className={`mt-3 w-full py-2 uppercase tracking-widest transition-all text-[9px] border border-wedding-terracotta/20 ${pixCopiado === i ? 'bg-green-50 text-green-600 border-green-200 font-bold' : 'bg-white text-wedding-terracotta hover:bg-wedding-terracotta hover:text-white'}`}
                             >
-                              {pixCopiado === i ? "✓ Chave Copiada!" : "Copiar Chave"}
+                              {pixCopiado === i ? "✓ Chave Copiada!" : "Copiar Chave PIX"}
                             </button>
                           </div>
                         )}
