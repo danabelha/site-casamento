@@ -6,11 +6,27 @@ import { useEffect, useRef, useState } from "react";
 import { trpc } from "../lib/trpc";
 
 // ===== CONSTANTES =====
-const GALLERY_IMAGES = [
-  "https://i.pinimg.com/736x/c0/bc/f8/c0bcf84c9b1f88e70d63f72a3ab87f44.jpg",
-  "https://i.pinimg.com/736x/d6/31/ae/d631aeb49b7fb2104f804c9f4da05042.jpg",
-  "https://i.pinimg.com/736x/25/40/70/254070ff05550f897f4a850e6786c884.jpg",
-  "https://i.pinimg.com/736x/a3/94/f2/a394f25f3491c43b14e44cee714aae35.jpg",
+const GALLERY_ITEMS = [
+  {
+    url: "https://i.pinimg.com/736x/c0/bc/f8/c0bcf84c9b1f88e70d63f72a3ab87f44.jpg",
+    titulo: "Como tudo começou",
+    texto: "Era um dia comum que se tornou extraordinário. Nosso primeiro encontro foi o início de uma jornada que mudaria nossas vidas para sempre."
+  },
+  {
+    url: "https://i.pinimg.com/736x/d6/31/ae/d631aeb49b7fb2104f804c9f4da05042.jpg",
+    titulo: "Nossas Aventuras",
+    texto: "Entre viagens, risadas e descobertas, cada quilômetro percorrido ao seu lado reforçou a certeza de que fomos feitos um para o outro."
+  },
+  {
+    url: "https://i.pinimg.com/736x/25/40/70/254070ff05550f897f4a850e6786c884.jpg",
+    titulo: "O Pedido",
+    texto: "Um 'sim' que ecoará pela eternidade. Sob o céu que testemunhou nosso amor, decidimos trilhar o mesmo caminho de mãos dadas."
+  },
+  {
+    url: "https://i.pinimg.com/736x/a3/94/f2/a394f25f3491c43b14e44cee714aae35.jpg",
+    titulo: "O Grande Dia",
+    texto: "Agora, estamos prestes a celebrar o capítulo mais importante da nossa história. E sua presença tornará esse momento ainda mais especial."
+  },
 ];
 
 const PRESENTES = [
@@ -56,63 +72,6 @@ function FadeSection({ children, className = "" }: { children: React.ReactNode; 
       }`}
     >
       {children}
-    </div>
-  );
-}
-
-function Carrossel() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [autoplay, setAutoplay] = useState(true);
-
-  useEffect(() => {
-    if (!autoplay) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % GALLERY_IMAGES.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [autoplay]);
-
-  const handleImageClick = (index: number) => {
-    setCurrentIndex(index);
-    setAutoplay(false);
-  };
-
-  return (
-    <div className="relative w-full mb-6 overflow-hidden pb-8">
-      <div className="flex items-center justify-center gap-2 sm:gap-4 perspective-[1000px] min-h-[300px] md:min-h-[450px]">
-        {/* Foto Esquerda (Oculta em Mobile) */}
-        <div 
-          className="flex-[0_0_60px] sm:flex-[0_0_140px] opacity-40 cursor-pointer transition-all duration-500 scale-90 hidden sm:block"
-          onClick={() => handleImageClick((currentIndex - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length)}
-        >
-          <img src={GALLERY_IMAGES[(currentIndex - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length]} className="w-full h-auto rounded-sm object-cover" alt="Anterior" />
-        </div>
-
-        {/* Foto Central (Principal no Mobile) */}
-        <div className="flex-[0_0_90%] sm:flex-[0_0_380px] z-10 transition-all duration-500">
-          <img src={GALLERY_IMAGES[currentIndex]} className="w-full h-auto rounded-sm shadow-xl object-cover" alt="Atual" />
-        </div>
-
-        {/* Foto Direita (Oculta em Mobile) */}
-        <div 
-          className="flex-[0_0_60px] sm:flex-[0_0_140px] opacity-40 cursor-pointer transition-all duration-500 scale-90 hidden sm:block"
-          onClick={() => handleImageClick((currentIndex + 1) % GALLERY_IMAGES.length)}
-        >
-          <img src={GALLERY_IMAGES[(currentIndex + 1) % GALLERY_IMAGES.length]} className="w-full h-auto rounded-sm object-cover" alt="Próxima" />
-        </div>
-      </div>
-
-      <div className="flex justify-center gap-2 mt-4">
-        {GALLERY_IMAGES.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => handleImageClick(i)}
-            className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${
-              currentIndex === i ? "bg-wedding-gold w-4" : "bg-wedding-gold/30"
-            }`}
-          />
-        ))}
-      </div>
     </div>
   );
 }
@@ -184,7 +143,7 @@ export default function Confirmacao() {
 
   return (
     <div className="min-h-screen bg-wedding-cream text-wedding-charcoal">
-      <main className="max-w-4xl mx-auto pt-20 pb-20">
+      <main className="max-w-6xl mx-auto pt-20 pb-20">
         {/* Cabeçalho (Nomes do Casal) - Sempre visível */}
         <FadeSection className="px-6 text-center mb-20">
           <p className="font-lato text-[10px] tracking-[0.6em] text-wedding-gold uppercase mb-6">05 de Dezembro de 2026</p>
@@ -193,7 +152,7 @@ export default function Confirmacao() {
 
         {/* Seção de Busca de Convidado - Oculta após verificação */}
         {!convidadoSelecionado && (
-          <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24 animate-out fade-out duration-500">
+          <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
             <SectionDivider title="Verificação de Convidado" isVerification={true} />
             <p className="font-light text-[#888] mb-8 text-sm">Informe seu nome conforme o convite</p>
             <input 
@@ -216,10 +175,10 @@ export default function Confirmacao() {
 
         {/* Conteúdo adicional - Visível apenas após o convidado ser selecionado */}
         {convidadoSelecionado && (
-          <div className="px-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
             
-            {/* Boas-vindas Personalizada (Segmento #02) */}
-            <FadeSection className="text-center mb-24 px-6">
+            {/* Boas-vindas Personalizada */}
+            <FadeSection className="text-center mb-32 px-6">
               <h2 className="font-halimun text-[32px] md:text-[48px] text-wedding-terracotta mb-6">
                 Olá, {convidadoSelecionado.nome}!
               </h2>
@@ -228,49 +187,86 @@ export default function Confirmacao() {
               </p>
             </FadeSection>
 
-            <FadeSection className="mb-24">
-              <SectionDivider title="Galeria" />
-              <Carrossel />
-            </FadeSection>
+            {/* Sticky Stacking Gallery Section */}
+            <section className="relative px-4 sm:px-6 mb-32">
+              <SectionDivider title="Nossa História" />
+              <div className="relative max-w-5xl mx-auto">
+                {GALLERY_ITEMS.map((item, index) => (
+                  <div 
+                    key={index} 
+                    className="sticky top-20 min-h-[70vh] flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 py-12"
+                  >
+                    {/* Texto Narrativo */}
+                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px]">
+                      <h3 className="font-cormorant text-[24px] md:text-[32px] text-wedding-terracotta mb-4">
+                        {item.titulo}
+                      </h3>
+                      <p className="font-montserrat text-[13px] md:text-[15px] text-wedding-charcoal/60 leading-relaxed">
+                        {item.texto}
+                      </p>
+                    </div>
 
-            <FadeSection className="mb-24">
+                    {/* Foto Estilo Polaroid */}
+                    <div className="flex-1 flex justify-center order-1 md:order-2">
+                      <div 
+                        className="bg-white p-3 pb-12 shadow-2xl transform transition-transform duration-500 hover:scale-105"
+                        style={{ 
+                          transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)`,
+                          boxShadow: '0 20px 50px rgba(0,0,0,0.15)'
+                        }}
+                      >
+                        <div className="relative w-[280px] h-[350px] sm:w-[320px] sm:h-[400px] overflow-hidden">
+                          <img 
+                            src={item.url} 
+                            alt={item.titulo} 
+                            className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-700"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <FadeSection className="mb-32 px-6">
               <SectionDivider title="Localização" />
-              <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
                 <div className="text-center md:text-right space-y-4">
                   <h3 className="font-cormorant text-2xl text-wedding-terracotta">Espaço das Águas</h3>
                   <p className="text-sm font-light text-[#888]">Rua das Palmeiras, 123 — São Paulo</p>
                   <a href="#" className="inline-block border-b border-wedding-gold text-wedding-gold py-1 text-[10px] uppercase tracking-widest">Abrir no Maps</a>
                 </div>
-                <div className="h-[300px] bg-gray-100 rounded-sm grayscale">
+                <div className="h-[300px] bg-gray-100 rounded-sm grayscale shadow-lg">
                   <iframe width="100%" height="100%" frameBorder="0" src="https://maps.google.com/maps?q=-23.5505,-46.6333&z=15&output=embed" />
                 </div>
               </div>
             </FadeSection>
 
-            <FadeSection className="mb-24">
+            <FadeSection className="mb-32 px-6">
               <SectionDivider title="Presentes" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 {PRESENTES.map((p, i) => (
-                  <div key={i} className="p-6 border border-wedding-blush/20 bg-white/50 hover:bg-white transition-all">
-                    <div className="flex justify-between items-start mb-4">
-                      <span className="text-2xl">{p.emoji}</span>
-                      <span className="text-[10px] uppercase tracking-widest text-wedding-gold font-bold">{p.valor}</span>
+                  <div key={i} className="p-8 border border-wedding-blush/20 bg-white/50 hover:bg-white transition-all shadow-sm hover:shadow-md">
+                    <div className="flex justify-between items-start mb-6">
+                      <span className="text-3xl">{p.emoji}</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-wedding-gold font-bold">{p.valor}</span>
                     </div>
-                    <h4 className="font-cormorant text-xl text-wedding-charcoal">{p.nome}</h4>
-                    <p className="text-[11px] text-[#888] mt-1 mb-4">{p.descricao}</p>
+                    <h4 className="font-cormorant text-xl text-wedding-charcoal mb-2">{p.nome}</h4>
+                    <p className="text-[12px] text-[#888] leading-relaxed mb-6">{p.descricao}</p>
                     <button 
                       onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })}
-                      className="text-[10px] uppercase tracking-widest text-wedding-terracotta border-b border-wedding-terracotta/30 pb-1"
+                      className="text-[10px] uppercase tracking-[0.2em] text-wedding-terracotta border-b border-wedding-terracotta/30 pb-1 hover:border-wedding-terracotta transition-all"
                     >
                       {pixVisivel[i] ? "Ocultar Chave" : "Presentear via PIX"}
                     </button>
                     {pixVisivel[i] && (
                       <div className="mt-4 p-4 bg-wedding-blush/10 text-[11px] animate-in fade-in zoom-in duration-300">
-                        <p className="text-[#888] uppercase mb-1">Chave PIX</p>
+                        <p className="text-[#888] uppercase mb-1 tracking-widest">Chave PIX</p>
                         <p className="font-mono break-all bg-white p-2 border border-wedding-blush/30">{p.pix}</p>
                         <button 
                           onClick={() => copiarPix(i, p.pix)}
-                          className={`mt-2 uppercase tracking-tighter transition-all ${pixCopiado === i ? 'text-green-500 font-bold' : 'text-wedding-terracotta'}`}
+                          className={`mt-2 uppercase tracking-widest transition-all text-[9px] ${pixCopiado === i ? 'text-green-600 font-bold' : 'text-wedding-terracotta'}`}
                         >
                           {pixCopiado === i ? "✓ Chave Copiada!" : "Copiar Chave"}
                         </button>
@@ -282,35 +278,34 @@ export default function Confirmacao() {
             </FadeSection>
 
             {/* Formulário de Confirmação */}
-            <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
+            <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-32">
               <SectionDivider title="Sua Confirmação" />
               {sucesso ? (
-                <div className="p-8 bg-wedding-blush/10 text-wedding-charcoal">
-                  <h3 className="font-cormorant text-2xl mb-4">Obrigado por confirmar, {convidadoSelecionado.nome}!</h3>
-                  <p className="font-lato text-sm">Sua presença é muito importante para nós.</p>
+                <div className="p-12 bg-wedding-blush/10 border border-wedding-blush/30 text-wedding-charcoal">
+                  <h3 className="font-halimun text-3xl mb-4 text-wedding-terracotta">Obrigado!</h3>
+                  <p className="font-montserrat text-sm text-wedding-charcoal/70">Sua presença é o nosso maior presente.</p>
                 </div>
               ) : (
-                <div className="space-y-6">
-                  <p className="font-lato text-sm text-[#888]">Olá, {convidadoSelecionado.nome}! Por favor, confirme sua presença e de seus acompanhantes.</p>
+                <div className="space-y-8">
+                  <p className="font-montserrat text-sm text-[#888]">Olá, {convidadoSelecionado.nome}! Por favor, confirme sua presença e de seus acompanhantes.</p>
 
-                  {/* Resposta Principal */}
                   <div className="flex justify-center gap-4">
                     <button
                       onClick={() => setResposta("Confirmado")}
-                      className={`py-3 px-6 border ${resposta === "Confirmado" ? "bg-wedding-terracotta text-white border-wedding-terracotta" : "border-wedding-blush/50 text-wedding-charcoal"} transition-all`}
+                      className={`py-4 px-8 border text-[12px] tracking-widest uppercase transition-all ${resposta === "Confirmado" ? "bg-wedding-terracotta text-white border-wedding-terracotta shadow-lg" : "border-wedding-blush/50 text-wedding-charcoal hover:border-wedding-terracotta"}`}
                     >
-                      Confirmar Presença
+                      Confirmar
                     </button>
                     <button
                       onClick={() => setResposta("Não Irá")}
-                      className={`py-3 px-6 border ${resposta === "Não Irá" ? "bg-wedding-terracotta text-white border-wedding-terracotta" : "border-wedding-blush/50 text-wedding-charcoal"} transition-all`}
+                      className={`py-4 px-8 border text-[12px] tracking-widest uppercase transition-all ${resposta === "Não Irá" ? "bg-wedding-terracotta text-white border-wedding-terracotta shadow-lg" : "border-wedding-blush/50 text-wedding-charcoal hover:border-wedding-terracotta"}`}
                     >
-                      Não Poderei Ir
+                      Não Irá
                     </button>
                   </div>
 
                   {resposta === "Confirmado" && (
-                    <div className="space-y-6 animate-in fade-in zoom-in duration-300">
+                    <div className="space-y-6 animate-in fade-in zoom-in duration-500">
                       {/* Acompanhantes Adultos */}
                       {Array.from({ length: convidadoSelecionado.limite || 0 }).map((_, index) => (
                         <div key={index} className="flex items-center gap-2">
@@ -325,28 +320,13 @@ export default function Confirmacao() {
                               setAdultos(newAdultos);
                             }}
                           />
-                          <button
-                            onClick={() => {
-                              const newAdultos = adultos.filter((_, i) => i !== index);
-                              setAdultos(newAdultos);
-                            }}
-                            className="text-red-500 text-sm"
-                          >
-                            Remover
-                          </button>
                         </div>
                       ))}
-                      <button
-                        onClick={() => setAdultos([...adultos, { nome: "" }])}
-                        className="text-wedding-terracotta text-sm border-b border-wedding-terracotta/50"
-                      >
-                        + Adicionar Acompanhante
-                      </button>
 
                       {/* Crianças */}
-                      <h4 className="font-cormorant text-xl mt-8">Crianças (opcional)</h4>
+                      <h4 className="font-cormorant text-2xl mt-12 text-wedding-terracotta">Crianças</h4>
                       {criancas.map((crianca, index) => (
-                        <div key={index} className="flex items-center gap-2">
+                        <div key={index} className="flex items-center gap-2 animate-in slide-in-from-left duration-300">
                           <input
                             type="text"
                             placeholder="Nome da Criança"
@@ -374,7 +354,7 @@ export default function Confirmacao() {
                               const newCriancas = criancas.filter((_, i) => i !== index);
                               setCriancas(newCriancas);
                             }}
-                            className="text-red-500 text-sm"
+                            className="text-red-400 text-[10px] uppercase tracking-tighter"
                           >
                             Remover
                           </button>
@@ -382,23 +362,22 @@ export default function Confirmacao() {
                       ))}
                       <button
                         onClick={() => setCriancas([...criancas, { nome: "", idade: "" }])}
-                        className="text-wedding-terracotta text-sm border-b border-wedding-terracotta/50"
+                        className="text-wedding-gold text-[10px] uppercase tracking-[0.2em] border-b border-wedding-gold/30 pb-1"
                       >
                         + Adicionar Criança
                       </button>
 
-                      {/* Mensagem */}
                       <textarea
                         placeholder="Deixe uma mensagem para os noivos (opcional)"
                         rows={4}
-                        className="wedding-input !text-[16px]"
+                        className="wedding-input !text-[16px] mt-8"
                         value={mensagem}
                         onChange={(e) => setMensagem(e.target.value)}
                       ></textarea>
 
                       <button
                         onClick={handleSubmit}
-                        className="w-full bg-wedding-charcoal text-white py-4 tracking-[0.2em] uppercase text-[12px]"
+                        className="w-full bg-wedding-charcoal text-white py-5 tracking-[0.4em] uppercase text-[12px] shadow-xl hover:bg-wedding-terracotta transition-all"
                       >
                         Finalizar Confirmação
                       </button>
