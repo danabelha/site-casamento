@@ -187,17 +187,17 @@ export default function Confirmacao() {
               </p>
             </FadeSection>
 
-            {/* Sticky Stacking Gallery Section - CORRIGIDA */}
+            {/* Sticky Stacking Gallery Section - TEXTO COM FUNDO OPACO */}
             <section className="relative px-4 sm:px-6 mb-32">
               <SectionDivider title="Nossa História" />
               <div className="relative max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
                   <div 
                     key={index} 
-                    className="sticky top-0 min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 py-20 bg-wedding-cream"
+                    className="sticky top-0 min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 py-20"
                   >
-                    {/* Texto Narrativo */}
-                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px]">
+                    {/* Texto Narrativo - Com fundo opaco para não atropelar */}
+                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] bg-wedding-cream/95 md:bg-wedding-cream p-6 md:p-0 z-20">
                       <h3 className="font-cormorant text-[28px] md:text-[36px] text-wedding-terracotta mb-6">
                         {item.titulo}
                       </h3>
@@ -207,7 +207,7 @@ export default function Confirmacao() {
                     </div>
 
                     {/* Foto Estilo Polaroid */}
-                    <div className="flex-1 flex justify-center order-1 md:order-2">
+                    <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
                       <div 
                         className="bg-white p-3 pb-12 shadow-2xl transform transition-transform duration-500 hover:scale-105"
                         style={{ 
