@@ -266,7 +266,7 @@ export default function Confirmacao() {
               </div>
             </FadeSection>
 
-            {/* Confirmação de Presença — REVISADA */}
+            {/* Confirmação de Presença */}
             <FadeSection className="max-w-[600px] mx-auto px-6 text-center mb-32">
               <SectionDivider title="Confirmação de Presença" />
               
@@ -378,7 +378,7 @@ export default function Confirmacao() {
                         </div>
                       )}
                       {limiteAtingido && (
-                        <p className="text-[10px] text-wedding-terracotta/60 italic italic">Limite de acompanhantes atingido.</p>
+                        <p className="text-[10px] text-wedding-terracotta/60 italic">Limite de acompanhantes atingido.</p>
                       )}
                     </div>
                   )}
@@ -398,10 +398,10 @@ export default function Confirmacao() {
                       
                       <button
                         onClick={handleSubmit}
-                        disabled={confirmarPresenca.isLoading}
+                        disabled={(confirmarPresenca as any).isPending}
                         className="w-full bg-wedding-charcoal text-white py-5 tracking-[0.4em] uppercase text-[12px] shadow-xl hover:bg-wedding-terracotta transition-all disabled:opacity-50"
                       >
-                        {confirmarPresenca.isLoading ? "Enviando..." : "Enviar Resposta"}
+                        {(confirmarPresenca as any).isPending ? "Enviando..." : "Enviar Resposta"}
                       </button>
                     </div>
                   )}
