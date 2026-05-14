@@ -190,7 +190,7 @@ export default function Confirmacao() {
               </p>
             </FadeSection>
 
-            {/* Sticky Stacking Gallery Section - EFEITO DE PILHA REAL */}
+            {/* Sticky Stacking Gallery Section */}
             <section className="relative px-4 sm:px-6 mb-16 md:mb-32">
               <SectionDivider title="Nossa História" />
               <div className="relative max-w-5xl mx-auto">
@@ -199,7 +199,6 @@ export default function Confirmacao() {
                     key={index} 
                     className="sticky top-0 min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20"
                   >
-                    {/* Texto Narrativo - Card Opaco para cobrir o anterior */}
                     <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-wedding-cream p-6 md:p-4 rounded-sm">
                       <h3 className="font-cormorant text-[24px] md:text-[36px] text-wedding-terracotta mb-4 md:mb-6">
                         {item.titulo}
@@ -209,7 +208,6 @@ export default function Confirmacao() {
                       </p>
                     </div>
 
-                    {/* Foto Estilo Polaroid - Seção Transparente para empilhar */}
                     <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
                       <div 
                         className="bg-white p-1.5 pb-6 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500"
@@ -231,6 +229,7 @@ export default function Confirmacao() {
               </div>
             </section>
 
+            {/* Localização */}
             <FadeSection className="mb-24 md:mb-32 px-6">
               <SectionDivider title="Localização" />
               <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
@@ -260,37 +259,67 @@ export default function Confirmacao() {
               </div>
             </FadeSection>
 
-            <FadeSection className="mb-24 md:mb-32 px-6">
+            {/* Presentes - CARROSSEL MOBILE E AVISO PIX */}
+            <FadeSection className="mb-24 md:mb-32">
               <SectionDivider title="Presentes" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                {PRESENTES.map((p, i) => (
-                  <div key={i} className="p-8 border border-wedding-blush/20 bg-white/50 hover:bg-white transition-all shadow-sm hover:shadow-md">
-                    <div className="flex justify-between items-start mb-6">
-                      <span className="text-3xl">{p.emoji}</span>
-                      <span className="text-[10px] uppercase tracking-[0.2em] text-wedding-gold font-bold">{p.valor}</span>
-                    </div>
-                    <h4 className="font-cormorant text-xl text-wedding-charcoal mb-2">{p.nome}</h4>
-                    <p className="text-[12px] text-[#888] leading-relaxed mb-6">{p.descricao}</p>
-                    <button 
-                      onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })}
-                      className="text-[10px] uppercase tracking-[0.2em] text-wedding-terracotta border-b border-wedding-terracotta/30 pb-1 hover:border-wedding-terracotta transition-all"
+              
+              {/* Aviso de Segurança PIX */}
+              <div className="max-w-3xl mx-auto px-6 mb-10">
+                <div className="bg-wedding-terracotta/5 border border-wedding-terracotta/20 p-4 rounded-sm flex items-center gap-4">
+                  <span className="text-xl">⚠️</span>
+                  <p className="text-[12px] md:text-[13px] text-wedding-charcoal/80 font-montserrat leading-relaxed">
+                    <strong>Atenção:</strong> Antes de confirmar o pagamento via PIX, por favor, verifique se o destinatário aparece como <strong>Daniel e Mariana</strong>.
+                  </p>
+                </div>
+              </div>
+
+              {/* Carrossel Mobile / Grade Desktop */}
+              <div className="relative px-4 md:px-6">
+                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible pb-8 md:pb-0 scrollbar-hide snap-x snap-mandatory max-w-5xl mx-auto">
+                  {PRESENTES.map((p, i) => (
+                    <div 
+                      key={i} 
+                      className="min-w-[280px] md:min-w-0 snap-center p-8 border border-wedding-blush/20 bg-white/50 hover:bg-white transition-all shadow-sm hover:shadow-md flex flex-col justify-between"
                     >
-                      {pixVisivel[i] ? "Ocultar Chave" : "Presentear via PIX"}
-                    </button>
-                    {pixVisivel[i] && (
-                      <div className="mt-4 p-4 bg-wedding-blush/10 text-[11px] animate-in fade-in zoom-in duration-300">
-                        <p className="text-[#888] uppercase mb-1 tracking-widest">Chave PIX</p>
-                        <p className="font-mono break-all bg-white p-2 border border-wedding-blush/30">{p.pix}</p>
-                        <button 
-                          onClick={() => copiarPix(i, p.pix)}
-                          className={`mt-2 uppercase tracking-widest transition-all text-[9px] ${pixCopiado === i ? 'text-green-600 font-bold' : 'text-wedding-terracotta'}`}
-                        >
-                          {pixCopiado === i ? "✓ Chave Copiada!" : "Copiar Chave"}
-                        </button>
+                      <div>
+                        <div className="flex justify-between items-start mb-6">
+                          <span className="text-3xl">{p.emoji}</span>
+                          <span className="text-[10px] uppercase tracking-[0.2em] text-wedding-gold font-bold">{p.valor}</span>
+                        </div>
+                        <h4 className="font-cormorant text-xl text-wedding-charcoal mb-2">{p.nome}</h4>
+                        <p className="text-[12px] text-[#888] leading-relaxed mb-6">{p.descricao}</p>
                       </div>
-                    )}
-                  </div>
-                ))}
+                      
+                      <div>
+                        <button 
+                          onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })}
+                          className="text-[10px] uppercase tracking-[0.2em] text-wedding-terracotta border-b border-wedding-terracotta/30 pb-1 hover:border-wedding-terracotta transition-all"
+                        >
+                          {pixVisivel[i] ? "Ocultar Chave" : "Presentear via PIX"}
+                        </button>
+                        
+                        {pixVisivel[i] && (
+                          <div className="mt-4 p-4 bg-wedding-blush/10 text-[11px] animate-in fade-in zoom-in duration-300">
+                            <p className="text-[#888] uppercase mb-1 tracking-widest">Chave PIX</p>
+                            <p className="font-mono break-all bg-white p-2 border border-wedding-blush/30">{p.pix}</p>
+                            <button 
+                              onClick={() => copiarPix(i, p.pix)}
+                              className={`mt-2 uppercase tracking-widest transition-all text-[9px] ${pixCopiado === i ? 'text-green-600 font-bold' : 'text-wedding-terracotta'}`}
+                            >
+                              {pixCopiado === i ? "✓ Chave Copiada!" : "Copiar Chave"}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* Indicador de scroll apenas no mobile */}
+                <div className="flex justify-center gap-1 mt-4 md:hidden">
+                  {PRESENTES.map((_, i) => (
+                    <div key={i} className="w-1.5 h-1.5 rounded-full bg-wedding-gold/30" />
+                  ))}
+                </div>
               </div>
             </FadeSection>
 
