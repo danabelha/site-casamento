@@ -187,21 +187,21 @@ export default function Confirmacao() {
               </p>
             </FadeSection>
 
-            {/* Sticky Stacking Gallery Section */}
+            {/* Sticky Stacking Gallery Section - CORRIGIDA */}
             <section className="relative px-4 sm:px-6 mb-32">
               <SectionDivider title="Nossa História" />
               <div className="relative max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
                   <div 
                     key={index} 
-                    className="sticky top-20 min-h-[70vh] flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 py-12"
+                    className="sticky top-0 min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 py-20 bg-wedding-cream"
                   >
                     {/* Texto Narrativo */}
                     <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px]">
-                      <h3 className="font-cormorant text-[24px] md:text-[32px] text-wedding-terracotta mb-4">
+                      <h3 className="font-cormorant text-[28px] md:text-[36px] text-wedding-terracotta mb-6">
                         {item.titulo}
                       </h3>
-                      <p className="font-montserrat text-[13px] md:text-[15px] text-wedding-charcoal/60 leading-relaxed">
+                      <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/65 leading-relaxed">
                         {item.texto}
                       </p>
                     </div>
@@ -212,14 +212,13 @@ export default function Confirmacao() {
                         className="bg-white p-3 pb-12 shadow-2xl transform transition-transform duration-500 hover:scale-105"
                         style={{ 
                           transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)`,
-                          boxShadow: '0 20px 50px rgba(0,0,0,0.15)'
                         }}
                       >
-                        <div className="relative w-[280px] h-[350px] sm:w-[320px] sm:h-[400px] overflow-hidden">
+                        <div className="relative w-[260px] h-[320px] sm:w-[320px] sm:h-[400px] overflow-hidden">
                           <img 
                             src={item.url} 
                             alt={item.titulo} 
-                            className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-700"
+                            className="w-full h-full object-cover"
                           />
                         </div>
                       </div>
