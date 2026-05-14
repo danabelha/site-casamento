@@ -41,12 +41,12 @@ export default function Home() {
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-wedding-charcoal max-w-[2000px] mx-auto">
       
-      {/* BackGround Image - Otimizada para Qualidade e Posicionamento */}
+      {/* BackGround Image - Otimizada para aparecer toda a imagem mantendo a harmonia */}
       <div
         className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55]"
         style={{
           backgroundImage: `url(${heroImage})`,
-          backgroundPosition: "center center", // Ajustado para centralizar melhor a imagem
+          backgroundPosition: "center 40%", // Ajustado levemente para cima para priorizar o arco e o altar
         }}
       />
 
@@ -54,11 +54,11 @@ export default function Home() {
       <div
         className="absolute inset-0 opacity-20 pointer-events-none"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'%3E%3C/feTurbulence%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'0.4\'%3E%3C/rect%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'%3E%3C/feTurbulence%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'%3E%3C/rect%3E%3C/svg%3E")`,
         }}
       />
 
-      {/* Conteúdo Principal - Sem o quadro de linha branco */}
+      {/* Conteúdo Principal */}
       <div
         className={`relative z-10 text-center px-4 py-12 transition-all duration-[1200ms] ease-out 
           ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
