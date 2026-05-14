@@ -190,17 +190,17 @@ export default function Confirmacao() {
               </p>
             </FadeSection>
 
-            {/* Sticky Stacking Gallery Section - REVISADA */}
+            {/* Sticky Stacking Gallery Section - EFEITO DE PILHA REAL */}
             <section className="relative px-4 sm:px-6 mb-16 md:mb-32">
               <SectionDivider title="Nossa História" />
               <div className="relative max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
                   <div 
                     key={index} 
-                    className="sticky top-0 min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20 bg-wedding-cream"
+                    className="sticky top-0 min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20"
                   >
-                    {/* Texto Narrativo - Garantindo que não empilhe no Desktop */}
-                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-20">
+                    {/* Texto Narrativo - Card Opaco para cobrir o anterior */}
+                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-wedding-cream p-6 md:p-4 rounded-sm">
                       <h3 className="font-cormorant text-[24px] md:text-[36px] text-wedding-terracotta mb-4 md:mb-6">
                         {item.titulo}
                       </h3>
@@ -209,7 +209,7 @@ export default function Confirmacao() {
                       </p>
                     </div>
 
-                    {/* Foto Estilo Polaroid - Moldura Reduzida no Mobile */}
+                    {/* Foto Estilo Polaroid - Seção Transparente para empilhar */}
                     <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
                       <div 
                         className="bg-white p-1.5 pb-6 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500"
@@ -231,7 +231,6 @@ export default function Confirmacao() {
               </div>
             </section>
 
-            {/* Localização - REVISADA */}
             <FadeSection className="mb-24 md:mb-32 px-6">
               <SectionDivider title="Localização" />
               <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
