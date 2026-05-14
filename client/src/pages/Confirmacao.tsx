@@ -191,30 +191,32 @@ export default function Confirmacao() {
           <h1 className="font-halimun text-[42px] md:text-[60px] text-wedding-terracotta leading-tight">Mariana & Daniel</h1>
         </FadeSection>
 
-        {/* Seção de Busca de Convidado - Sempre visível */}
-        <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
-          <SectionDivider title="Verificação de Convidado" isVerification={true} />
-          <p className="font-light text-[#888] mb-8 text-sm">Informe seu nome conforme o convite</p>
-          <input 
-            type="text" 
-            placeholder="Nome do Convidado" 
-            className="wedding-input mb-6 !text-[16px]"
-            value={nomeBusca}
-            onChange={(e) => setNomeBusca(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && buscarConvidado()}
-          />
-          <button 
-            onClick={buscarConvidado}
-            disabled={carregandoBusca}
-            className={`w-full bg-wedding-charcoal text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
-          >
-            {carregandoBusca ? "Verificando..." : "Verificar Convite"}
-          </button>
-        </FadeSection>
+        {/* Seção de Busca de Convidado - Oculta após verificação */}
+        {!convidadoSelecionado && (
+          <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24 animate-out fade-out duration-500">
+            <SectionDivider title="Verificação de Convidado" isVerification={true} />
+            <p className="font-light text-[#888] mb-8 text-sm">Informe seu nome conforme o convite</p>
+            <input 
+              type="text" 
+              placeholder="Nome do Convidado" 
+              className="wedding-input mb-6 !text-[16px]"
+              value={nomeBusca}
+              onChange={(e) => setNomeBusca(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && buscarConvidado()}
+            />
+            <button 
+              onClick={buscarConvidado}
+              disabled={carregandoBusca}
+              className={`w-full bg-wedding-charcoal text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
+            >
+              {carregandoBusca ? "Verificando..." : "Verificar Convite"}
+            </button>
+          </FadeSection>
+        )}
 
         {/* Conteúdo adicional - Visível apenas após o convidado ser selecionado */}
         {convidadoSelecionado && (
-          <div className="px-6 animate-in fade-in duration-1000">
+          <div className="px-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
             
             {/* Boas-vindas Personalizada (Segmento #02) */}
             <FadeSection className="text-center mb-24 px-6">
