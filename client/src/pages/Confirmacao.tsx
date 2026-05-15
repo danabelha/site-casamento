@@ -131,12 +131,26 @@ export default function Confirmacao() {
         ...criancas.map(c => `${c.nome} (${c.idade} anos)`)
       ].join("\n");
 
+      // Filtrar crianças com base na idade real
+      const menoresDe8 = criancas.filter(c => {
+        const idadeNum = parseInt(c.idade, 10);
+        return !isNaN(idadeNum) && idadeNum < 8;
+      });
+
+      const criancasMaioresOuIgual8 = criancas.filter(c => {
+        const idadeNum = parseInt(c.idade, 10);
+        return !isNaN(idadeNum) && idadeNum >= 8;
+      });
+
       await confirmarPresenca.mutateAsync({
         id: convidadoSelecionado.id,
         status: resposta === "Talvez" ? "Talvez" : resposta === "Confirmado" ? "Confirmado" : "Não Irá",
-        acompanhantes: adultos.length,
+        // Acompanhantes totais (Adultos + Crianças >= 8 anos)
+        acompanhantes: adultos.length + criancasMaioresOuIgual8.length,
+        // Total de crianças informadas
         criancas: criancas.length,
-        menores8: criancas.filter(c => Number(c.idade) < 8).length,
+        // Apenas as que realmente têm menos de 8 anos
+        menores8: menoresDe8.length,
         mensagem,
         acompanhanteDetalhes: detalhes,
       });
