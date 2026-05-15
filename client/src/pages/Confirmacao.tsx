@@ -131,25 +131,26 @@ export default function Confirmacao() {
         ...criancas.map(c => `${c.nome} (${c.idade} anos)`)
       ].join("\n");
 
-      // Filtrar crianças com base na idade real
+      // Regra do Contrato: Idade <= 7 anos é isento (Menores8)
+      // Crianças com idade > 7 anos contam como acompanhantes pagantes
       const menoresDe8 = criancas.filter(c => {
         const idadeNum = parseInt(c.idade, 10);
-        return !isNaN(idadeNum) && idadeNum < 8;
+        return !isNaN(idadeNum) && idadeNum <= 7;
       });
 
-      const criancasMaioresOuIgual8 = criancas.filter(c => {
+      const criancasPagantes = criancas.filter(c => {
         const idadeNum = parseInt(c.idade, 10);
-        return !isNaN(idadeNum) && idadeNum >= 8;
+        return !isNaN(idadeNum) && idadeNum > 7;
       });
 
       await confirmarPresenca.mutateAsync({
         id: convidadoSelecionado.id,
         status: resposta === "Talvez" ? "Talvez" : resposta === "Confirmado" ? "Confirmado" : "Não Irá",
-        // Acompanhantes totais (Adultos + Crianças >= 8 anos)
-        acompanhantes: adultos.length + criancasMaioresOuIgual8.length,
-        // Total de crianças informadas
+        // Acompanhantes Pagantes = Adultos + Crianças > 7 anos
+        acompanhantes: adultos.length + criancasPagantes.length,
+        // Total de crianças informadas (para histórico)
         criancas: criancas.length,
-        // Apenas as que realmente têm menos de 8 anos
+        // Isentos conforme contrato (<= 7 anos)
         menores8: menoresDe8.length,
         mensagem,
         acompanhanteDetalhes: detalhes,
