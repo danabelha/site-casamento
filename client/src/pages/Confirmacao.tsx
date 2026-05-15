@@ -5,6 +5,9 @@
 import { useEffect, useRef, useState } from "react";
 import { trpc } from "../lib/trpc";
 
+// Importar imagens
+import manualImg from "../assets/images/manual.png";
+
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
   {
@@ -271,9 +274,27 @@ export default function Confirmacao() {
               <SectionDivider title="Confirmação de Presença" />
               
               {sucesso ? (
-                <div className="p-12 bg-wedding-blush/10 border border-wedding-blush/30 text-wedding-charcoal">
-                  <h3 className="font-halimun text-3xl mb-4 text-wedding-terracotta">Obrigado!</h3>
-                  <p className="font-montserrat text-sm text-wedding-charcoal/70">Sua resposta foi enviada com carinho.</p>
+                <div className="space-y-12">
+                  <div className="p-12 bg-wedding-blush/10 border border-wedding-blush/30 text-wedding-charcoal">
+                    <h3 className="font-halimun text-3xl mb-4 text-wedding-terracotta">Obrigado!</h3>
+                    <p className="font-montserrat text-sm text-wedding-charcoal/70">Sua resposta foi enviada com carinho.</p>
+                  </div>
+                  
+                  {/* Manual do Convidado — Exibido apenas em caso de sucesso */}
+                  <FadeSection className="space-y-8 animate-in fade-in slide-in-from-top-8 duration-1000">
+                    <div className="w-10 h-[1px] bg-wedding-gold mx-auto mb-8" />
+                    <h4 className="font-cormorant text-3xl text-wedding-terracotta">Manual do Convidado</h4>
+                    <div className="bg-white p-2 shadow-2xl rounded-sm overflow-hidden max-w-[500px] mx-auto">
+                      <img 
+                        src={manualImg} 
+                        alt="Manual do Convidado" 
+                        className="w-full h-auto"
+                      />
+                    </div>
+                    <p className="font-montserrat text-[10px] text-wedding-charcoal/50 uppercase tracking-widest">
+                      Tire um print para não esquecer os detalhes!
+                    </p>
+                  </FadeSection>
                 </div>
               ) : (
                 <div className="space-y-10">
