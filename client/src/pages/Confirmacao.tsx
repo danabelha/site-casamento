@@ -280,11 +280,11 @@ export default function Confirmacao() {
                     <p className="font-montserrat text-sm text-wedding-charcoal/70">Sua resposta foi enviada com carinho.</p>
                   </div>
                   
-                  {/* Manual do Convidado — Exibido apenas em caso de sucesso */}
+                  {/* Manual do Convidado — Exibição Limpa */}
                   <FadeSection className="space-y-8 animate-in fade-in slide-in-from-top-8 duration-1000">
                     <div className="w-10 h-[1px] bg-wedding-gold mx-auto mb-8" />
                     <h4 className="font-cormorant text-3xl text-wedding-terracotta">Manual do Convidado</h4>
-                    <div className="bg-white p-2 shadow-2xl rounded-sm overflow-hidden max-w-[500px] mx-auto">
+                    <div className="max-w-[500px] mx-auto overflow-hidden">
                       <img 
                         src={manualImg} 
                         alt="Manual do Convidado" 
