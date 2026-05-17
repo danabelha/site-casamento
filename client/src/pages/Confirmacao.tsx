@@ -49,11 +49,11 @@ const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURICom
 function SectionDivider({ title, isVerification = false }: { title: string; isVerification?: boolean } ) {
   return (
     <div className="text-center mb-8 md:mb-12 px-4">
-      <h2 className={`font-cormorant font-light text-wedding-charcoal leading-tight mb-4 whitespace-nowrap
+      <h2 className={`font-cormorant font-light text-[#462F29] leading-tight mb-4 whitespace-nowrap
         ${isVerification ? 'text-[22px] sm:text-[28px] md:text-[42px]' : 'text-[28px] md:text-[42px]'}`}>
         {title}
       </h2>
-      <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />
+      {!isVerification && <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />}
     </div>
   );
 }
@@ -171,8 +171,11 @@ export default function Confirmacao() {
         {/* Cabeçalho (Nomes do Casal) */}
         <FadeSection className="px-6 text-center mb-20">
           <p className="font-lato text-[10px] tracking-[0.6em] text-wedding-gold uppercase mb-6">05 de Dezembro de 2026</p>
-            <h1 className="font-halimun text-[42px] md:text-[60px] text-wedding-terracotta leading-tight">Mariana & Daniel</h1>
+            <h1 className="font-halimun text-[42px] md:text-[60px] text-[#462F29] leading-tight">Mariana & Daniel</h1>
         </FadeSection>
+
+        {/* Efeito de Envelope no Topo */}
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-wedding-cream to-transparent z-20 pointer-events-none" />
 
         {/* Divisor Minimalista */}
         <div className="text-center my-10 md:my-16">
@@ -182,7 +185,7 @@ export default function Confirmacao() {
         {!convidadoSelecionado && (
           <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
             <SectionDivider title="Verificação de Convidado" isVerification={true} />
-            <p className="font-light text-[#888] mb-8 text-sm">Informe seu nome conforme o convite</p>
+            <p className="font-light text-[#888] mb-8 text-sm">Informe seu Nome e Sobrenome</p>
             <input 
               type="text" 
               placeholder="Nome do Convidado" 
@@ -194,7 +197,7 @@ export default function Confirmacao() {
             <button 
               onClick={buscarConvidado}
               disabled={carregandoBusca}
-              className={`w-full bg-wedding-charcoal text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
+              className={`w-full bg-[#462F29] text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
             >
               {carregandoBusca ? "Verificando..." : "Verificar Convite"}
             </button>
@@ -205,7 +208,650 @@ export default function Confirmacao() {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {/* Boas-vindas */}
             <FadeSection className="text-center mb-24 md:mb-32 px-6">
-              <h2 className="font-halimun text-[32px] md:text-[48px] text-wedding-terracotta mb-6">
+              <h2 className="font-halimun text-[32px] md:text-[48px] text-[#462F29] mb-6">
+                Olá, {convidadoSelecionado.nome}!
+              </h2>
+              <p className="font-montserrat text-[14px] md:text-[18px] text-wedding-charcoal/70 leading-relaxed max-w-[600px] mx-auto">
+                Nossa história também tem você, por isso queremos viver esse momento único ao seu lado.
+              </p>
+            </FadeSection>
+
+            {/* Galeria */}
+            <section className="relative px-4 sm:px-6 mb-16 md:mb-32">
+              <SectionDivider title="Nossa História" />
+              <div className="relative max-w-5xl mx-auto">
+                {GALLERY_ITEMS.map((item, index) => (
+                  <div key={index} className="sticky top-0 min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20">
+                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-[#462F29] p-6 md:p-4 rounded-sm shadow-sm md:shadow-none">
+                      <h3 className="font-cormorant text-[24px] md:text-[36px] text-white mb-4 md:mb-6">{item.titulo}</h3>
+                      <p className="font-montserrat text-[13px] md:text-[16px] text-white/80 leading-relaxed">{item.texto}</p>
+                    </div>
+                    <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
+                      <div className="bg-white p-1.5 pb-6 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500" style={{ transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)` }}>
+                        <div className="relative w-[240px] h-[300px] sm:w-[320px] sm:h-[400px] overflow-hidden">
+                          <img src={item.url} alt={item.titulo} className="w-full h-full object-cover" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Localização */}
+            <FadeSection className="mb-24 md:mb-32 px-6">
+              <SectionDivider title="Localização" />
+              <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
+                
+                <div className="text-center md:text-left">
+                  <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed mb-2">
+                    05 de Dezembro de 2026
+                  </p>
+                  <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed mb-4">
+                    Início: 18:00h
+                  </p>
+                  <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed mb-4">
+                    {ENDERECO_CURTO}
+                  </p>
+                  <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-wedding-gold text-white px-6 py-3 font-montserrat text-[12px] uppercase tracking-[0.2em] transition-colors hover:bg-wedding-gold/80">
+                    Ver no Mapa
+                  </a>
+                </div>
+
+                <div className="w-full h-[300px] md:h-[400px] overflow-hidden shadow-lg">
+                  <iframe
+                    src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}`}
+                    width="100%" height="100%" style={{ border: 0 }} allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade">
+                  </iframe>
+                </div>
+              </div>
+            </FadeSection>
+
+            {/* Presentes */}
+            <FadeSection className="mb-24 md:mb-32 px-6">
+              <SectionDivider title="Presentes" />
+              <div className="max-w-5xl mx-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {PRESENTES.map((presente, index) => (
+                    <div key={index} className="bg-white p-6 rounded-lg shadow-md text-center relative">
+                      <div className="text-5xl mb-4">{presente.emoji}</div>
+                      <h3 className="font-cormorant text-2xl text-wedding-charcoal mb-2">{presente.nome}</h3>
+                      <p className="font-montserrat text-sm text-wedding-charcoal/70 mb-4">{presente.descricao}</p>
+                      <button
+                        onClick={() => setPixVisivel(prev => ({ ...prev, [index]: !prev[index] }))}
+                        className="bg-wedding-gold text-white px-6 py-2 rounded-full font-montserrat text-xs uppercase tracking-wider hover:bg-wedding-gold/80 transition-colors"
+                      >
+                        {pixVisivel[index] ? "Esconder PIX" : "Presentear via PIX"}
+                      </button>
+                      {pixVisivel[index] && (
+                        <div className="mt-4 p-4 bg-wedding-cream rounded-md border border-wedding-gold/30">
+                          <p className="font-montserrat text-xs text-wedding-charcoal/80 mb-2 font-bold">Confirme o destinatário: Daniel e Mariana</p>
+                          <p className="font-montserrat text-sm text-wedding-charcoal break-all mb-2">{presente.pix}</p>
+                          <button
+                            onClick={() => copiarPix(index, presente.pix)}
+                            className="w-full bg-wedding-charcoal text-white py-2 rounded-full font-montserrat text-xs uppercase tracking-wider hover:bg-wedding-charcoal/80 transition-colors"
+                          >
+                            {pixCopiado === index ? "Copiado!" : "Copiar Chave PIX"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </FadeSection>
+
+            {/* Confirmação de Presença */}
+            <FadeSection className="mb-24 md:mb-32 px-6">
+              <SectionDivider title="Confirmação de Presença" />
+              {!sucesso ? (
+                <div className="max-w-3xl mx-auto">
+                  <p className="font-montserrat text-lg text-wedding-charcoal text-center mb-8">
+                    {convidadoSelecionado.limite > 0
+                      ? `${convidadoSelecionado.nome}, por favor, confirme sua presença e de seus acompanhantes (limite: ${convidadoSelecionado.limite}).`
+                      : `${convidadoSelecionado.nome}, por favor, confirme sua presença.`}
+                  </p>
+
+                  {/* Opções de Resposta */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    {[ "Confirmado", "Talvez", "Não Irá" ].map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => setResposta(opt as any)}
+                        className={`p-6 border-2 rounded-lg font-cormorant text-xl transition-all
+                          ${resposta === opt
+                            ? "border-wedding-gold bg-wedding-gold text-white shadow-md"
+                            : "border-wedding-cream bg-white text-wedding-charcoal hover:border-wedding-gold/50"}`}
+                      >
+                        {opt === "Confirmado" ? "Confirmo minha presença" : opt === "Talvez" ? "Ainda não tenho certeza" : "Não poderei comparecer"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {resposta === "Confirmado" && ( // Acompanhantes e Mensagem
+                    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                      <h3 className="font-cormorant text-2xl text-wedding-charcoal mb-4">Acompanhantes</h3>
+                      <p className="font-montserrat text-sm text-wedding-charcoal/70 mb-4">
+                        Você pode levar até {convidadoSelecionado.limite} acompanhantes.
+                      </p>
+
+                      {/* Adicionar Adulto */}
+                      {adultos.length + criancas.length < (convidadoSelecionado.limite || 0) && (
+                        <div className="mb-4">
+                          <input
+                            type="text"
+                            placeholder="Nome e Sobrenome do Adulto"
+                            className="wedding-input mb-2"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                                setAdultos([...adultos, { nome: e.currentTarget.value.trim() }]);
+                                e.currentTarget.value = '';
+                              }
+                            }}
+                          />
+                          <button
+                            onClick={() => {
+                              const input = document.querySelector('input[placeholder="Nome e Sobrenome do Adulto"]') as HTMLInputElement;
+                              if (input && input.value.trim()) {
+                                setAdultos([...adultos, { nome: input.value.trim() }]);
+                                input.value = '';
+                              }
+                            }}
+                            className="bg-wedding-gold text-white px-4 py-2 rounded-full font-montserrat text-xs uppercase tracking-wider hover:bg-wedding-gold/80 transition-colors"
+                          >
+                            Adicionar Adulto
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Lista de Adultos */}
+                      {adultos.length > 0 && (
+                        <div className="mb-4">
+                          <p className="font-montserrat text-sm text-wedding-charcoal/70 mb-2">Adultos:</p>
+                          {adultos.map((a, i) => (
+                            <div key={i} className="flex justify-between items-center bg-wedding-cream p-2 rounded-md mb-1">
+                              <span className="font-montserrat text-sm text-wedding-charcoal">{a.nome}</span>
+                              <button onClick={() => setAdultos(adultos.filter((_, idx) => idx !== i))} className="text-red-500 text-xs">Remover</button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Adicionar Criança */}
+                      {adultos.length + criancas.length < (convidadoSelecionado.limite || 0) && (
+                        <div className="mb-4">
+                          <input
+                            type="text"
+                            placeholder="Nome e Sobrenome da Criança"
+                            className="wedding-input mb-2"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                                setCriancas([...criancas, { nome: e.currentTarget.value.trim(), idade: '' }]);
+                                e.currentTarget.value = '';
+                              }
+                            }}
+                          />
+                          <input
+                            type="number"
+                            placeholder="Idade da Criança"
+                            className="wedding-input mb-2"
+                            onChange={(e) => {
+                              const lastChildIndex = criancas.length - 1;
+                              if (lastChildIndex >= 0) {
+                                const updatedCriancas = [...criancas];
+                                updatedCriancas[lastChildIndex].idade = e.target.value;
+                                setCriancas(updatedCriancas);
+                              }
+                            }}
+                          />
+                          <button
+                            onClick={() => {
+                              const inputNome = document.querySelector('input[placeholder="Nome e Sobrenome da Criança"]') as HTMLInputElement;
+                              const inputIdade = document.querySelector('input[placeholder="Idade da Criança"]') as HTMLInputElement;
+                              if (inputNome && inputNome.value.trim() && inputIdade && inputIdade.value.trim()) {
+                                setCriancas([...criancas, { nome: inputNome.value.trim(), idade: inputIdade.value.trim() }]);
+                                inputNome.value = '';
+                                inputIdade.value = '';
+                              }
+                            }}
+                            className="bg-wedding-gold text-white px-4 py-2 rounded-full font-montserrat text-xs uppercase tracking-wider hover:bg-wedding-gold/80 transition-colors"
+                          >
+                            Adicionar Criança
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Lista de Crianças */}
+                      {criancas.length > 0 && (
+                        <div className="mb-4">
+                          <p className="font-montserrat text-sm text-wedding-charcoal/70 mb-2">Crianças:</p>
+                          {criancas.map((c, i) => (
+                            <div key={i} className="flex justify-between items-center bg-wedding-cream p-2 rounded-md mb-1">
+                              <span className="font-montserrat text-sm text-wedding-charcoal">{c.nome} ({c.idade} anos)</span>
+                              <button onClick={() => setCriancas(criancas.filter((_, idx) => idx !== i))} className="text-red-500 text-xs">Remover</button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Mensagem */}
+                      <h3 className="font-cormorant text-2xl text-wedding-charcoal mb-4">Mensagem para os Noivos</h3>
+                      <textarea
+                        placeholder="Deixe uma mensagem carinhosa..."
+                        className="wedding-input h-32 mb-4"
+                        value={mensagem}
+                        onChange={(e) => setMensagem(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {resposta === "Não Irá" && ( // Mensagem para quem não vai
+                    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                      <h3 className="font-cormorant text-2xl text-wedding-charcoal mb-4">Mensagem para os Noivos</h3>
+                      <textarea
+                        placeholder="Sentiremos sua falta! Deixe uma mensagem..."
+                        className="wedding-input h-32 mb-4"
+                        value={mensagem}
+                        onChange={(e) => setMensagem(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {/* Botão de Envio */}
+                  {resposta && (
+                    <button
+                      onClick={handleSubmit}
+                      disabled={confirmarPresenca.isPending}
+                      className={`w-full bg-wedding-gold text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${confirmarPresenca.isPending ? 'opacity-50' : 'opacity-100'}`}
+                    >
+                      {confirmarPresenca.isPending ? "Enviando..." : "Enviar Resposta"}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center max-w-xl mx-auto">
+                  <h2 className="font-halimun text-[32px] md:text-[48px] text-wedding-terracota mb-6">
+                    Obrigado, sua resposta foi salva com carinho!
+                  </h2>
+                  <p className="font-montserrat text-[14px] md:text-[18px] text-wedding-charcoal/70 leading-relaxed mb-8">
+                    Estamos ansiosos para celebrar com você.
+                  </p>
+                  <div className="w-full max-w-md mx-auto mb-8">
+                    <img src={manualImg} alt="Manual do Convidado" className="w-full h-auto" />
+                    <p className="font-montserrat text-xs text-wedding-charcoal/60 mt-2">Tire um print para não esquecer os detalhes!</p>
+                  </div>
+                </div>
+              )}
+            </FadeSection>
+
+            {/* Efeito de Envelope no Rodapé */}
+            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-wedding-cream to-transparent z-20 pointer-events-none" />
+
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+        </FadeSection>
+
+        {/* Efeito de Envelope no Topo */}
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-wedding-cream to-transparent z-20 pointer-events-none" />
+
+        {/* Divisor Minimalista */}
+        <div className="text-center my-10 md:my-16">
+          <div className="w-16 h-[1px] bg-wedding-gold mx-auto" />
+        </div>
+
+        {!convidadoSelecionado && (
+          <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
+            <SectionDivider title="Verificação de Convidado" isVerification={true} />
+            <p className="font-light text-[#888] mb-8 text-sm">Informe seu Nome e Sobrenome</p>
+            <input 
+              type="text" 
+              placeholder="Nome do Convidado" 
+              className="wedding-input mb-6 !text-[16px]"
+              value={nomeBusca}
+              onChange={(e) => setNomeBusca(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && buscarConvidado()}
+            />
+            <button 
+              onClick={buscarConvidado}
+              disabled={carregandoBusca}
+              className={`w-full bg-[#462F29] text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
+            >
+              {carregandoBusca ? "Verificando..." : "Verificar Convite"}
+            </button>
+          </FadeSection>
+        )}
+
+        {convidadoSelecionado && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            {/* Boas-vindas */}
+            <FadeSection className="text-center mb-24 md:mb-32 px-6">
+              <h2 className="font-halimun text-[32px] md:text-[48px] text-[#462F29] mb-6">
+                Olá, {convidadoSelecionado.nome}!
+              </h2>
+              <p className="font-montserrat text-[14px] md:text-[18px] text-wedding-charcoal/70 leading-relaxed max-w-[600px] mx-auto">
+                Nossa história também tem você, por isso queremos viver esse momento único ao seu lado.
+              </p>
+            </FadeSection>
+
+            {/* Galeria */}
+            <section className="relative px-4 sm:px-6 mb-16 md:mb-32">
+              <SectionDivider title="Nossa História" />
+              <div className="relative max-w-5xl mx-auto">
+                {GALLERY_ITEMS.map((item, index) => (
+                  <div key={index} className="sticky top-0 min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20">
+                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-[#462F29] p-6 md:p-4 rounded-sm shadow-sm md:shadow-none">
+                      <h3 className="font-cormorant text-[24px] md:text-[36px] text-white mb-4 md:mb-6">{item.titulo}</h3>
+                      <p className="font-montserrat text-[13px] md:text-[16px] text-white/80 leading-relaxed">{item.texto}</p>
+                    </div>
+                    <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
+                      <div className="bg-white p-1.5 pb-6 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500" style={{ transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)` }}>
+                        <div className="relative w-[240px] h-[300px] sm:w-[320px] sm:h-[400px] overflow-hidden">
+                          <img src={item.url} alt={item.titulo} className="w-full h-full object-cover" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Localização */}
+            <FadeSection className="mb-24 md:mb-32 px-6">
+              <SectionDivider title="Localização" />
+              <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
+                
+                <div className="text-center md:text-left">
+                  <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed mb-2">
+                    05 de Dezembro de 2026
+                  </p>
+                  <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed mb-4">
+                    Início: 18:00h
+                  </p>
+                  <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed mb-4">
+                    {ENDERECO_CURTO}
+                  </p>
+                  <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-wedding-gold text-white px-6 py-3 font-montserrat text-[12px] uppercase tracking-[0.2em] transition-colors hover:bg-wedding-gold/80">
+                    Ver no Mapa
+                  </a>
+                </div>
+
+                <div className="w-full h-[300px] md:h-[400px] overflow-hidden shadow-lg">
+                  <iframe
+                    src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}`}
+                    width="100%" height="100%" style={{ border: 0 }} allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade">
+                  </iframe>
+                </div>
+              </div>
+            </FadeSection>
+
+            {/* Presentes */}
+            <FadeSection className="mb-24 md:mb-32 px-6">
+              <SectionDivider title="Presentes" />
+              <div className="max-w-5xl mx-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {PRESENTES.map((presente, index) => (
+                    <div key={index} className="bg-white p-6 rounded-lg shadow-md text-center relative">
+                      <div className="text-5xl mb-4">{presente.emoji}</div>
+                      <h3 className="font-cormorant text-2xl text-wedding-charcoal mb-2">{presente.nome}</h3>
+                      <p className="font-montserrat text-sm text-wedding-charcoal/70 mb-4">{presente.descricao}</p>
+                      <button
+                        onClick={() => setPixVisivel(prev => ({ ...prev, [index]: !prev[index] }))}
+                        className="bg-wedding-gold text-white px-6 py-2 rounded-full font-montserrat text-xs uppercase tracking-wider hover:bg-wedding-gold/80 transition-colors"
+                      >
+                        {pixVisivel[index] ? "Esconder PIX" : "Presentear via PIX"}
+                      </button>
+                      {pixVisivel[index] && (
+                        <div className="mt-4 p-4 bg-wedding-cream rounded-md border border-wedding-gold/30">
+                          <p className="font-montserrat text-xs text-wedding-charcoal/80 mb-2 font-bold">Confirme o destinatário: Daniel e Mariana</p>
+                          <p className="font-montserrat text-sm text-wedding-charcoal break-all mb-2">{presente.pix}</p>
+                          <button
+                            onClick={() => copiarPix(index, presente.pix)}
+                            className="w-full bg-wedding-charcoal text-white py-2 rounded-full font-montserrat text-xs uppercase tracking-wider hover:bg-wedding-charcoal/80 transition-colors"
+                          >
+                            {pixCopiado === index ? "Copiado!" : "Copiar Chave PIX"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </FadeSection>
+
+            {/* Confirmação de Presença */}
+            <FadeSection className="mb-24 md:mb-32 px-6">
+              <SectionDivider title="Confirmação de Presença" />
+              {!sucesso ? (
+                <div className="max-w-3xl mx-auto">
+                  <p className="font-montserrat text-lg text-wedding-charcoal text-center mb-8">
+                    {convidadoSelecionado.limite > 0
+                      ? `${convidadoSelecionado.nome}, por favor, confirme sua presença e de seus acompanhantes (limite: ${convidadoSelecionado.limite}).`
+                      : `${convidadoSelecionado.nome}, por favor, confirme sua presença.`}
+                  </p>
+
+                  {/* Opções de Resposta */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    {[ "Confirmado", "Talvez", "Não Irá" ].map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => setResposta(opt as any)}
+                        className={`p-6 border-2 rounded-lg font-cormorant text-xl transition-all
+                          ${resposta === opt
+                            ? "border-wedding-gold bg-wedding-gold text-white shadow-md"
+                            : "border-wedding-cream bg-white text-wedding-charcoal hover:border-wedding-gold/50"}`}
+                      >
+                        {opt === "Confirmado" ? "Confirmo minha presença" : opt === "Talvez" ? "Ainda não tenho certeza" : "Não poderei comparecer"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {resposta === "Confirmado" && ( // Acompanhantes e Mensagem
+                    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                      <h3 className="font-cormorant text-2xl text-wedding-charcoal mb-4">Acompanhantes</h3>
+                      <p className="font-montserrat text-sm text-wedding-charcoal/70 mb-4">
+                        Você pode levar até {convidadoSelecionado.limite} acompanhantes.
+                      </p>
+
+                      {/* Adicionar Adulto */}
+                      {adultos.length + criancas.length < (convidadoSelecionado.limite || 0) && (
+                        <div className="mb-4">
+                          <input
+                            type="text"
+                            placeholder="Nome e Sobrenome do Adulto"
+                            className="wedding-input mb-2"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                                setAdultos([...adultos, { nome: e.currentTarget.value.trim() }]);
+                                e.currentTarget.value = '';
+                              }
+                            }}
+                          />
+                          <button
+                            onClick={() => {
+                              const input = document.querySelector('input[placeholder="Nome e Sobrenome do Adulto"]') as HTMLInputElement;
+                              if (input && input.value.trim()) {
+                                setAdultos([...adultos, { nome: input.value.trim() }]);
+                                input.value = '';
+                              }
+                            }}
+                            className="bg-wedding-gold text-white px-4 py-2 rounded-full font-montserrat text-xs uppercase tracking-wider hover:bg-wedding-gold/80 transition-colors"
+                          >
+                            Adicionar Adulto
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Lista de Adultos */}
+                      {adultos.length > 0 && (
+                        <div className="mb-4">
+                          <p className="font-montserrat text-sm text-wedding-charcoal/70 mb-2">Adultos:</p>
+                          {adultos.map((a, i) => (
+                            <div key={i} className="flex justify-between items-center bg-wedding-cream p-2 rounded-md mb-1">
+                              <span className="font-montserrat text-sm text-wedding-charcoal">{a.nome}</span>
+                              <button onClick={() => setAdultos(adultos.filter((_, idx) => idx !== i))} className="text-red-500 text-xs">Remover</button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Adicionar Criança */}
+                      {adultos.length + criancas.length < (convidadoSelecionado.limite || 0) && (
+                        <div className="mb-4">
+                          <input
+                            type="text"
+                            placeholder="Nome e Sobrenome da Criança"
+                            className="wedding-input mb-2"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                                setCriancas([...criancas, { nome: e.currentTarget.value.trim(), idade: '' }]);
+                                e.currentTarget.value = '';
+                              }
+                            }}
+                          />
+                          <input
+                            type="number"
+                            placeholder="Idade da Criança"
+                            className="wedding-input mb-2"
+                            onChange={(e) => {
+                              const lastChildIndex = criancas.length - 1;
+                              if (lastChildIndex >= 0) {
+                                const updatedCriancas = [...criancas];
+                                updatedCriancas[lastChildIndex].idade = e.target.value;
+                                setCriancas(updatedCriancas);
+                              }
+                            }}
+                          />
+                          <button
+                            onClick={() => {
+                              const inputNome = document.querySelector('input[placeholder="Nome e Sobrenome da Criança"]') as HTMLInputElement;
+                              const inputIdade = document.querySelector('input[placeholder="Idade da Criança"]') as HTMLInputElement;
+                              if (inputNome && inputNome.value.trim() && inputIdade && inputIdade.value.trim()) {
+                                setCriancas([...criancas, { nome: inputNome.value.trim(), idade: inputIdade.value.trim() }]);
+                                inputNome.value = '';
+                                inputIdade.value = '';
+                              }
+                            }}
+                            className="bg-wedding-gold text-white px-4 py-2 rounded-full font-montserrat text-xs uppercase tracking-wider hover:bg-wedding-gold/80 transition-colors"
+                          >
+                            Adicionar Criança
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Lista de Crianças */}
+                      {criancas.length > 0 && (
+                        <div className="mb-4">
+                          <p className="font-montserrat text-sm text-wedding-charcoal/70 mb-2">Crianças:</p>
+                          {criancas.map((c, i) => (
+                            <div key={i} className="flex justify-between items-center bg-wedding-cream p-2 rounded-md mb-1">
+                              <span className="font-montserrat text-sm text-wedding-charcoal">{c.nome} ({c.idade} anos)</span>
+                              <button onClick={() => setCriancas(criancas.filter((_, idx) => idx !== i))} className="text-red-500 text-xs">Remover</button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Mensagem */}
+                      <h3 className="font-cormorant text-2xl text-wedding-charcoal mb-4">Mensagem para os Noivos</h3>
+                      <textarea
+                        placeholder="Deixe uma mensagem carinhosa..."
+                        className="wedding-input h-32 mb-4"
+                        value={mensagem}
+                        onChange={(e) => setMensagem(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {resposta === "Não Irá" && ( // Mensagem para quem não vai
+                    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                      <h3 className="font-cormorant text-2xl text-wedding-charcoal mb-4">Mensagem para os Noivos</h3>
+                      <textarea
+                        placeholder="Sentiremos sua falta! Deixe uma mensagem..."
+                        className="wedding-input h-32 mb-4"
+                        value={mensagem}
+                        onChange={(e) => setMensagem(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {/* Botão de Envio */}
+                  {resposta && (
+                    <button
+                      onClick={handleSubmit}
+                      disabled={confirmarPresenca.isPending}
+                      className={`w-full bg-wedding-gold text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${confirmarPresenca.isPending ? 'opacity-50' : 'opacity-100'}`}
+                    >
+                      {confirmarPresenca.isPending ? "Enviando..." : "Enviar Resposta"}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center max-w-xl mx-auto">
+                  <h2 className="font-halimun text-[32px] md:text-[48px] text-wedding-terracotta mb-6">
+                    Obrigado, sua resposta foi salva com carinho!
+                  </h2>
+                  <p className="font-montserrat text-[14px] md:text-[18px] text-wedding-charcoal/70 leading-relaxed mb-8">
+                    Estamos ansiosos para celebrar com você.
+                  </p>
+                  <div className="w-full max-w-md mx-auto mb-8">
+                    <img src={manualImg} alt="Manual do Convidado" className="w-full h-auto" />
+                    <p className="font-montserrat text-xs text-wedding-charcoal/60 mt-2">Tire um print para não esquecer os detalhes!</p>
+                  </div>
+                </div>
+              )}
+            </FadeSection>
+
+            {/* Efeito de Envelope no Rodapé */}
+            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-wedding-cream to-transparent z-20 pointer-events-none" />
+
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+        </FadeSection>
+
+        {/* Divisor Minimalista */}
+        <div className="text-center my-10 md:my-16">
+          <div className="w-16 h-[1px] bg-wedding-gold mx-auto" />
+        </div>
+
+        {!convidadoSelecionado && (
+          <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
+            <div className="text-center mb-8 md:mb-12 px-4">
+              <h2 className="font-cormorant font-light text-[#462F29] leading-tight mb-4 whitespace-nowrap text-[22px] sm:text-[28px] md:text-[42px]">
+                Verificação de Convidado
+              </h2>
+            </div>
+            <p className="font-light text-[#888] mb-8 text-sm">Informe seu Nome e Sobrenome</p>
+            <input 
+              type="text" 
+              placeholder="Nome do Convidado" 
+              className="wedding-input mb-6 !text-[16px]"
+              value={nomeBusca}
+              onChange={(e) => setNomeBusca(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && buscarConvidado()}
+            />
+            <button 
+              onClick={buscarConvidado}
+              disabled={carregandoBusca}
+              className={`w-full bg-[#462F29] text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
+            >
+              {carregandoBusca ? "Verificando..." : "Verificar Convite"}
+            </button>
+          </FadeSection>
+        )}
+
+        {convidadoSelecionado && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            {/* Boas-vindas */}
+            <FadeSection className="text-center mb-24 md:mb-32 px-6">
+              <h2 className="font-halimun text-[32px] md:text-[48px] text-[#462F29] mb-6">
                 Olá, {convidadoSelecionado.nome}!
               </h2>
               <p className="font-montserrat text-[14px] md:text-[18px] text-wedding-charcoal/70 leading-relaxed max-w-[600px] mx-auto">
