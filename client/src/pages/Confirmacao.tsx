@@ -171,8 +171,13 @@ export default function Confirmacao() {
         {/* Cabeçalho (Nomes do Casal) */}
         <FadeSection className="px-6 text-center mb-20">
           <p className="font-lato text-[10px] tracking-[0.6em] text-wedding-gold uppercase mb-6">05 de Dezembro de 2026</p>
-          <h1 className="font-halimun text-[42px] md:text-[60px] text-wedding-terracotta leading-tight">Mariana & Daniel</h1>
+            <h1 className="font-halimun text-[42px] md:text-[60px] text-wedding-terracotta leading-tight">Mariana & Daniel</h1>
         </FadeSection>
+
+        {/* Divisor Minimalista */}
+        <div className="text-center my-10 md:my-16">
+          <div className="w-16 h-[1px] bg-wedding-gold mx-auto" />
+        </div>
 
         {!convidadoSelecionado && (
           <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
