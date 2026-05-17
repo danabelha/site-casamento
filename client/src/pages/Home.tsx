@@ -43,16 +43,10 @@ export default function Home() {
       
       {/* BackGround Image - Otimizada para aparecer toda a imagem mantendo a harmonia */}
       <div
-          className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55] md:bg-fixed"
+          className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55] bg-center md:bg-fixed"
         style={{
           backgroundImage: `url(${heroImage})`,
-          backgroundPosition: "center center", // Ajustado para preencher toda a tela no mobile
           backgroundSize: "cover",
-          backgroundAttachment: "scroll",
-          '@media (min-width: 768px)': {
-            backgroundAttachment: "fixed",
-            backgroundPosition: "center 40%",
-          }
         }}
       />
 
@@ -71,7 +65,8 @@ export default function Home() {
       >
         {/* Pré-título */}
         <p 
-          className={`font-montserrat text-[14px] md:text-[28px] tracking-[0.15em] uppercase text-wedding-gold font-bold mb-6 \n            transition-all duration-700 ease-out ${loaded ? "opacity-100 translate-y-0 delay-200" : "opacity-0 translate-y-5"}`}        >
+          className={`font-montserrat text-[14px] md:text-[28px] tracking-[0.15em] uppercase text-wedding-gold font-bold mb-6 
+            transition-all duration-700 ease-out ${loaded ? "opacity-100 translate-y-0 delay-200" : "opacity-0 translate-y-5"}`}        >
           E enfim, o nosso casamento
         </p>
 

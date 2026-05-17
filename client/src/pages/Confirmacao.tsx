@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { trpc } from '../utils/trpc';
-import FadeSection from '../components/FadeSection';
+import { useState } from 'react';
+import { trpc } from '../lib/trpc';
 import manualImg from '../assets/images/manual.png';
 
 const GALLERY_ITEMS = [
@@ -47,10 +46,16 @@ const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Celeiro+Quinta
 
 const SectionDivider = ({ title, isVerification = false }: { title: string, isVerification?: boolean }) => (
   <div className="text-center mb-12">
-    <h2 className={`font-cormorant text-[32px] md:text-[42px] text-[#462F29] uppercase tracking-[0.1em] mb-4`}>
+    <h2 className="font-cormorant text-[32px] md:text-[42px] text-[#462F29] uppercase tracking-[0.1em] mb-4">
       {title}
     </h2>
     {!isVerification && <div className="w-12 h-[1px] bg-wedding-gold mx-auto" />}
+  </div>
+);
+
+const FadeSection = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
+  <div className={`transition-all duration-1000 ${className}`}>
+    {children}
   </div>
 );
 
