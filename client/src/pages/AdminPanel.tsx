@@ -164,6 +164,7 @@ export default function AdminPanel() {
     acompanhantes: confirmadosLista.reduce((acc, c) => acc + (Number(c.acompanhantes) || 0), 0),
     // Crianças (< 8 anos) = Isentas (<= 7 anos)
     criancasMenores8: confirmadosLista.reduce((acc, c) => acc + (Number(c.menores8) || 0), 0),
+    pendentes: convidados.filter(c => c.status === "Pendente").length,
   };
 
   let convidadosFiltrados = Array.isArray(convidados) ? convidados : [];
@@ -209,7 +210,8 @@ export default function AdminPanel() {
             { label: "Não Irão", valor: stats.naoIrao, cor: "#F44336" },
             { label: "Talvez", valor: stats.talvez, cor: "#FF9800" },
             { label: "ACOMPANHANTES", valor: stats.acompanhantes, cor: "#2196F3" },
-            { label: "Crianças (< 8 anos)", valor: stats.criancasMenores8, cor: "#E91E63" }
+            { label: "Crianças (< 8 anos)", valor: stats.criancasMenores8, cor: "#E91E63" },
+            { label: "Pendentes", valor: stats.pendentes, cor: "#607D8B" }
           ].map((s) => (
             <div key={s.label} style={{ border: "1px solid #E8CECE", padding: "20px", textAlign: "center", backgroundColor: "#FFF" }}>
               <p style={{ fontSize: "24px", fontWeight: "bold", color: s.cor, margin: "0 0 4px 0" }}>{s.valor}</p>
