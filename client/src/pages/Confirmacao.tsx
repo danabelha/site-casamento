@@ -71,12 +71,10 @@ export default function Confirmacao() {
   const [pixVisivel, setPixVisivel] = useState<{ [key: number]: boolean }>({});
   const [pixCopiado, setPixCopiado] = useState<number | null>(null);
 
-  const utils = trpc.useContext();
-  const buscarMutation = trpc.buscarConvidado.useMutation();
+  const buscarMutation = trpc.searchConvidados.useMutation();
   const confirmarPresenca = trpc.confirmarPresenca.useMutation({
     onSuccess: () => {
       setSucesso(true);
-      utils.getConvidados.invalidate();
     }
   });
 
