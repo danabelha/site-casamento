@@ -306,7 +306,7 @@ export default function Confirmacao() {
               <SectionDivider title="Confirmação de Presença" />
               {!sucesso ? (
                 <div className="max-w-3xl mx-auto">
-                  <p className="font-montserrat text-lg text-wedding-charcoal text-center mb-8">
+                  <p className="font-montserrat text-lg text-[#462F29] text-center mb-8">
                     {convidadoSelecionado.limite > 0
                       ? `${convidadoSelecionado.nome}, por favor, confirme sua presença e de seus acompanhantes (limite: ${convidadoSelecionado.limite}).`
                       : `${convidadoSelecionado.nome}, por favor, confirme sua presença.`}
@@ -330,7 +330,7 @@ export default function Confirmacao() {
 
                   {resposta === "Confirmado" && ( // Acompanhantes e Mensagem
                     <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-                      <h3 className="font-cormorant text-2xl text-wedding-charcoal mb-4">Acompanhantes</h3>
+                      <h3 className="font-cormorant text-2xl text-[#462F29] mb-4">Acompanhantes</h3>
                       <p className="font-montserrat text-sm text-wedding-charcoal/70 mb-4">
                         Você pode levar até {convidadoSelecionado.limite} acompanhantes.
                       </p>
@@ -435,7 +435,7 @@ export default function Confirmacao() {
                       )}
 
                       {/* Mensagem */}
-                      <h3 className="font-cormorant text-2xl text-wedding-charcoal mb-4">Mensagem para os Noivos</h3>
+                      <h3 className="font-cormorant text-2xl text-[#462F29] mb-4">Mensagem para os Noivos</h3>
                       <textarea
                         placeholder="Deixe uma mensagem carinhosa..."
                         className="wedding-input h-32 mb-4"
@@ -447,7 +447,7 @@ export default function Confirmacao() {
 
                   {resposta === "Não Irá" && ( // Mensagem para quem não vai
                     <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-                      <h3 className="font-cormorant text-2xl text-wedding-charcoal mb-4">Mensagem para os Noivos</h3>
+                      <h3 className="font-cormorant text-2xl text-[#462F29] mb-4">Mensagem para os Noivos</h3>
                       <textarea
                         placeholder="Sentiremos sua falta! Deixe uma mensagem..."
                         className="wedding-input h-32 mb-4"
