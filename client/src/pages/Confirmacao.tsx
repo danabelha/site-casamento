@@ -125,15 +125,16 @@ export default function Confirmacao() {
 
   return (
     <div className="min-h-screen bg-wedding-cream relative overflow-hidden">
+      {/* Efeito de Envelope no Topo */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white to-transparent opacity-60 z-20 pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-wedding-gold/20 z-30" />
+
       <main className="max-w-6xl mx-auto pt-20 pb-20 relative z-10">
         {/* Cabeçalho (Nomes do Casal) */}
-        <FadeSection className="px-6 text-center mb-20">
+        <FadeSection className="px-6 text-center mb-12">
           <p className="font-lato text-[10px] tracking-[0.6em] text-wedding-gold uppercase mb-6">05 de Dezembro de 2026</p>
           <h1 className="font-halimun text-[42px] md:text-[60px] text-[#462F29] leading-tight">Mariana & Daniel</h1>
         </FadeSection>
-
-        {/* Efeito de Envelope no Topo */}
-        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-wedding-cream to-transparent z-20 pointer-events-none" />
 
         {/* Divisor Minimalista */}
         <div className="text-center my-10 md:my-16">
@@ -174,15 +175,15 @@ export default function Confirmacao() {
               </p>
             </FadeSection>
 
-            {/* Galeria */}
+            {/* Galeria de Empilhamento Real */}
             <section className="relative px-4 sm:px-6 mb-16 md:mb-32">
               <SectionDivider title="Nossa História" />
               <div className="relative max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
                   <div key={index} className="sticky top-0 min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20">
-                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-[#462F29] p-6 md:p-4 rounded-sm shadow-sm md:shadow-none">
+                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-[#462F29] p-8 md:p-10 rounded-sm shadow-xl">
                       <h3 className="font-cormorant text-[24px] md:text-[36px] text-white mb-4 md:mb-6">{item.titulo}</h3>
-                      <p className="font-montserrat text-[13px] md:text-[16px] text-white/80 leading-relaxed">{item.texto}</p>
+                      <p className="font-montserrat text-[13px] md:text-[16px] text-white/90 leading-relaxed">{item.texto}</p>
                     </div>
                     <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
                       <div className="bg-white p-1.5 pb-6 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500" style={{ transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)` }}>
@@ -210,11 +211,11 @@ export default function Confirmacao() {
                   <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed mb-4">
                     {ENDERECO_CURTO}
                   </p>
-                  <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-wedding-gold text-white px-6 py-3 font-montserrat text-[12px] uppercase tracking-[0.2em] transition-colors hover:bg-wedding-gold/80">
+                  <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-[#462F29] text-white px-6 py-3 font-montserrat text-[12px] uppercase tracking-[0.2em] transition-colors hover:bg-[#462F29]/90">
                     Ver no Mapa
                   </a>
                 </div>
-                <div className="w-full h-[300px] md:h-[400px] overflow-hidden shadow-lg">
+                <div className="w-full h-[300px] md:h-[400px] overflow-hidden shadow-lg rounded-sm">
                   <iframe
                     src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}`}
                     width="100%" height="100%" style={{ border: 0 }} allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade">
@@ -369,7 +370,7 @@ export default function Confirmacao() {
                     <button
                       onClick={handleSubmit}
                       disabled={confirmarPresenca.isPending}
-                      className={`w-full bg-wedding-gold text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${confirmarPresenca.isPending ? 'opacity-50' : 'opacity-100'}`}
+                      className={`w-full bg-[#462F29] text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${confirmarPresenca.isPending ? 'opacity-50' : 'opacity-100'}`}
                     >
                       {confirmarPresenca.isPending ? "Enviando..." : "Enviar Resposta"}
                     </button>
@@ -390,12 +391,13 @@ export default function Confirmacao() {
                 </div>
               )}
             </FadeSection>
-
-            {/* Efeito de Envelope no Rodapé */}
-            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-wedding-cream to-transparent z-20 pointer-events-none" />
           </div>
         )}
       </main>
+
+      {/* Efeito de Envelope no Rodapé */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent opacity-60 z-20 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-wedding-gold/20 z-30" />
     </div>
   );
 }
