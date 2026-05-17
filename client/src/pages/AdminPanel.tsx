@@ -156,11 +156,14 @@ export default function AdminPanel() {
   const confirmadosLista = convidados.filter(c => c.status === "Confirmado");
   const stats = {
     total: convidados.length,
+    // Total Evento = Titulares Confirmados + Acompanhantes Pagantes (> 7 anos)
     confirmados: confirmadosLista.reduce((acc, c) => acc + 1 + (Number(c.acompanhantes) || 0), 0),
     naoIrao: convidados.filter(c => c.status === "Não Irá").length,
     talvez: convidados.filter(c => c.status === "Talvez").length,
+    // ACOMPANHANTES = Acompanhantes Pagantes (> 7 anos)
     acompanhantes: confirmadosLista.reduce((acc, c) => acc + (Number(c.acompanhantes) || 0), 0),
-    criancasMenores8: confirmadosLista.reduce((acc, c) => acc + (Number(c.criancas) || 0), 0),
+    // Crianças (< 8 anos) = Isentas (<= 7 anos)
+    criancasMenores8: confirmadosLista.reduce((acc, c) => acc + (Number(c.menores8) || 0), 0),
   };
 
   let convidadosFiltrados = Array.isArray(convidados) ? convidados : [];
@@ -331,4 +334,4 @@ export default function AdminPanel() {
     </div>
   );
 }
-// Trigger build: 2026-05-12 00:15
+// Trigger build: 2026-05-17 12:00
