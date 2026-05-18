@@ -96,14 +96,14 @@ export default function Confirmacao() {
   const [pixCopiado, setPixCopiado] = useState<number | null>(null);
   const [carregandoBusca, setCarregandoBusca] = useState(false);
 
-  const searchConvidados = trpc.searchConvidados.useMutation();
-  const confirmarPresenca = trpc.confirmarPresenca.useMutation();
+  const searchMutation = trpc.searchConvidados.useMutation();
+  const confirmarMutation = trpc.confirmarPresenca.useMutation();
 
-  const searchConvidados = async () => {
+  const handleSearch = async () => {
     if (!nomeBusca.trim() || carregandoBusca) return;
     try {
       setCarregandoBusca(true);
-      const resultado = await searchConvidados.mutateAsync({ nome: nomeBusca });
+      const resultado = await searchMutation.mutateAsync({ nome: nomeBusca });
       if (resultado && (resultado as any).length > 0) {
         setConvidadoSelecionado((resultado as any)[0]);
       } else {
@@ -143,7 +143,7 @@ export default function Confirmacao() {
         return !isNaN(idadeNum) && idadeNum > 7;
       });
 
-      await confirmarPresenca.mutateAsync({
+      await confirmarMutation.mutateAsync({
         id: convidadoSelecionado.id,
         status: resposta === "Talvez" ? "Talvez" : resposta === "Confirmado" ? "Confirmado" : "Não Irá",
         // Acompanhantes Pagantes = Adultos + Crianças > 7 anos
@@ -189,10 +189,10 @@ export default function Confirmacao() {
               className="wedding-input mb-6 !text-[16px]"
               value={nomeBusca}
               onChange={(e) => setNomeBusca(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && searchConvidados()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             />
             <button 
-              onClick={searchConvidados}
+              onClick={handleSearch}
               disabled={carregandoBusca}
               className={`w-full bg-wedding-charcoal text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
             >
