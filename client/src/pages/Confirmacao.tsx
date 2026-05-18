@@ -439,10 +439,10 @@ export default function Confirmacao() {
                       
                       <button
                         onClick={handleSubmit}
-                        disabled={(confirmarPresenca as any).isPending}
+                        disabled={confirmarMutation.isPending}
                         className="w-full bg-wedding-charcoal text-white py-5 tracking-[0.4em] uppercase text-[12px] shadow-xl hover:bg-wedding-terracotta transition-all disabled:opacity-50"
                       >
-                        {(confirmarPresenca as any).isPending ? "Enviando..." : "Enviar Resposta"}
+                        {confirmarMutation.isPending ? "Enviando..." : "Enviar Resposta"}
                       </button>
                     </div>
                   )}
