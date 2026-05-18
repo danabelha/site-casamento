@@ -171,7 +171,7 @@ export default function Confirmacao() {
         {/* Cabeçalho (Nomes do Casal) */}
         <FadeSection className="px-6 text-center mb-20">
           <p className="font-lato text-[10px] tracking-[0.6em] text-wedding-gold uppercase mb-6">05 de Dezembro de 2026</p>
-            <h1 className="font-halimun text-[42px] md:text-[60px] text-wedding-terracotta leading-tight">Mariana & Daniel</h1>
+            <h1 className="font-halimun text-[42px] md:text-[60px] text-[#462F29] leading-tight">Mariana & Daniel</h1>
         </FadeSection>
 
         {/* Divisor Minimalista */}
@@ -180,12 +180,12 @@ export default function Confirmacao() {
         </div>
 
         {!convidadoSelecionado && (
-          <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
-            <SectionDivider title="Verificação de Convidado" isVerification={true} />
+          <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24 p-8 bg-white shadow-lg rounded-lg border border-gray-200">
+
             <p className="font-light text-[#888] mb-8 text-sm">Informe seu nome conforme o convite</p>
             <input 
               type="text" 
-              placeholder="Nome do Convidado" 
+              placeholder="Digite seu nome completo aqui" 
               className="wedding-input mb-6 !text-[16px]"
               value={nomeBusca}
               onChange={(e) => setNomeBusca(e.target.value)}
