@@ -43,7 +43,7 @@ export default function Home() {
       
       {/* BackGround Image - Otimizada para aparecer toda a imagem mantendo a harmonia */}
       <div
-          className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55] bg-center md:bg-fixed"
+          className="absolute inset-0 bg-cover bg-no-repeat brightness-[0.55] bg-top md:bg-center md:bg-fixed"
         style={{
           backgroundImage: `url(${heroImage})`,
           backgroundSize: "cover",
@@ -65,7 +65,7 @@ export default function Home() {
       >
         {/* Pré-título */}
         <p 
-          className={`font-montserrat text-[14px] md:text-[28px] tracking-[0.15em] uppercase text-wedding-gold font-bold mb-6 
+          className={`font-montserrat text-[14px] md:text-[28px] tracking-[0.15em] uppercase text-wedding-gold font-extrabold mb-6 
             transition-all duration-700 ease-out ${loaded ? "opacity-100 translate-y-0 delay-200" : "opacity-0 translate-y-5"}`}        >
           E enfim, o nosso casamento
         </p>
@@ -106,7 +106,7 @@ export default function Home() {
               <span className="font-montserrat text-[22px] sm:text-[28px] md:text-[48px] text-wedding-cream font-extralight leading-none">
                 {String(item.valor).padStart(2, "0")}
               </span>
-              <span className="font-montserrat text-[9px] sm:text-[11px] md:text-[18px] tracking-[0.2em] uppercase text-wedding-gold mt-1 font-bold">
+              <span className="font-montserrat text-[9px] sm:text-[11px] md:text-[18px] tracking-[0.2em] uppercase text-wedding-gold mt-1 font-extrabold">
                 {item.label}
               </span>
             </div>
