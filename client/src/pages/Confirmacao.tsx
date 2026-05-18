@@ -2,7 +2,7 @@
  * Página de Confirmação — Otimizada para Mobile First com Tailwind 4
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { trpc } from "../lib/trpc";
 
 // Importar imagens
@@ -49,11 +49,11 @@ const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURICom
 function SectionDivider({ title, isVerification = false }: { title: string; isVerification?: boolean } ) {
   return (
     <div className="text-center mb-8 md:mb-12 px-4">
-      <h2 className={`font-cormorant font-light text-[#462F29] leading-tight mb-4 whitespace-nowrap
+      <h2 className={`font-cormorant font-light text-wedding-charcoal leading-tight mb-4 whitespace-nowrap
         ${isVerification ? 'text-[22px] sm:text-[28px] md:text-[42px]' : 'text-[28px] md:text-[42px]'}`}>
         {title}
       </h2>
-      {!isVerification && <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />}
+      <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />
     </div>
   );
 }
@@ -96,16 +96,16 @@ export default function Confirmacao() {
   const [pixCopiado, setPixCopiado] = useState<number | null>(null);
   const [carregandoBusca, setCarregandoBusca] = useState(false);
 
-  const searchConvidadosMutation = trpc.searchConvidados.useMutation();
-  const confirmarPresencaMutation = trpc.confirmarPresenca.useMutation();
+  const searchConvidados = trpc.searchConvidados.useMutation();
+  const confirmarPresenca = trpc.confirmarPresenca.useMutation();
 
-  const buscarConvidado = async () => {
+  const searchConvidados = async () => {
     if (!nomeBusca.trim() || carregandoBusca) return;
     try {
       setCarregandoBusca(true);
-      const resultado = await searchConvidadosMutation.mutateAsync({ nome: nomeBusca });
-      if (resultado) {
-        setConvidadoSelecionado(resultado);
+      const resultado = await searchConvidados.mutateAsync({ nome: nomeBusca });
+      if (resultado && (resultado as any).length > 0) {
+        setConvidadoSelecionado((resultado as any)[0]);
       } else {
         alert("Convidado não encontrado. Verifique o nome.");
       }
@@ -131,6 +131,8 @@ export default function Confirmacao() {
         ...criancas.map(c => `${c.nome} (${c.idade} anos)`)
       ].join("\n");
 
+      // Regra do Contrato: Idade <= 7 anos é isento (Menores8)
+      // Crianças com idade > 7 anos contam como acompanhantes pagantes
       const menoresDe8 = criancas.filter(c => {
         const idadeNum = parseInt(c.idade, 10);
         return !isNaN(idadeNum) && idadeNum <= 7;
@@ -141,11 +143,14 @@ export default function Confirmacao() {
         return !isNaN(idadeNum) && idadeNum > 7;
       });
 
-      await confirmarPresencaMutation.mutateAsync({
+      await confirmarPresenca.mutateAsync({
         id: convidadoSelecionado.id,
-        status: resposta,
+        status: resposta === "Talvez" ? "Talvez" : resposta === "Confirmado" ? "Confirmado" : "Não Irá",
+        // Acompanhantes Pagantes = Adultos + Crianças > 7 anos
         acompanhantes: adultos.length + criancasPagantes.length,
+        // Total de crianças informadas (para histórico)
         criancas: criancas.length,
+        // Isentos conforme contrato (<= 7 anos)
         menores8: menoresDe8.length,
         mensagem,
         acompanhanteDetalhes: detalhes,
@@ -161,15 +166,12 @@ export default function Confirmacao() {
   const limiteAtingido = totalAcompanhantes >= (convidadoSelecionado?.limite || 0);
 
   return (
-    <div className="min-h-screen bg-wedding-cream text-wedding-charcoal relative overflow-hidden">
-      {/* Efeito de Envelope no Topo */}
-      <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-[#462F29]/5 to-transparent z-20 pointer-events-none" />
-
-      <main className="max-w-6xl mx-auto pt-20 pb-20 relative z-10">
+    <div className="min-h-screen bg-wedding-cream text-wedding-charcoal">
+      <main className="max-w-6xl mx-auto pt-20 pb-20">
         {/* Cabeçalho (Nomes do Casal) */}
         <FadeSection className="px-6 text-center mb-20">
           <p className="font-lato text-[10px] tracking-[0.6em] text-wedding-gold uppercase mb-6">05 de Dezembro de 2026</p>
-          <h1 className="font-halimun text-[42px] md:text-[60px] text-[#462F29] leading-tight">Mariana & Daniel</h1>
+            <h1 className="font-halimun text-[42px] md:text-[60px] text-wedding-terracotta leading-tight">Mariana & Daniel</h1>
         </FadeSection>
 
         {/* Divisor Minimalista */}
@@ -180,19 +182,19 @@ export default function Confirmacao() {
         {!convidadoSelecionado && (
           <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24">
             <SectionDivider title="Verificação de Convidado" isVerification={true} />
-            <p className="font-light text-[#888] mb-8 text-sm">Informe seu Nome e Sobrenome</p>
+            <p className="font-light text-[#888] mb-8 text-sm">Informe seu nome conforme o convite</p>
             <input 
               type="text" 
               placeholder="Nome do Convidado" 
               className="wedding-input mb-6 !text-[16px]"
               value={nomeBusca}
               onChange={(e) => setNomeBusca(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && buscarConvidado()}
+              onKeyDown={(e) => e.key === 'Enter' && searchConvidados()}
             />
             <button 
-              onClick={buscarConvidado}
+              onClick={searchConvidados}
               disabled={carregandoBusca}
-              className={`w-full bg-[#462F29] text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
+              className={`w-full bg-wedding-charcoal text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
             >
               {carregandoBusca ? "Verificando..." : "Verificar Convite"}
             </button>
@@ -203,7 +205,7 @@ export default function Confirmacao() {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {/* Boas-vindas */}
             <FadeSection className="text-center mb-24 md:mb-32 px-6">
-              <h2 className="font-halimun text-[32px] md:text-[48px] text-[#462F29] mb-6">
+              <h2 className="font-halimun text-[32px] md:text-[48px] text-wedding-terracotta mb-6">
                 Olá, {convidadoSelecionado.nome}!
               </h2>
               <p className="font-montserrat text-[14px] md:text-[18px] text-wedding-charcoal/70 leading-relaxed max-w-[600px] mx-auto">
@@ -217,9 +219,9 @@ export default function Confirmacao() {
               <div className="relative max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
                   <div key={index} className="sticky top-0 min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20">
-                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-[#462F29] p-8 md:p-10 rounded-sm shadow-xl">
-                      <h3 className="font-cormorant text-[24px] md:text-[36px] text-white mb-4 md:mb-6">{item.titulo}</h3>
-                      <p className="font-montserrat text-[13px] md:text-[16px] text-white/80 leading-relaxed">{item.texto}</p>
+                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-wedding-cream p-6 md:p-4 rounded-sm shadow-sm md:shadow-none">
+                      <h3 className="font-cormorant text-[24px] md:text-[36px] text-wedding-terracotta mb-4 md:mb-6">{item.titulo}</h3>
+                      <p className="font-montserrat text-[13px] md:text-[16px] text-wedding-charcoal/65 leading-relaxed">{item.texto}</p>
                     </div>
                     <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
                       <div className="bg-white p-1.5 pb-6 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500" style={{ transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)` }}>
@@ -237,27 +239,13 @@ export default function Confirmacao() {
             <FadeSection className="mb-24 md:mb-32 px-6">
               <SectionDivider title="Localização" />
               <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
-                <div className="text-center md:text-left">
-                  <h3 className="font-cormorant text-[28px] text-[#462F29] mb-4">Celeiro Quintal</h3>
-                  <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed mb-2">
-                    05 de Dezembro de 2026
-                  </p>
-                  <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed mb-2">
-                    Início: 18:00h
-                  </p>
-                  <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed mb-6">
-                    {ENDERECO_CURTO}
-                  </p>
-                  <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-[#462F29] text-white px-8 py-4 font-montserrat text-[12px] uppercase tracking-[0.2em] transition-colors hover:bg-[#462F29]/90">
-                    Ver no Mapa
-                  </a>
+                <div className="text-center md:text-right space-y-4">
+                  <h3 className="font-cormorant text-[28px] text-wedding-terracotta">Celeiro Quintal</h3>
+                  <p className="text-[14px] font-light text-wedding-charcoal/70 leading-relaxed">R. Cônego Eugênio Leite, 1098<br />Pinheiros, São Paulo - SP</p>
+                  <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block border-b border-wedding-gold text-wedding-gold py-1 text-[10px] uppercase tracking-[0.2em] hover:text-wedding-terracotta hover:border-wedding-terracotta transition-all">Ver no Mapa</a>
                 </div>
-
-                <div className="w-full h-[300px] md:h-[400px] overflow-hidden shadow-lg rounded-sm">
-                  <iframe
-                    src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}`}
-                    width="100%" height="100%" style={{ border: 0 }} allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade">
-                  </iframe>
+                <div className="h-[300px] bg-gray-100 rounded-sm shadow-lg overflow-hidden">
+                  <iframe width="100%" height="100%" frameBorder="0" src={`https://maps.google.com/maps?q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}&z=17&output=embed`} />
                 </div>
               </div>
             </FadeSection>
@@ -278,18 +266,18 @@ export default function Confirmacao() {
                         <p className="text-[12px] text-[#888] leading-relaxed mb-6">{p.descricao}</p>
                       </div>
                       <div>
-                        <button onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })} className="text-[10px] uppercase tracking-[0.2em] text-[#462F29] border-b border-[#462F29]/30 pb-1 hover:border-[#462F29] transition-all">
+                        <button onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })} className="text-[10px] uppercase tracking-[0.2em] text-wedding-terracotta border-b border-wedding-terracotta/30 pb-1 hover:border-wedding-terracotta transition-all">
                           {pixVisivel[i] ? "Ocultar Chave" : "Presentear via PIX"}
                         </button>
                         {pixVisivel[i] && (
-                          <div className="mt-4 p-4 bg-wedding-cream border border-wedding-gold/20 text-[11px] animate-in fade-in zoom-in duration-300 rounded-sm">
-                            <div className="flex items-start gap-2 mb-3 text-[#462F29]">
+                          <div className="mt-4 p-4 bg-wedding-terracotta/5 border border-wedding-terracotta/10 text-[11px] animate-in fade-in zoom-in duration-300 rounded-sm">
+                            <div className="flex items-start gap-2 mb-3 text-wedding-terracotta/80">
                               <span className="text-xs">⚠️</span>
-                              <p className="font-montserrat leading-tight font-bold">Confirme o destinatário:<br/>Daniel e Mariana</p>
+                              <p className="font-montserrat leading-tight">Confirme o destinatário:<br/><strong>Daniel e Mariana</strong></p>
                             </div>
                             <p className="text-[#888] uppercase mb-1 tracking-widest text-[9px]">Chave PIX</p>
                             <p className="font-mono break-all bg-white p-2 border border-wedding-blush/30">{p.pix}</p>
-                            <button onClick={() => copiarPix(i, p.pix)} className={`mt-3 w-full py-2 uppercase tracking-widest transition-all text-[9px] border border-wedding-gold/20 ${pixCopiado === i ? 'bg-green-50 text-green-600 border-green-200 font-bold' : 'bg-white text-[#462F29] hover:bg-[#462F29] hover:text-white'}`}>
+                            <button onClick={() => copiarPix(i, p.pix)} className={`mt-3 w-full py-2 uppercase tracking-widest transition-all text-[9px] border border-wedding-terracotta/20 ${pixCopiado === i ? 'bg-green-50 text-green-600 border-green-200 font-bold' : 'bg-white text-wedding-terracotta hover:bg-wedding-terracotta hover:text-white'}`}>
                               {pixCopiado === i ? "✓ Chave Copiada!" : "Copiar Chave PIX"}
                             </button>
                           </div>
@@ -307,15 +295,15 @@ export default function Confirmacao() {
               
               {sucesso ? (
                 <div className="space-y-12">
-                  <div className="p-12 bg-white border border-wedding-blush/30 text-wedding-charcoal shadow-sm">
-                    <h3 className="font-halimun text-3xl mb-4 text-[#462F29]">Obrigado!</h3>
+                  <div className="p-12 bg-wedding-blush/10 border border-wedding-blush/30 text-wedding-charcoal">
+                    <h3 className="font-halimun text-3xl mb-4 text-wedding-terracotta">Obrigado!</h3>
                     <p className="font-montserrat text-sm text-wedding-charcoal/70">Sua resposta foi enviada com carinho.</p>
                   </div>
                   
-                  {/* Manual do Convidado */}
+                  {/* Manual do Convidado — Exibição Limpa */}
                   <FadeSection className="space-y-8 animate-in fade-in slide-in-from-top-8 duration-1000">
                     <div className="w-10 h-[1px] bg-wedding-gold mx-auto mb-8" />
-                    <h4 className="font-cormorant text-3xl text-[#462F29]">Manual do Convidado</h4>
+                    <h4 className="font-cormorant text-3xl text-wedding-terracotta">Manual do Convidado</h4>
                     <div className="max-w-[500px] mx-auto overflow-hidden">
                       <img 
                         src={manualImg} 
@@ -353,7 +341,7 @@ export default function Confirmacao() {
                         onClick={() => setResposta(opt.id as any)}
                         className={`p-4 border text-[11px] uppercase tracking-widest transition-all h-full flex items-center justify-center text-center
                           ${resposta === opt.id 
-                            ? "bg-[#462F29] text-white border-[#462F29] shadow-md" 
+                            ? "bg-wedding-charcoal text-white border-wedding-charcoal shadow-md" 
                             : "bg-white text-wedding-charcoal border-wedding-blush/30 hover:border-wedding-gold"}`}
                       >
                         {opt.label}
@@ -361,11 +349,12 @@ export default function Confirmacao() {
                     ))}
                   </div>
 
-                  {/* Seção de Acompanhantes */}
+                  {/* Seção de Acompanhantes (Apenas se Confirmado) */}
                   {resposta === "Confirmado" && convidadoSelecionado.limite > 0 && (
                     <div className="space-y-6 pt-6 border-t border-wedding-blush/20 animate-in fade-in slide-in-from-top-4">
-                      <h4 className="font-cormorant text-2xl text-[#462F29]">Seus Acompanhantes</h4>
+                      <h4 className="font-cormorant text-2xl text-wedding-terracotta">Seus Acompanhantes</h4>
                       
+                      {/* Lista de Acompanhantes */}
                       <div className="space-y-4">
                         {adultos.map((a, i) => (
                           <div key={`a-${i}`} className="flex gap-2 items-center bg-white p-2 border border-wedding-blush/10">
@@ -412,6 +401,7 @@ export default function Confirmacao() {
                         ))}
                       </div>
 
+                      {/* Botões de Adicionar */}
                       {!limiteAtingido && (
                         <div className="flex justify-center gap-4">
                           <button 
@@ -427,6 +417,9 @@ export default function Confirmacao() {
                             + Criança
                           </button>
                         </div>
+                      )}
+                      {limiteAtingido && (
+                        <p className="text-[10px] text-wedding-terracotta/60 italic">Limite de acompanhantes atingido.</p>
                       )}
                     </div>
                   )}
@@ -446,10 +439,10 @@ export default function Confirmacao() {
                       
                       <button
                         onClick={handleSubmit}
-                        disabled={confirmarPresencaMutation.isPending}
-                        className="w-full bg-[#462F29] text-white py-5 tracking-[0.4em] uppercase text-[12px] shadow-xl hover:bg-[#462F29]/90 transition-all disabled:opacity-50"
+                        disabled={(confirmarPresenca as any).isPending}
+                        className="w-full bg-wedding-charcoal text-white py-5 tracking-[0.4em] uppercase text-[12px] shadow-xl hover:bg-wedding-terracotta transition-all disabled:opacity-50"
                       >
-                        {confirmarPresencaMutation.isPending ? "Enviando..." : "Enviar Resposta"}
+                        {(confirmarPresenca as any).isPending ? "Enviando..." : "Enviar Resposta"}
                       </button>
                     </div>
                   )}
@@ -458,9 +451,6 @@ export default function Confirmacao() {
             </FadeSection>
           </div>
         )}
-
-        {/* Efeito de Envelope no Rodapé */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#462F29]/5 to-transparent z-20 pointer-events-none" />
       </main>
     </div>
   );
