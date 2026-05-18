@@ -182,7 +182,7 @@ export default function Confirmacao() {
         {!convidadoSelecionado && (
           <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24 p-8 bg-white shadow-lg rounded-lg border border-gray-200">
 
-            <p className="font-light text-[#888] mb-8 text-sm">Informe seu nome conforme o convite</p>
+            <p className="font-light text-[#888] mb-8 text-sm">Informe seu Nome e Sobrenome</p>
             <input 
               type="text" 
               placeholder="Digite seu nome completo aqui" 
@@ -194,7 +194,7 @@ export default function Confirmacao() {
             <button 
               onClick={handleSearch}
               disabled={carregandoBusca}
-              className={`w-full bg-wedding-charcoal text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
+              className={`w-full bg-[#462F29] text-white py-4 tracking-[0.2em] uppercase text-[12px] transition-opacity ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
             >
               {carregandoBusca ? "Verificando..." : "Verificar Convite"}
             </button>
