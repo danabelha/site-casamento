@@ -205,7 +205,7 @@ export default function Confirmacao() {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {/* Boas-vindas */}
             <FadeSection className="text-center mb-24 md:mb-32 px-6">
-              <h2 className="font-halimun text-[32px] md:text-[48px] text-wedding-terracotta mb-6">
+              <h2 className="font-halimun text-[32px] md:text-[48px] text-[#462F29] mb-6">
                 Olá, {convidadoSelecionado.nome}!
               </h2>
               <p className="font-montserrat text-[14px] md:text-[18px] text-wedding-charcoal/70 leading-relaxed max-w-[600px] mx-auto">
@@ -219,9 +219,9 @@ export default function Confirmacao() {
               <div className="relative max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
                   <div key={index} className="sticky top-0 min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20">
-                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-wedding-cream p-6 md:p-4 rounded-sm shadow-sm md:shadow-none">
-                      <h3 className="font-cormorant text-[24px] md:text-[36px] text-wedding-terracotta mb-4 md:mb-6">{item.titulo}</h3>
-                      <p className="font-montserrat text-[13px] md:text-[16px] text-wedding-charcoal/65 leading-relaxed">{item.texto}</p>
+                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-[#462F29] p-6 md:p-4 rounded-sm shadow-sm md:shadow-none">
+                      <h3 className="font-cormorant text-[24px] md:text-[36px] text-white mb-4 md:mb-6">{item.titulo}</h3>
+                      <p className="font-montserrat text-[13px] md:text-[16px] text-white/80 leading-relaxed">{item.texto}</p>
                     </div>
                     <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
                       <div className="bg-white p-1.5 pb-6 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500" style={{ transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)` }}>
@@ -240,7 +240,8 @@ export default function Confirmacao() {
               <SectionDivider title="Localização" />
               <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
                 <div className="text-center md:text-right space-y-4">
-                  <h3 className="font-cormorant text-[28px] text-wedding-terracotta">Celeiro Quintal</h3>
+                  <h3 className="font-cormorant text-[28px] text-[#462F29]">Celeiro Quintal</h3>
+                  <p className="text-[14px] font-light text-wedding-charcoal/70 leading-relaxed">05 de Dezembro de 2026, 19:00</p>
                   <p className="text-[14px] font-light text-wedding-charcoal/70 leading-relaxed">R. Cônego Eugênio Leite, 1098<br />Pinheiros, São Paulo - SP</p>
                   <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block border-b border-wedding-gold text-wedding-gold py-1 text-[10px] uppercase tracking-[0.2em] hover:text-wedding-terracotta hover:border-wedding-terracotta transition-all">Ver no Mapa</a>
                 </div>
