@@ -39,7 +39,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative h-[100dvh] min-h-screen flex items-center justify-center overflow-hidden bg-wedding-charcoal max-w-[2000px] mx-auto">
+    <div className="relative h-[100dvh] w-full flex items-center justify-center overflow-hidden bg-wedding-charcoal">
       
       {/* BackGround Image - Otimizada para aparecer toda a imagem mantendo a harmonia */}
       <div
