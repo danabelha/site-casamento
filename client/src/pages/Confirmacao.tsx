@@ -7,7 +7,7 @@ import { trpc } from "../lib/trpc";
 // CalligraphicDivider removido conforme solicitado para limpar o visual do cabeçalho
 
 // Importar imagens
-import manualImg from "../assets/images/manual_final_match.png";
+import manualImg from "../assets/images/manual_final_v2.png";
 import headerLogo from "../assets/images/header_logo_perfect.png";
 
 // ===== CONSTANTES =====
