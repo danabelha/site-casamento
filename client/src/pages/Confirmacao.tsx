@@ -235,20 +235,33 @@ export default function Confirmacao() {
             </section>
 
             {/* Localização */}
-            <FadeSection className="mb-24 md:mb-32 px-6">
-              <SectionDivider title="Localização" />
-              <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
-                <div className="text-center md:text-right space-y-4">
-                  <h3 className="font-cormorant text-[28px] text-[#462F29]">Celeiro Quintal</h3>
-                  <p className="text-[14px] font-light text-wedding-charcoal/70 leading-relaxed">05 de Dezembro de 2026, 18:00</p>
-                  <p className="text-[14px] font-light text-wedding-charcoal/70 leading-relaxed">R. Cônego Eugênio Leite, 1098<br />Pinheiros, São Paulo - SP</p>
-                  <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block border-b border-wedding-gold text-wedding-gold py-1 text-[10px] uppercase tracking-[0.2em] hover:text-wedding-terracotta hover:border-wedding-terracotta transition-all">Ver no Mapa</a>
+            <div className="bg-[#462F29] py-20 md:py-32 mb-24 md:mb-32">
+              <FadeSection className="px-6">
+                <div className="text-center mb-12">
+                  <h2 className="font-cormorant font-light text-white text-[28px] md:text-[42px] leading-tight mb-4">Localização</h2>
+                  <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />
                 </div>
-                <div className="h-[300px] bg-gray-100 rounded-sm shadow-lg overflow-hidden">
-                  <iframe width="100%" height="100%" frameBorder="0" src={`https://maps.google.com/maps?q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}&z=17&output=embed`} />
+                <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
+                  <div className="text-center md:text-right space-y-6">
+                    <h3 className="font-halimun text-[32px] text-wedding-gold">Celeiro Quintal</h3>
+                    <div className="space-y-2">
+                      <p className="text-[16px] font-light text-white/90 tracking-wide">05 de Dezembro de 2026, 18:00</p>
+                      <p className="text-[14px] font-light text-white/70 leading-relaxed">R. Cônego Eugênio Leite, 1098<br />Pinheiros, São Paulo - SP</p>
+                    </div>
+                    <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-wedding-gold text-white px-8 py-3 text-[10px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#462F29] transition-all shadow-lg">Ver no Mapa</a>
+                  </div>
+                  <div className="h-[350px] bg-white p-2 rounded-sm shadow-2xl overflow-hidden transform md:rotate-1">
+                    <iframe 
+                      width="100%" 
+                      height="100%" 
+                      frameBorder="0" 
+                      style={{ filter: 'grayscale(0.2) contrast(1.1)' }}
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}&z=17&output=embed`} 
+                    />
+                  </div>
                 </div>
-              </div>
-            </FadeSection>
+              </FadeSection>
+            </div>
 
             {/* Presentes */}
             <FadeSection className="mb-24 md:mb-32">
