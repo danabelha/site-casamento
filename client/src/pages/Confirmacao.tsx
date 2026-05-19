@@ -4,7 +4,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { trpc } from "../lib/trpc";
-import CalligraphicDivider from "../components/CalligraphicDivider";
+// CalligraphicDivider removido conforme solicitado para limpar o visual do cabeçalho
 
 // Importar imagens
 import manualImg from "../assets/images/manual.png";
