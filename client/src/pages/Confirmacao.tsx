@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { trpc } from "../lib/trpc";
+import CalligraphicDivider from "../components/CalligraphicDivider";
 
 // Importar imagens
 import manualImg from "../assets/images/manual.png";
@@ -174,10 +175,8 @@ export default function Confirmacao() {
             <h1 className="font-halimun text-[42px] md:text-[60px] text-[#462F29] leading-tight">Mariana & Daniel</h1>
         </FadeSection>
 
-        {/* Divisor Minimalista */}
-        <div className="text-center my-10 md:my-16">
-          <div className="w-16 h-[1px] bg-wedding-gold mx-auto" />
-        </div>
+        {/* Divisor Caligráfico */}
+        <CalligraphicDivider className="my-10 md:my-16" />
 
         {!convidadoSelecionado && (
           <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24 p-8 bg-white shadow-lg rounded-lg border border-gray-200">
