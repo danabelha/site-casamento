@@ -8,6 +8,7 @@ import CalligraphicDivider from "../components/CalligraphicDivider";
 
 // Importar imagens
 import manualImg from "../assets/images/manual.png";
+import headerLogo from "../assets/images/header_logo.png";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
@@ -164,10 +165,13 @@ export default function Confirmacao() {
   return (
     <div className="min-h-screen bg-wedding-cream text-wedding-charcoal">
       <main className="max-w-6xl mx-auto pt-20 pb-20">
-        {/* Cabeçalho (Nomes do Casal) */}
-        <FadeSection className="px-6 text-center mb-20">
-          <p className="font-lato text-[10px] tracking-[0.6em] text-wedding-gold uppercase mb-6">05 de Dezembro de 2026</p>
-          <h1 className="font-halimun text-[42px] md:text-[60px] text-[#462F29] leading-tight">Mariana & Daniel</h1>
+        {/* Cabeçalho (Logo do Casal) */}
+        <FadeSection className="px-6 flex justify-center mb-16 md:mb-20">
+          <img 
+            src={headerLogo} 
+            alt="Mariana & Daniel - 05 de Dezembro de 2026" 
+            className="w-full max-w-[320px] md:max-w-[500px] h-auto object-contain"
+          />
         </FadeSection>
 
         {/* Divisor Caligráfico */}
