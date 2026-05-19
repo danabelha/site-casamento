@@ -132,8 +132,6 @@ export default function Confirmacao() {
         ...criancas.map(c => `${c.nome} (${c.idade} anos)`)
       ].join("\n");
 
-      // Regra do Contrato: Idade <= 7 anos é isento (Menores8)
-      // Crianças com idade > 7 anos contam como acompanhantes pagantes
       const menoresDe8 = criancas.filter(c => {
         const idadeNum = parseInt(c.idade, 10);
         return !isNaN(idadeNum) && idadeNum <= 7;
@@ -147,11 +145,8 @@ export default function Confirmacao() {
       await confirmarMutation.mutateAsync({
         id: convidadoSelecionado.id,
         status: resposta === "Talvez" ? "Talvez" : resposta === "Confirmado" ? "Confirmado" : "Não Irá",
-        // Acompanhantes Pagantes = Adultos + Crianças > 7 anos
         acompanhantes: adultos.length + criancasPagantes.length,
-        // Total de crianças informadas (para histórico)
         criancas: criancas.length,
-        // Isentos conforme contrato (<= 7 anos)
         menores8: menoresDe8.length,
         mensagem,
         acompanhanteDetalhes: detalhes,
@@ -172,15 +167,14 @@ export default function Confirmacao() {
         {/* Cabeçalho (Nomes do Casal) */}
         <FadeSection className="px-6 text-center mb-20">
           <p className="font-lato text-[10px] tracking-[0.6em] text-wedding-gold uppercase mb-6">05 de Dezembro de 2026</p>
-            <h1 className="font-halimun text-[42px] md:text-[60px] text-[#462F29] leading-tight">Mariana & Daniel</h1>
+          <h1 className="font-halimun text-[42px] md:text-[60px] text-[#462F29] leading-tight">Mariana & Daniel</h1>
         </FadeSection>
 
         {/* Divisor Caligráfico */}
         <CalligraphicDivider className="my-10 md:my-16" />
 
-        {!convidadoSelecionado && (
+        {!convidadoSelecionado ? (
           <FadeSection className="max-w-[500px] mx-auto px-6 text-center mb-24 p-8 bg-white shadow-lg rounded-lg border border-gray-200">
-
             <p className="font-light text-[#888] mb-8 text-sm">Informe seu Nome e Sobrenome</p>
             <input 
               type="text" 
@@ -198,9 +192,7 @@ export default function Confirmacao() {
               {carregandoBusca ? "Verificando..." : "Verificar Convite"}
             </button>
           </FadeSection>
-        )}
-
-        {convidadoSelecionado && (
+        ) : (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {/* Boas-vindas */}
             <FadeSection className="text-center mb-24 md:mb-32 px-6">
@@ -452,36 +444,37 @@ export default function Confirmacao() {
                           </div>
                         )}
                         {limiteAtingido && (
-                        <p className="text-[10px] text-wedding-terracotta/60 italic">Limite de acompanhantes atingido.</p>
-                      )}
-                    </div>
-                  )}
+                          <p className="text-[10px] text-wedding-terracotta/60 italic">Limite de acompanhantes atingido.</p>
+                        )}
+                      </div>
+                    )}
 
-                  {/* Mensagem e Botão Final */}
-                  {resposta && (
-                    <div className="space-y-6 pt-10 border-t border-white/10 animate-in fade-in duration-500">
-                      {(resposta === "Confirmado" || resposta === "Não Irá") && (
-                        <textarea
-                          placeholder="Deixe uma mensagem carinhosa para os noivos..."
-                          rows={4}
-                          className="wedding-input !text-[16px] !bg-white/5 !text-white !border-white/10 placeholder:text-white/30"
-                          value={mensagem}
-                          onChange={(e) => setMensagem(e.target.value)}
-                        />
-                      )}
-                      
-                      <button
-                        onClick={handleSubmit}
-                        disabled={confirmarMutation.isPending}
-                        className="w-full bg-wedding-gold text-white py-5 tracking-[0.4em] uppercase text-[12px] shadow-2xl hover:bg-white hover:text-[#462F29] transition-all disabled:opacity-50 font-bold"
-                      >
-                        {confirmarMutation.isPending ? "Enviando..." : "Enviar Resposta"}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </FadeSection>
+                    {/* Mensagem e Botão Final */}
+                    {resposta && (
+                      <div className="space-y-6 pt-10 border-t border-white/10 animate-in fade-in duration-500">
+                        {(resposta === "Confirmado" || resposta === "Não Irá") && (
+                          <textarea
+                            placeholder="Deixe uma mensagem carinhosa para os noivos..."
+                            rows={4}
+                            className="wedding-input !text-[16px] !bg-white/5 !text-white !border-white/10 placeholder:text-white/30"
+                            value={mensagem}
+                            onChange={(e) => setMensagem(e.target.value)}
+                          />
+                        )}
+                        
+                        <button
+                          onClick={handleSubmit}
+                          disabled={confirmarMutation.isPending}
+                          className="w-full bg-wedding-gold text-white py-5 tracking-[0.4em] uppercase text-[12px] shadow-2xl hover:bg-white hover:text-[#462F29] transition-all disabled:opacity-50 font-bold"
+                        >
+                          {confirmarMutation.isPending ? "Enviando..." : "Enviar Resposta"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </FadeSection>
+            </div>
           </div>
         )}
       </main>
