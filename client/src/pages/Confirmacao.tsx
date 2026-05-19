@@ -49,7 +49,7 @@ const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURICom
 function SectionDivider({ title, isVerification = false }: { title: string; isVerification?: boolean } ) {
   return (
     <div className="text-center mb-8 md:mb-12 px-4">
-      <h2 className={`font-cormorant font-light text-wedding-charcoal leading-tight mb-4 whitespace-nowrap
+      <h2 className={`font-cormorant font-light text-[#462F29] leading-tight mb-4 whitespace-nowrap
         ${isVerification ? 'text-[22px] sm:text-[28px] md:text-[42px]' : 'text-[28px] md:text-[42px]'}`}>
         {title}
       </h2>
@@ -241,7 +241,7 @@ export default function Confirmacao() {
               <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
                 <div className="text-center md:text-right space-y-4">
                   <h3 className="font-cormorant text-[28px] text-[#462F29]">Celeiro Quintal</h3>
-                  <p className="text-[14px] font-light text-wedding-charcoal/70 leading-relaxed">05 de Dezembro de 2026, 19:00</p>
+                  <p className="text-[14px] font-light text-wedding-charcoal/70 leading-relaxed">05 de Dezembro de 2026, 18:00</p>
                   <p className="text-[14px] font-light text-wedding-charcoal/70 leading-relaxed">R. Cônego Eugênio Leite, 1098<br />Pinheiros, São Paulo - SP</p>
                   <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block border-b border-wedding-gold text-wedding-gold py-1 text-[10px] uppercase tracking-[0.2em] hover:text-wedding-terracotta hover:border-wedding-terracotta transition-all">Ver no Mapa</a>
                 </div>
