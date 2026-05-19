@@ -382,11 +382,11 @@ export default function Confirmacao() {
                         {/* Lista de Acompanhantes */}
                         <div className="space-y-4">
                           {adultos.map((a, i) => (
-                            <div key={`a-${i}`} className="flex gap-2 items-center bg-white/5 p-2 border border-white/10">
+                            <div key={`a-${i}`} className="flex gap-2 items-center bg-white p-2 border border-wedding-gold/20 shadow-inner">
                               <input
                                 type="text"
                                 placeholder="Nome e Sobrenome (Adulto)"
-                                className="wedding-input flex-grow !border-none !p-3 !text-[14px] !text-white bg-transparent placeholder:text-white/30"
+                                className="wedding-input flex-grow !border-none !p-3 !text-[14px] !text-[#462F29] bg-transparent placeholder:text-[#462F29]/40"
                                 value={a.nome}
                                 onChange={(e) => {
                                   const n = [...adultos];
@@ -394,15 +394,15 @@ export default function Confirmacao() {
                                   setAdultos(n);
                                 }}
                               />
-                              <button onClick={() => setAdultos(adultos.filter((_, idx) => idx !== i))} className="text-red-400 text-[10px] px-3 uppercase tracking-widest">Remover</button>
+                              <button onClick={() => setAdultos(adultos.filter((_, idx) => idx !== i))} className="text-red-500 text-[10px] px-3 uppercase tracking-widest font-bold">Remover</button>
                             </div>
                           ))}
                           {criancas.map((c, i) => (
-                            <div key={`c-${i}`} className="flex gap-2 items-center bg-white/5 p-2 border border-white/10">
+                            <div key={`c-${i}`} className="flex gap-2 items-center bg-white p-2 border border-wedding-gold/20 shadow-inner">
                               <input
                                 type="text"
                                 placeholder="Nome e Sobrenome (Criança)"
-                                className="wedding-input flex-grow !border-none !p-3 !text-[14px] !text-white bg-transparent placeholder:text-white/30"
+                                className="wedding-input flex-grow !border-none !p-3 !text-[14px] !text-[#462F29] bg-transparent placeholder:text-[#462F29]/40"
                                 value={c.nome}
                                 onChange={(e) => {
                                   const n = [...criancas];
@@ -413,7 +413,7 @@ export default function Confirmacao() {
                               <input
                                 type="number"
                                 placeholder="Idade"
-                                className="wedding-input w-20 !border-none !p-3 !text-[14px] !text-white bg-transparent placeholder:text-white/30"
+                                className="wedding-input w-20 !border-none !p-3 !text-[14px] !text-[#462F29] bg-transparent placeholder:text-[#462F29]/40"
                                 value={c.idade}
                                 onChange={(e) => {
                                   const n = [...criancas];
@@ -421,7 +421,7 @@ export default function Confirmacao() {
                                   setCriancas(n);
                                 }}
                               />
-                              <button onClick={() => setCriancas(criancas.filter((_, idx) => idx !== i))} className="text-red-400 text-[10px] px-3 uppercase tracking-widest">Remover</button>
+                              <button onClick={() => setCriancas(criancas.filter((_, idx) => idx !== i))} className="text-red-500 text-[10px] px-3 uppercase tracking-widest font-bold">Remover</button>
                             </div>
                           ))}
                         </div>
@@ -453,13 +453,13 @@ export default function Confirmacao() {
                     {resposta && (
                       <div className="space-y-6 pt-10 border-t border-white/10 animate-in fade-in duration-500">
                         {(resposta === "Confirmado" || resposta === "Não Irá") && (
-                          <textarea
-                            placeholder="Deixe uma mensagem carinhosa para os noivos..."
-                            rows={4}
-                            className="wedding-input !text-[16px] !bg-white/5 !text-white !border-white/10 placeholder:text-white/30"
-                            value={mensagem}
-                            onChange={(e) => setMensagem(e.target.value)}
-                          />
+                        <textarea
+                          placeholder="Deixe uma mensagem carinhosa para os noivos..."
+                          rows={4}
+                          className="wedding-input !text-[16px] !bg-white !text-[#462F29] !border-wedding-gold/20 shadow-inner placeholder:text-[#462F29]/40"
+                          value={mensagem}
+                          onChange={(e) => setMensagem(e.target.value)}
+                        />
                         )}
                         
                         <button
