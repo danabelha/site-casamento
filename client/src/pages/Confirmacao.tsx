@@ -8,7 +8,7 @@ import { trpc } from "../lib/trpc";
 
 // Importar imagens
 import manualImg from "../assets/images/manual.png";
-import headerLogo from "../assets/images/header_logo_final.png";
+import headerLogo from "../assets/images/header_logo_perfect.png";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
