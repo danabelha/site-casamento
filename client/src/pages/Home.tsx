@@ -31,6 +31,14 @@ export default function Home() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    // Bloquear rolagem apenas na Home
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setTempoRestante(calcularTempoRestante());
     }, 1000);

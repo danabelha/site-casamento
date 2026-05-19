@@ -117,10 +117,8 @@
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100%;
-    height: -webkit-fill-available;
-    overflow: hidden;
-    background-color: #2C2C2C; /* Wedding Charcoal para evitar frestas brancas */
+    min-height: 100%;
+    background-color: #462F29; /* Cor R:70, G:47, B:41 para evitar frestas brancas */
     @apply text-foreground;
   }
 }
