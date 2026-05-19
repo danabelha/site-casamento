@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import heroImage from "../assets/images/home.webp";
+import heroImage from "../assets/images/home.png";
 
 interface TimeLeft {
   dias: number;
