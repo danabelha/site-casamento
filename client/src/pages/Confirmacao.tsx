@@ -256,28 +256,44 @@ export default function Confirmacao() {
               <div className="relative px-4 md:px-6">
                 <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible pb-8 md:pb-0 scrollbar-hide snap-x snap-mandatory max-w-5xl mx-auto">
                   {PRESENTES.map((p, i) => (
-                    <div key={i} className="min-w-[280px] md:min-w-0 snap-center p-8 border border-wedding-blush/20 bg-white/50 hover:bg-white transition-all shadow-sm hover:shadow-md flex flex-col justify-between">
-                      <div>
-                        <div className="flex justify-between items-start mb-6">
-                          <span className="text-3xl">{p.emoji}</span>
-                          <span className="text-[10px] uppercase tracking-[0.2em] text-wedding-gold font-bold">{p.valor}</span>
+                    <div 
+                      key={i} 
+                      className="min-w-[280px] md:min-w-0 snap-center bg-white p-3 pb-8 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+                      style={{ 
+                        transform: `rotate(${i % 2 === 0 ? '-1.5' : '1.5'}deg)`,
+                        transition: 'all 0.4s ease-out'
+                      }}
+                    >
+                      <div className="aspect-square bg-gray-50 flex items-center justify-center mb-6 overflow-hidden rounded-sm relative group">
+                        <span className="text-6xl transition-transform duration-500 group-hover:scale-125">{p.emoji}</span>
+                        <div className="absolute top-2 right-2 bg-wedding-gold/90 text-white text-[9px] px-2 py-1 rounded-full font-bold tracking-widest uppercase">
+                          {p.valor}
                         </div>
-                        <h4 className="font-cormorant text-xl text-wedding-charcoal mb-2">{p.nome}</h4>
-                        <p className="text-[12px] text-[#888] leading-relaxed mb-6">{p.descricao}</p>
                       </div>
-                      <div>
-                        <button onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })} className="text-[10px] uppercase tracking-[0.2em] text-wedding-terracotta border-b border-wedding-terracotta/30 pb-1 hover:border-wedding-terracotta transition-all">
+                      
+                      <div className="px-2 text-center">
+                        <h4 className="font-halimun text-lg text-[#462F29] mb-3">{p.nome}</h4>
+                        <p className="text-[11px] text-[#888] font-montserrat leading-relaxed mb-6 h-8 flex items-center justify-center">{p.descricao}</p>
+                        
+                        <button 
+                          onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })} 
+                          className="w-full bg-[#462F29] text-white py-3 text-[10px] uppercase tracking-[0.2em] hover:bg-wedding-terracotta transition-all shadow-md"
+                        >
                           {pixVisivel[i] ? "Ocultar Chave" : "Presentear via PIX"}
                         </button>
+
                         {pixVisivel[i] && (
-                          <div className="mt-4 p-4 bg-wedding-terracotta/5 border border-wedding-terracotta/10 text-[11px] animate-in fade-in zoom-in duration-300 rounded-sm">
+                          <div className="mt-4 p-4 bg-wedding-terracotta/5 border border-wedding-terracotta/10 text-[11px] animate-in fade-in zoom-in duration-300 rounded-sm text-left">
                             <div className="flex items-start gap-2 mb-3 text-wedding-terracotta/80">
                               <span className="text-xs">⚠️</span>
-                              <p className="font-montserrat leading-tight">Confirme o destinatário:<br/><strong>Daniel e Mariana</strong></p>
+                              <p className="font-montserrat leading-tight text-[10px]">Confirme o destinatário:<br/><strong>Daniel e Mariana</strong></p>
                             </div>
-                            <p className="text-[#888] uppercase mb-1 tracking-widest text-[9px]">Chave PIX</p>
-                            <p className="font-mono break-all bg-white p-2 border border-wedding-blush/30">{p.pix}</p>
-                            <button onClick={() => copiarPix(i, p.pix)} className={`mt-3 w-full py-2 uppercase tracking-widest transition-all text-[9px] border border-wedding-terracotta/20 ${pixCopiado === i ? 'bg-green-50 text-green-600 border-green-200 font-bold' : 'bg-white text-wedding-terracotta hover:bg-wedding-terracotta hover:text-white'}`}>
+                            <p className="text-[#888] uppercase mb-1 tracking-widest text-[8px]">Chave PIX</p>
+                            <p className="font-mono break-all bg-white p-2 border border-wedding-blush/30 text-[10px]">{p.pix}</p>
+                            <button 
+                              onClick={() => copiarPix(i, p.pix)} 
+                              className={`mt-3 w-full py-2 uppercase tracking-widest transition-all text-[9px] border border-wedding-terracotta/20 ${pixCopiado === i ? 'bg-green-50 text-green-600 border-green-200 font-bold' : 'bg-white text-wedding-terracotta hover:bg-wedding-terracotta hover:text-white'}`}
+                            >
                               {pixCopiado === i ? "✓ Chave Copiada!" : "Copiar Chave PIX"}
                             </button>
                           </div>
