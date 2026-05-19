@@ -8,7 +8,7 @@ import { trpc } from "../lib/trpc";
 
 // Importar imagens
 import manualImg from "../assets/images/manual.png";
-import headerLogo from "../assets/images/header_logo_fixed.png";
+import headerLogo from "../assets/images/header_logo_final.png";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
@@ -163,7 +163,7 @@ export default function Confirmacao() {
   const limiteAtingido = totalAcompanhantes >= (convidadoSelecionado?.limite || 0);
 
   return (
-    <div className="min-h-screen bg-wedding-cream text-wedding-charcoal">
+    <div className="min-h-screen bg-[#FDFAF6] text-wedding-charcoal">
       <main className="max-w-6xl mx-auto pt-20 pb-20">
         {/* Cabeçalho (Logo do Casal) */}
         <FadeSection className="px-4 flex justify-center mb-12 md:mb-16">
