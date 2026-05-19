@@ -44,7 +44,7 @@ const PRESENTES = [
 ];
 
 const ENDERECO_CURTO = "R. Cônego Eugênio Leite, 1098 - Pinheiros, São Paulo - SP";
-const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}`;
+const MAPS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}`;
 
 // ===== COMPONENTES AUXILIARES =====
 
@@ -249,7 +249,7 @@ export default function Confirmacao() {
                       height="100%" 
                       frameBorder="0" 
                       style={{ filter: 'grayscale(0.2) contrast(1.1)' }}
-                      src={`https://maps.google.com/maps?q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}&z=17&output=embed`} 
+                      src={`https://www.google.com/maps?q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}&output=embed`} 
                     />
                   </div>
                 </div>
