@@ -39,11 +39,11 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative h-[100dvh] w-full flex items-center justify-center overflow-hidden bg-wedding-charcoal">
+    <div className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-wedding-charcoal" style={{ height: '100dvh' }}>
       
       {/* BackGround Image - Otimizada para aparecer toda a imagem mantendo a harmonia */}
       <div
-          className="absolute inset-0 w-full h-full bg-cover bg-no-repeat brightness-[0.55] bg-top md:bg-center md:bg-fixed"
+          className="fixed inset-0 w-full h-full bg-cover bg-no-repeat brightness-[0.55] bg-top md:bg-center"
         style={{
           backgroundImage: `url(${heroImage})`,
           backgroundSize: "cover",
