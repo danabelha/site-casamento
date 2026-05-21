@@ -326,21 +326,23 @@ export default function Confirmacao() {
                       <p className="font-montserrat text-sm text-white/70">Sua resposta foi enviada com carinho.</p>
                     </div>
                     
-                    {/* Manual do Convidado — Exibição Limpa */}
-                    <FadeSection className="space-y-8 animate-in fade-in slide-in-from-top-8 duration-1000">
-                      <div className="w-10 h-[1px] bg-wedding-gold mx-auto mb-8" />
-                      <h4 className="font-halimun text-3xl text-wedding-gold">Manual do Convidado</h4>
-                      <div className="max-w-[500px] mx-auto">
-                        <img 
-                          src={manualImg} 
-                          alt="Manual do Convidado" 
-                          className="w-full h-auto"
-                        />
-                      </div>
-                      <p className="font-montserrat text-[10px] text-white/50 uppercase tracking-widest">
-                        Tire um print para não esquecer os detalhes!
-                      </p>
-                    </FadeSection>
+                    {/* Manual do Convidado — Exibição Condicional */}
+                    {status === "Confirmado" && (
+                      <FadeSection className="space-y-8 animate-in fade-in slide-in-from-top-8 duration-1000">
+                        <div className="w-10 h-[1px] bg-wedding-gold mx-auto mb-8" />
+                        <h4 className="font-halimun text-3xl text-wedding-gold">Manual do Convidado</h4>
+                        <div className="max-w-[500px] mx-auto">
+                          <img 
+                            src={manualImg} 
+                            alt="Manual do Convidado" 
+                            className="w-full h-auto"
+                          />
+                        </div>
+                        <p className="font-montserrat text-[10px] text-white/50 uppercase tracking-widest">
+                          Tire um print para não esquecer os detalhes!
+                        </p>
+                      </FadeSection>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-10">
