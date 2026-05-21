@@ -327,7 +327,7 @@ export default function Confirmacao() {
                     </div>
                     
                     {/* Manual do Convidado — Exibição Condicional */}
-                    {status === "Confirmado" && (
+                    {resposta === "Confirmado" && (
                       <FadeSection className="space-y-8 animate-in fade-in slide-in-from-top-8 duration-1000">
                         <div className="w-10 h-[1px] bg-wedding-gold mx-auto mb-8" />
                         <h4 className="font-halimun text-3xl text-wedding-gold">Manual do Convidado</h4>
