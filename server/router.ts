@@ -119,14 +119,18 @@ const appRouter = t.router({
       };
 
       convidados.forEach((c: any) => {
-        if (c.status === "Confirmado") stats.confirmados++;
-        else if (c.status === "Não Irá") stats.naoIrao++;
-        else if (c.status === "Talvez") stats.talvez++;
-        else stats.pendentes++;
-
-        stats.acompanhantes += c.acompanhantes || 0;
-        stats.criancas += c.criancas || 0;
-        stats.menores8 += c.menores8 || 0;
+        if (c.status === "Confirmado") {
+          stats.confirmados++;
+          stats.acompanhantes += c.acompanhantes || 0;
+          stats.criancas += c.criancas || 0;
+          stats.menores8 += c.menores8 || 0;
+        } else if (c.status === "Não Irá") {
+          stats.naoIrao++;
+        } else if (c.status === "Talvez") {
+          stats.talvez++;
+        } else {
+          stats.pendentes++;
+        }
       });
 
       return stats;

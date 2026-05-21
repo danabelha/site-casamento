@@ -156,13 +156,13 @@ export default function AdminPanel() {
   const confirmadosLista = convidados.filter(c => c.status === "Confirmado");
   const stats = {
     total: convidados.length,
-    // Total Evento = Titulares Confirmados + Acompanhantes Pagantes (> 7 anos)
-    confirmados: confirmadosLista.reduce((acc, c) => acc + 1 + (Number(c.acompanhantes) || 0), 0),
+    // Total Evento = Titulares Confirmados + Acompanhantes + Crianças (< 8 anos)
+    confirmados: confirmadosLista.reduce((acc, c) => acc + 1 + (Number(c.acompanhantes) || 0) + (Number(c.menores8) || 0), 0),
     naoIrao: convidados.filter(c => c.status === "Não Irá").length,
     talvez: convidados.filter(c => c.status === "Talvez").length,
-    // ACOMPANHANTES = Acompanhantes Pagantes (> 7 anos)
+    // ACOMPANHANTES = Acompanhantes Adultos/Pagantes
     acompanhantes: confirmadosLista.reduce((acc, c) => acc + (Number(c.acompanhantes) || 0), 0),
-    // Crianças (< 8 anos) = Isentas (<= 7 anos)
+    // Crianças (< 8 anos)
     criancasMenores8: confirmadosLista.reduce((acc, c) => acc + (Number(c.menores8) || 0), 0),
     pendentes: convidados.filter(c => c.status === "Pendente").length,
   };
