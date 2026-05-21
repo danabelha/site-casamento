@@ -413,17 +413,20 @@ export default function Confirmacao() {
                                   setCriancas(n);
                                 }}
                               />
-                              <input
-                                type="number"
-                                placeholder="Idade"
-                                className="wedding-input w-20 !border-none !p-3 !text-[14px] !text-[#462F29] bg-transparent placeholder:text-[#462F29]/40"
-                                value={c.idade}
-                                onChange={(e) => {
-                                  const n = [...criancas];
-                                  n[i].idade = e.target.value;
-                                  setCriancas(n);
-                                }}
-                              />
+                              <div className="flex items-center gap-2 px-3 border-l border-wedding-gold/20">
+                                <span className="text-[10px] uppercase tracking-widest text-[#462F29]/40 font-bold">Idade:</span>
+                                <input
+                                  type="number"
+                                  placeholder="0"
+                                  className="wedding-input w-12 !border-none p-0 !text-[14px] font-bold !text-[#462F29] bg-transparent focus:ring-0"
+                                  value={c.idade}
+                                  onChange={(e) => {
+                                    const n = [...criancas];
+                                    n[i].idade = e.target.value;
+                                    setCriancas(n);
+                                  }}
+                                />
+                              </div>
                               <button onClick={() => setCriancas(criancas.filter((_, idx) => idx !== i))} className="text-red-500 text-[10px] px-3 uppercase tracking-widest font-bold">Remover</button>
                             </div>
                           ))}
