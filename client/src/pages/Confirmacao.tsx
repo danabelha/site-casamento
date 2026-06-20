@@ -10,6 +10,7 @@ import { trpc } from "../lib/trpc";
 import manualImg from "../assets/images/manual_final_v2.png";
 import headerLogo from "../assets/images/header_logo_perfect.png";
 import princesaImg from "../assets/images/princesa.jpg";
+import fazendeiroImg from "../assets/images/fazendeiro.jpg";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
@@ -44,7 +45,14 @@ const PRESENTES = [
     emoji: "👑",
     foto: princesaImg 
   },
-  { nome: "Jantar Romântico", descricao: "Um jantar especial para celebrarmos juntos", valor: "R$ 350", pix: "casamento@danielemariana.com", emoji: "🍷" },
+  { 
+    nome: "Cota para o Noivo Comprar a Fazenda", 
+    descricao: "Daniel ainda acredita que um dia terá uma fazenda com cavalos, vacas e um apiário.", 
+    valor: "Qualquer valor", 
+    pix: "casamento@danielemariana.com", 
+    emoji: "🚜",
+    foto: fazendeiroImg
+  },
   { nome: "Kit Cozinha", descricao: "Utensílios para nossa nova casa", valor: "R$ 280", pix: "casamento@danielemariana.com", emoji: "🏠" },
   { nome: "Noite em Hotel", descricao: "Uma noite especial em nosso destino", valor: "R$ 500", pix: "casamento@danielemariana.com", emoji: "🌙" },
   { nome: "Sessão de Fotos", descricao: "Memórias eternas do nosso amor", valor: "R$ 600", pix: "casamento@danielemariana.com", emoji: "📸" },
