@@ -9,6 +9,7 @@ import { trpc } from "../lib/trpc";
 // Importar imagens
 import manualImg from "../assets/images/manual_final_v2.png";
 import headerLogo from "../assets/images/header_logo_perfect.png";
+import princesaImg from "../assets/images/princesa.jpg";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
@@ -35,7 +36,14 @@ const GALLERY_ITEMS = [
 ];
 
 const PRESENTES = [
-  { nome: "Lua de Mel", descricao: "Contribua para nossa viagem dos sonhos", valor: "Qualquer valor", pix: "casamento@danielemariana.com", emoji: "✈️" },
+  { 
+    nome: "Cota para a Noiva se Manter Princesa", 
+    descricao: "Ajude Mariana a manter os altos padrões de realeza pelos próximos 50 anos.", 
+    valor: "Qualquer valor", 
+    pix: "casamento@danielemariana.com", 
+    emoji: "👑",
+    foto: princesaImg 
+  },
   { nome: "Jantar Romântico", descricao: "Um jantar especial para celebrarmos juntos", valor: "R$ 350", pix: "casamento@danielemariana.com", emoji: "🍷" },
   { nome: "Kit Cozinha", descricao: "Utensílios para nossa nova casa", valor: "R$ 280", pix: "casamento@danielemariana.com", emoji: "🏠" },
   { nome: "Noite em Hotel", descricao: "Uma noite especial em nosso destino", valor: "R$ 500", pix: "casamento@danielemariana.com", emoji: "🌙" },
@@ -271,7 +279,15 @@ export default function Confirmacao() {
                       }}
                     >
                       <div className="aspect-square bg-gray-50 flex items-center justify-center mb-6 overflow-hidden rounded-sm relative group">
-                        <span className="text-6xl transition-transform duration-500 group-hover:scale-125">{p.emoji}</span>
+                        {p.foto ? (
+                          <img 
+                            src={p.foto} 
+                            alt={p.nome} 
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                          />
+                        ) : (
+                          <span className="text-6xl transition-transform duration-500 group-hover:scale-125">{p.emoji}</span>
+                        )}
                         <div className="absolute top-2 right-2 bg-wedding-gold/90 text-white text-[9px] px-2 py-1 rounded-full font-bold tracking-widest uppercase">
                           {p.valor}
                         </div>
