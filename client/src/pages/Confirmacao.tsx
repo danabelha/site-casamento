@@ -42,51 +42,45 @@ const GALLERY_ITEMS = [
 
 const PRESENTES = [
   { 
-    nome: "Cota para a Noiva se Manter Princesa", 
+    nome: "👑 Manutenção da Princesa", 
     descricao: "Ajude Mariana a manter os altos padrões de realeza pelos próximos 50 anos.", 
     valor: "Qualquer valor", 
     pix: "casamento@danielemariana.com", 
-    emoji: "👑",
-    foto: princesaImg 
+    foto: princesaImg
   },
   { 
-    nome: "Cota para o Noivo Comprar a Fazenda", 
+    nome: "🚜 Projeto Fazenda", 
     descricao: "Daniel ainda acredita que um dia terá uma fazenda com cavalos, vacas e um apiário.", 
     valor: "Qualquer valor", 
     pix: "casamento@danielemariana.com", 
-    emoji: "🚜",
     foto: fazendeiroImg
   },
   { 
-    nome: "Cota para o Noivo Não Usar Camisa de Time", 
+    nome: "👕 Reabilitação Fashion", 
     descricao: "Ajude Mariana nesta importante missão social.", 
     valor: "Qualquer valor", 
     pix: "casamento@danielemariana.com", 
-    emoji: "👕",
     foto: camisaTimeImg
   },
   { 
-    nome: "Cota para Pool Party Pós-Casamento", 
+    nome: "🏖️ Pool Party Pós-Casamento", 
     descricao: "A festa acaba, mas a ressaca emocional continua.", 
     valor: "Qualquer valor", 
     pix: "casamento@danielemariana.com", 
-    emoji: "🏖️",
     foto: poolPartyImg
   },
   { 
-    nome: "Cota para manter o plano de Saude da Noiva", 
-    descricao: "Nem a ciencia explica como ama um hospital", 
+    nome: "🏥 Plano de Saúde Premium", 
+    descricao: "Nem a ciência explica como alguém consegue gostar tanto de hospital.", 
     valor: "Qualquer valor", 
     pix: "casamento@danielemariana.com", 
-    emoji: "🏥",
     foto: planoSaudeImg
   },
   { 
-    nome: "Cota para tocar a musica", 
+    nome: "🎶 Fundo do Cavaco", 
     descricao: '"MANDEEEEEEI MEU CAVACO CHORAR"', 
     valor: "Qualquer valor", 
     pix: "casamento@danielemariana.com", 
-    emoji: "🎸",
     foto: cavacoImg
   },
 ];
@@ -328,18 +322,24 @@ export default function Confirmacao() {
                         ) : (
                           <span className="text-6xl transition-transform duration-500 group-hover:scale-125">{p.emoji}</span>
                         )}
-                        <div className="absolute top-2 right-2 bg-wedding-gold/90 text-white text-[9px] px-2 py-1 rounded-full font-bold tracking-widest uppercase">
-                          {p.valor}
-                        </div>
+
                       </div>
                       
-                      <div className="px-2 text-center">
-                        <h4 className="font-halimun text-lg text-[#462F29] mb-3">{p.nome}</h4>
-                        <p className="text-[11px] text-[#888] font-montserrat leading-relaxed mb-6 h-8 flex items-center justify-center">{p.descricao}</p>
+                      <div className="px-2 text-center flex flex-col items-center">
+                        <h4 className="font-['Montserrat'] font-semibold text-[13px] text-[#462F29] mb-2 uppercase tracking-[0.15em] leading-tight">
+                          {p.nome}
+                        </h4>
+                        <p className="text-[10px] text-[#462F29]/60 font-montserrat leading-relaxed mb-5 h-8 flex items-center justify-center max-w-[90%]">
+                          {p.descricao}
+                        </p>
                         
+                        <div className="text-[8px] font-bold text-[#462F29]/30 mb-5 tracking-[0.25em] uppercase">
+                          {p.valor}
+                        </div>
+
                         <button 
                           onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })} 
-                          className="w-full bg-[#462F29] text-white py-3 text-[10px] uppercase tracking-[0.2em] hover:bg-wedding-terracotta transition-all shadow-md"
+                          className="w-full bg-[#462F29] text-white py-3 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#D4AF37] transition-all duration-500 shadow-md rounded-sm"
                         >
                           {pixVisivel[i] ? "Ocultar Chave" : "Presentear via PIX"}
                         </button>
