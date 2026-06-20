@@ -49,14 +49,16 @@ export default function Home() {
   return (
     <div className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-wedding-charcoal" style={{ height: '100dvh' }}>
       
-      {/* BackGround Image - Otimizada para aparecer toda a imagem mantendo a harmonia */}
+      {/* BackGround Image - Valorização da fotografia com ajuste sutil de luminosidade */}
       <div
-          className="fixed inset-0 w-full h-full bg-cover bg-no-repeat brightness-[0.55] bg-top md:bg-center"
+          className="fixed inset-0 w-full h-full bg-cover bg-no-repeat brightness-[0.65] bg-top md:bg-center"
         style={{
           backgroundImage: `url(${heroImage})`,
           backgroundSize: "cover",
         }}
       />
+      {/* Overlay sutil para garantir legibilidade mantendo detalhes da foto */}
+      <div className="fixed inset-0 bg-black/15 pointer-events-none" />
 
       {/* Textura de Grão */}
       <div
@@ -95,30 +97,33 @@ export default function Home() {
           05 de Dezembro de 2026 &nbsp;·&nbsp; São Paulo
         </p>
 
-        {/* Contador Regressivo */}
+        {/* Contador Regressivo - Design Premium Editorial */}
         <div 
-          className={`inline-flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-0 mb-12 py-3 border-y border-wedding-gold/40 w-full sm:w-auto 
+          className={`inline-flex items-center justify-center mb-12 py-6 w-full sm:w-auto px-4
             transition-all duration-700 ease-out ${loaded ? "opacity-100 translate-y-0 delay-500" : "opacity-0 translate-y-5"}`}
         >
-          {[
-            { valor: tempoRestante.dias, label: "Dias" },
-            { valor: tempoRestante.horas, label: "Horas" },
-            { valor: tempoRestante.minutos, label: "Min" },
-            { valor: tempoRestante.segundos, label: "Seg" },
-          ].map((item, i) => (
-            <div
-              key={item.label}
-              className={`flex flex-col items-center px-2 sm:px-4 md:px-8 
-                ${i < 3 ? "border-r border-wedding-gold/30" : ""}`}
-            >
-              <span className="font-montserrat text-[22px] sm:text-[28px] md:text-[48px] text-wedding-cream font-extralight leading-none">
-                {String(item.valor).padStart(2, "0")}
-              </span>
-              <span className="font-montserrat text-[9px] sm:text-[11px] md:text-[18px] tracking-[0.2em] uppercase text-wedding-gold mt-1 font-extrabold">
-                {item.label}
-              </span>
-            </div>
-          ))}
+          <div className="flex items-center justify-center">
+            {[
+              { valor: tempoRestante.dias, label: "Dias" },
+              { valor: tempoRestante.horas, label: "Horas" },
+              { valor: tempoRestante.minutos, label: "Min" },
+              { valor: tempoRestante.segundos, label: "Seg" },
+            ].map((item, i) => (
+              <div key={item.label} className="flex items-center">
+                <div className="flex flex-col items-center px-4 sm:px-6 md:px-10">
+                  <span className="font-montserrat text-[28px] sm:text-[36px] md:text-[56px] text-wedding-cream font-light leading-none tracking-tighter">
+                    {String(item.valor).padStart(2, "0")}
+                  </span>
+                  <span className="font-montserrat text-[8px] sm:text-[10px] md:text-[14px] tracking-[0.3em] uppercase text-wedding-gold mt-2 font-semibold">
+                    {item.label}
+                  </span>
+                </div>
+                {i < 3 && (
+                  <div className="w-[1px] h-10 md:h-16 bg-wedding-gold/60"></div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Botão CTA */}
