@@ -11,6 +11,7 @@ import manualImg from "../assets/images/manual_final_v2.png";
 import headerLogo from "../assets/images/header_logo_perfect.png";
 import princesaImg from "../assets/images/princesa.jpg";
 import fazendeiroImg from "../assets/images/fazendeiro.jpg";
+import camisaTimeImg from "../assets/images/camisa_time.jpg";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
@@ -53,7 +54,14 @@ const PRESENTES = [
     emoji: "🚜",
     foto: fazendeiroImg
   },
-  { nome: "Kit Cozinha", descricao: "Utensílios para nossa nova casa", valor: "R$ 280", pix: "casamento@danielemariana.com", emoji: "🏠" },
+  { 
+    nome: "Cota para o Noivo Não Usar Camisa de Time", 
+    descricao: "Ajude Mariana nesta importante missão social.", 
+    valor: "Qualquer valor", 
+    pix: "casamento@danielemariana.com", 
+    emoji: "👕",
+    foto: camisaTimeImg
+  },
   { nome: "Noite em Hotel", descricao: "Uma noite especial em nosso destino", valor: "R$ 500", pix: "casamento@danielemariana.com", emoji: "🌙" },
   { nome: "Sessão de Fotos", descricao: "Memórias eternas do nosso amor", valor: "R$ 600", pix: "casamento@danielemariana.com", emoji: "📸" },
   { nome: "Contribuição Livre", descricao: "Qualquer valor é bem-vindo com amor", pix: "casamento@danielemariana.com", emoji: "💝" },
