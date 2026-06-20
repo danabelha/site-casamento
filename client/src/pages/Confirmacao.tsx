@@ -400,14 +400,22 @@ export default function Confirmacao() {
                   </div>
                 ) : (
                   <div className="space-y-10">
-                    <div className="space-y-2">
-                      <p className="font-cormorant text-2xl text-white">
-                        {convidadoSelecionado.nome}, por favor, confirme sua presença.
-                      </p>
-                      {convidadoSelecionado.limite > 0 && (
-                        <p className="font-montserrat text-[12px] text-wedding-gold uppercase tracking-[0.2em] font-bold">
-                          Você pode levar até {convidadoSelecionado.limite} acompanhante(s).
+                    <div className="space-y-6 animate-in fade-in duration-500">
+                      <div className="space-y-2">
+                        <h2 className="font-cormorant text-[42px] font-medium text-wedding-gold leading-tight">
+                          {convidadoSelecionado.nome}
+                        </h2>
+                        <p className="text-white text-lg font-light tracking-wide">
+                          Por favor, confirme sua presença.
                         </p>
+                      </div>
+                      
+                      {convidadoSelecionado.limite > 0 && (
+                        <div className="inline-block border border-wedding-gold/30 px-4 py-1.5 rounded-sm">
+                          <p className="font-montserrat text-[10px] text-wedding-gold uppercase tracking-[0.25em] font-bold">
+                            Você pode levar até {convidadoSelecionado.limite} acompanhante(s)
+                          </p>
+                        </div>
                       )}
                     </div>
 
