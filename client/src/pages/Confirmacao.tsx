@@ -14,6 +14,7 @@ import fazendeiroImg from "../assets/images/fazendeiro.jpg";
 import camisaTimeImg from "../assets/images/camisa_time.jpg";
 import poolPartyImg from "../assets/images/pool_party.png";
 import planoSaudeImg from "../assets/images/plano_saude.jpg";
+import cavacoImg from "../assets/images/cavaco.jpg";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
@@ -80,7 +81,14 @@ const PRESENTES = [
     emoji: "🏥",
     foto: planoSaudeImg
   },
-  { nome: "Contribuição Livre", descricao: "Qualquer valor é bem-vindo com amor", pix: "casamento@danielemariana.com", emoji: "💝" },
+  { 
+    nome: "Cota para tocar a musica", 
+    descricao: '"MANDEEEEEEI MEU CAVACO CHORAR"', 
+    valor: "Qualquer valor", 
+    pix: "casamento@danielemariana.com", 
+    emoji: "🎸",
+    foto: cavacoImg
+  },
 ];
 
 const ENDERECO_CURTO = "R. Cônego Eugênio Leite, 1098 - Pinheiros, São Paulo - SP";
