@@ -12,6 +12,7 @@ import headerLogo from "../assets/images/header_logo_perfect.png";
 import princesaImg from "../assets/images/princesa.jpg";
 import fazendeiroImg from "../assets/images/fazendeiro.jpg";
 import camisaTimeImg from "../assets/images/camisa_time.jpg";
+import poolPartyImg from "../assets/images/pool_party.png";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
@@ -62,7 +63,14 @@ const PRESENTES = [
     emoji: "👕",
     foto: camisaTimeImg
   },
-  { nome: "Noite em Hotel", descricao: "Uma noite especial em nosso destino", valor: "R$ 500", pix: "casamento@danielemariana.com", emoji: "🌙" },
+  { 
+    nome: "Cota para Pool Party Pós-Casamento", 
+    descricao: "A festa acaba, mas a ressaca emocional continua.", 
+    valor: "Qualquer valor", 
+    pix: "casamento@danielemariana.com", 
+    emoji: "🏖️",
+    foto: poolPartyImg
+  },
   { nome: "Sessão de Fotos", descricao: "Memórias eternas do nosso amor", valor: "R$ 600", pix: "casamento@danielemariana.com", emoji: "📸" },
   { nome: "Contribuição Livre", descricao: "Qualquer valor é bem-vindo com amor", pix: "casamento@danielemariana.com", emoji: "💝" },
 ];
