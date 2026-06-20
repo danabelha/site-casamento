@@ -313,14 +313,12 @@ export default function Confirmacao() {
                       }}
                     >
                       <div className="aspect-square bg-gray-50 flex items-center justify-center mb-6 overflow-hidden rounded-sm relative group">
-                        {p.foto ? (
+                        {p.foto && (
                           <img 
                             src={p.foto} 
                             alt={p.nome} 
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
                           />
-                        ) : (
-                          <span className="text-6xl transition-transform duration-500 group-hover:scale-125">{p.emoji}</span>
                         )}
 
                       </div>
