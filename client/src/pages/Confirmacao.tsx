@@ -13,6 +13,7 @@ import princesaImg from "../assets/images/princesa.jpg";
 import fazendeiroImg from "../assets/images/fazendeiro.jpg";
 import camisaTimeImg from "../assets/images/camisa_time.jpg";
 import poolPartyImg from "../assets/images/pool_party.png";
+import planoSaudeImg from "../assets/images/plano_saude.jpg";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
@@ -71,7 +72,14 @@ const PRESENTES = [
     emoji: "🏖️",
     foto: poolPartyImg
   },
-  { nome: "Sessão de Fotos", descricao: "Memórias eternas do nosso amor", valor: "R$ 600", pix: "casamento@danielemariana.com", emoji: "📸" },
+  { 
+    nome: "Cota para manter o plano de Saude da Noiva", 
+    descricao: "Nem a ciencia explica como ama um hospital", 
+    valor: "Qualquer valor", 
+    pix: "casamento@danielemariana.com", 
+    emoji: "🏥",
+    foto: planoSaudeImg
+  },
   { nome: "Contribuição Livre", descricao: "Qualquer valor é bem-vindo com amor", pix: "casamento@danielemariana.com", emoji: "💝" },
 ];
 
