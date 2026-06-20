@@ -204,6 +204,56 @@ export default function Confirmacao() {
   const totalAcompanhantes = adultos.length + criancas.length;
   const limiteAtingido = totalAcompanhantes >= (convidadoSelecionado?.limite || 0);
 
+  const getSucessoMensagem = () => {
+    if (resposta === "Confirmado") {
+      return {
+        titulo: "CONFIRMAÇÃO RECEBIDA",
+        mensagem: (
+          <>
+            <p className="font-cormorant text-2xl text-wedding-gold mb-4">Que alegria ter você conosco!</p>
+            <p className="text-white/80 font-light leading-relaxed">
+              Sua presença foi registrada com sucesso e estamos ansiosos para celebrar este dia tão especial ao seu lado.
+            </p>
+          </>
+        )
+      };
+    }
+    if (resposta === "Talvez") {
+      return {
+        titulo: "RESPOSTA RECEBIDA",
+        mensagem: (
+          <>
+            <p className="font-cormorant text-2xl text-wedding-gold mb-4">Obrigado por nos avisar.</p>
+            <p className="text-white/80 font-light leading-relaxed">
+              Ficaremos felizes em receber sua confirmação quando você tiver certeza. Estaremos esperando por você.
+            </p>
+          </>
+        )
+      };
+    }
+    return {
+      titulo: "RESPOSTA RECEBIDA",
+      mensagem: (
+        <>
+          <p className="font-cormorant text-2xl text-wedding-gold mb-4">Sentiremos sua falta neste dia tão especial.</p>
+          <p className="text-white/80 font-light leading-relaxed">
+            Obrigado por nos avisar e por fazer parte da nossa história. Seu carinho já torna este momento ainda mais especial.
+          </p>
+        </>
+      )
+    };
+  };
+
+  const PremiumTitle = ({ title }: { title: string }) => (
+    <div className="flex flex-col items-center space-y-4 mb-8">
+      <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
+      <h4 className="font-montserrat text-[14px] font-semibold uppercase tracking-[0.2em] text-wedding-gold text-center">
+        {title}
+      </h4>
+      <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-[#FDFAF6] text-wedding-charcoal">
       <main className="max-w-6xl mx-auto pt-20 pb-20">
@@ -375,17 +425,25 @@ export default function Confirmacao() {
                 
                 {sucesso ? (
                   <div className="space-y-12">
-                    <div className="p-12 bg-white/5 border border-white/10 text-white">
-                      <h3 className="font-halimun text-4xl mb-4 text-wedding-gold">Obrigado!</h3>
-                      <p className="font-montserrat text-sm text-white/70">Sua resposta foi enviada com carinho.</p>
+                    <div className="text-center space-y-8 py-16 px-8 border border-wedding-gold/20 bg-white/5 rounded-sm animate-in fade-in duration-600 max-w-2xl mx-auto">
+                      <PremiumTitle title={getSucessoMensagem().titulo} />
+                      
+                      <div className="animate-in fade-in slide-in-from-bottom-2 duration-700 delay-200 text-white">
+                        {getSucessoMensagem().mensagem}
+                      </div>
+
+                      <div className="pt-8">
+                        <div className="w-12 h-12 bg-wedding-gold/10 rounded-full flex items-center justify-center mx-auto">
+                          <span className="text-xl">✨</span>
+                        </div>
+                      </div>
                     </div>
                     
                     {/* Manual do Convidado — Exibição Condicional */}
                     {resposta === "Confirmado" && (
                       <FadeSection className="space-y-8 animate-in fade-in slide-in-from-top-8 duration-1000">
-                        <div className="w-10 h-[1px] bg-wedding-gold mx-auto mb-8" />
-                        <h4 className="font-halimun text-3xl text-wedding-gold">Manual do Convidado</h4>
-                        <div className="max-w-[500px] mx-auto">
+                        <PremiumTitle title="MANUAL DO CONVIDADO" />
+                        <div className="max-w-[500px] mx-auto bg-white p-2 rounded-sm shadow-2xl">
                           <img 
                             src={manualImg} 
                             alt="Manual do Convidado" 
@@ -442,13 +500,7 @@ export default function Confirmacao() {
                     {/* Seção de Acompanhantes (Apenas se Confirmado) */}
                     {resposta === "Confirmado" && convidadoSelecionado.limite > 0 && (
                       <div className="space-y-8 pt-10 border-t border-white/10 animate-in fade-in slide-in-from-top-4">
-                        <div className="flex flex-col items-center space-y-4">
-                          <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
-                          <h4 className="font-montserrat text-[14px] font-semibold uppercase tracking-[0.2em] text-wedding-gold">
-                            Seus Acompanhantes
-                          </h4>
-                          <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
-                        </div>
+                        <PremiumTitle title="SEUS ACOMPANHANTES" />
                         
                         {/* Lista de Acompanhantes */}
                         <div className="space-y-4">
@@ -532,16 +584,10 @@ export default function Confirmacao() {
                       <div className="space-y-8 pt-10 border-t border-white/10 animate-in fade-in duration-500">
                         {(resposta === "Confirmado" || resposta === "Não Irá") && (
                         <div className="space-y-6">
-                          <div className="flex flex-col items-center space-y-4">
-                            <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
-                            <h4 className="font-montserrat text-[14px] font-semibold uppercase tracking-[0.2em] text-wedding-gold text-center">
-                              Mensagem para os Noivos
-                            </h4>
-                            <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
-                            <p className="text-[12px] text-white/60 font-light italic text-center">
-                              Compartilhe uma lembrança, um conselho ou uma mensagem carinhosa para os noivos.
-                            </p>
-                          </div>
+                          <PremiumTitle title="MENSAGEM PARA OS NOIVOS" />
+                          <p className="text-[12px] text-white/60 font-light italic text-center -mt-6">
+                            Compartilhe uma lembrança, um conselho ou uma mensagem carinhosa para os noivos.
+                          </p>
                           
                           <textarea
                             placeholder="Escreva aqui sua mensagem..."
@@ -553,13 +599,16 @@ export default function Confirmacao() {
                         </div>
                         )}
                         
-                        <button
-                          onClick={handleSubmit}
-                          disabled={confirmarMutation.isPending}
-                          className="w-full bg-wedding-gold text-white py-5 tracking-[0.4em] uppercase text-[12px] shadow-2xl hover:bg-white hover:text-[#462F29] transition-all disabled:opacity-50 font-bold"
-                        >
-                          {confirmarMutation.isPending ? "Enviando..." : "Enviar Resposta"}
-                        </button>
+                        <div className="pt-4">
+                          <PremiumTitle title="BLOCO DE CONFIRMAÇÃO FINAL" />
+                          <button
+                            onClick={handleSubmit}
+                            disabled={confirmarMutation.isPending}
+                            className="w-full bg-wedding-gold text-white py-5 tracking-[0.4em] uppercase text-[12px] shadow-2xl hover:bg-white hover:text-[#462F29] transition-all disabled:opacity-50 font-bold"
+                          >
+                            {confirmarMutation.isPending ? "Enviando..." : "Enviar Resposta"}
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
