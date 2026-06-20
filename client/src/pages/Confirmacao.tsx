@@ -442,12 +442,18 @@ export default function Confirmacao() {
                     {/* Seção de Acompanhantes (Apenas se Confirmado) */}
                     {resposta === "Confirmado" && convidadoSelecionado.limite > 0 && (
                       <div className="space-y-8 pt-10 border-t border-white/10 animate-in fade-in slide-in-from-top-4">
-                        <h4 className="font-halimun text-[32px] text-wedding-gold">Seus Acompanhantes</h4>
+                        <div className="flex flex-col items-center space-y-4">
+                          <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
+                          <h4 className="font-montserrat text-[14px] font-semibold uppercase tracking-[0.2em] text-wedding-gold">
+                            Seus Acompanhantes
+                          </h4>
+                          <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
+                        </div>
                         
                         {/* Lista de Acompanhantes */}
                         <div className="space-y-4">
                           {adultos.map((a, i) => (
-                            <div key={`a-${i}`} className="flex gap-2 items-center bg-white p-2 border border-wedding-gold/20 shadow-inner">
+                            <div key={`a-${i}`} className="flex gap-2 items-center bg-white p-2 border border-wedding-gold/20 shadow-inner rounded-sm">
                               <input
                                 type="text"
                                 placeholder="Nome e Sobrenome (Adulto)"
@@ -463,7 +469,7 @@ export default function Confirmacao() {
                             </div>
                           ))}
                           {criancas.map((c, i) => (
-                            <div key={`c-${i}`} className="flex gap-2 items-center bg-white p-2 border border-wedding-gold/20 shadow-inner">
+                            <div key={`c-${i}`} className="flex gap-2 items-center bg-white p-2 border border-wedding-gold/20 shadow-inner rounded-sm">
                               <input
                                 type="text"
                                 placeholder="Nome e Sobrenome (Criança)"
@@ -494,40 +500,57 @@ export default function Confirmacao() {
                           ))}
                         </div>
 
-                        {/* Botões de Adicionar */}
+                        {/* Cards Premium de Adicionar */}
                         {!limiteAtingido && (
-                          <div className="flex justify-center gap-6">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <button 
                               onClick={() => setAdultos([...adultos, { nome: "" }])}
-                              className="text-[11px] uppercase tracking-[0.2em] text-wedding-gold border border-wedding-gold/30 px-6 py-2 hover:bg-wedding-gold hover:text-white transition-all"
+                              className="group flex flex-col items-center p-6 border border-wedding-gold/30 rounded-md transition-all duration-300 hover:bg-wedding-gold hover:-translate-y-1 hover:shadow-lg"
                             >
-                              + Adulto
+                              <span className="text-2xl mb-2 group-hover:scale-110 transition-transform">👤</span>
+                              <span className="font-montserrat text-[12px] font-semibold uppercase tracking-widest text-wedding-gold group-hover:text-white">Adicionar Adulto</span>
+                              <span className="text-[10px] text-white/40 mt-1 group-hover:text-white/70">Acompanhante adulto</span>
                             </button>
                             <button 
                               onClick={() => setCriancas([...criancas, { nome: "", idade: "" }])}
-                              className="text-[11px] uppercase tracking-[0.2em] text-wedding-gold border border-wedding-gold/30 px-6 py-2 hover:bg-wedding-gold hover:text-white transition-all"
+                              className="group flex flex-col items-center p-6 border border-wedding-gold/30 rounded-md transition-all duration-300 hover:bg-wedding-gold hover:-translate-y-1 hover:shadow-lg"
                             >
-                              + Criança
+                              <span className="text-2xl mb-2 group-hover:scale-110 transition-transform">👶</span>
+                              <span className="font-montserrat text-[12px] font-semibold uppercase tracking-widest text-wedding-gold group-hover:text-white">Adicionar Criança</span>
+                              <span className="text-[10px] text-white/40 mt-1 group-hover:text-white/70">Menor de idade</span>
                             </button>
                           </div>
                         )}
                         {limiteAtingido && (
-                          <p className="text-[10px] text-wedding-terracotta/60 italic">Limite de acompanhantes atingido.</p>
+                          <p className="text-[10px] text-wedding-gold/60 italic text-center">Limite de acompanhantes atingido.</p>
                         )}
                       </div>
                     )}
 
                     {/* Mensagem e Botão Final */}
                     {resposta && (
-                      <div className="space-y-6 pt-10 border-t border-white/10 animate-in fade-in duration-500">
+                      <div className="space-y-8 pt-10 border-t border-white/10 animate-in fade-in duration-500">
                         {(resposta === "Confirmado" || resposta === "Não Irá") && (
-                        <textarea
-                          placeholder="Deixe uma mensagem carinhosa para os noivos..."
-                          rows={4}
-                          className="wedding-input !text-[16px] !bg-white !text-[#462F29] !border-wedding-gold/20 shadow-inner placeholder:text-[#462F29]/40"
-                          value={mensagem}
-                          onChange={(e) => setMensagem(e.target.value)}
-                        />
+                        <div className="space-y-6">
+                          <div className="flex flex-col items-center space-y-4">
+                            <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
+                            <h4 className="font-montserrat text-[14px] font-semibold uppercase tracking-[0.2em] text-wedding-gold text-center">
+                              Mensagem para os Noivos
+                            </h4>
+                            <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
+                            <p className="text-[12px] text-white/60 font-light italic text-center">
+                              Compartilhe uma lembrança, um conselho ou uma mensagem carinhosa para os noivos.
+                            </p>
+                          </div>
+                          
+                          <textarea
+                            placeholder="Escreva aqui sua mensagem..."
+                            rows={4}
+                            className="wedding-input !text-[16px] !bg-white !text-[#462F29] !border-wedding-gold/20 shadow-inner placeholder:text-[#462F29]/40 rounded-sm"
+                            value={mensagem}
+                            onChange={(e) => setMensagem(e.target.value)}
+                          />
+                        </div>
                         )}
                         
                         <button
