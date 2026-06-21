@@ -292,8 +292,8 @@ export default function Confirmacao() {
           </FadeSection>
         ) : (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            {/* Boas-vindas */}
-            <FadeSection className="text-center mb-24 md:mb-32 px-6">
+            {/* 1. Boas-vindas */}
+            <FadeSection className="text-center mb-16 md:mb-24 px-6">
               <h2 className="font-halimun text-[32px] md:text-[48px] text-[#462F29] mb-6">
                 Olá, {convidadoSelecionado.nome}!
               </h2>
@@ -302,126 +302,8 @@ export default function Confirmacao() {
               </p>
             </FadeSection>
 
-            {/* Galeria */}
-            <section className="relative px-4 sm:px-6 mb-16 md:mb-32">
-              <SectionDivider title="Nossa História" />
-              <div className="relative max-w-5xl mx-auto">
-                {GALLERY_ITEMS.map((item, index) => (
-                  <div key={index} className="sticky top-0 min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20">
-                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-[#462F29] p-6 md:p-4 rounded-sm shadow-sm md:shadow-none">
-                      <h3 className="font-cormorant text-[24px] md:text-[36px] text-white mb-4 md:mb-6">{item.titulo}</h3>
-                      <p className="font-montserrat text-[13px] md:text-[16px] text-white/80 leading-relaxed">{item.texto}</p>
-                    </div>
-                    <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
-                      <div className="bg-white p-1.5 pb-6 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500" style={{ transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)` }}>
-                        <div className="relative w-[240px] h-[300px] sm:w-[320px] sm:h-[400px] overflow-hidden">
-                          <img src={item.url} alt={item.titulo} className="w-full h-full object-cover" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Localização */}
+            {/* 2. Confirmação de Presença */}
             <div className="bg-[#462F29] py-20 md:py-32 mb-24 md:mb-32">
-              <FadeSection className="px-6">
-                <div className="text-center mb-12">
-                  <h2 className="font-cormorant font-light text-white text-[28px] md:text-[42px] leading-tight mb-4">Localização</h2>
-                  <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />
-                </div>
-                <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
-                  <div className="text-center md:text-right space-y-6">
-                    <h3 className="font-halimun text-[32px] text-wedding-gold">Celeiro Quintal</h3>
-                    <div className="space-y-2">
-                      <p className="text-[16px] font-light text-white/90 tracking-wide">05 de Dezembro de 2026, 18:00</p>
-                      <p className="text-[14px] font-light text-white/70 leading-relaxed">R. Cônego Eugênio Leite, 1098<br />Pinheiros, São Paulo - SP</p>
-                    </div>
-                    <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-wedding-gold text-white px-8 py-3 text-[10px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#462F29] transition-all shadow-lg">Ver no Mapa</a>
-                  </div>
-                  <div className="h-[350px] bg-white p-2 rounded-sm shadow-2xl overflow-hidden transform md:rotate-1">
-                    <iframe 
-                      width="100%" 
-                      height="100%" 
-                      frameBorder="0" 
-                      style={{ filter: 'grayscale(0.2) contrast(1.1)' }}
-                      src={`https://www.google.com/maps?q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}&output=embed`} 
-                    />
-                  </div>
-                </div>
-              </FadeSection>
-            </div>
-
-            {/* Presentes */}
-            <FadeSection className="mb-24 md:mb-32">
-              <SectionDivider title="Presentes" />
-              <div className="relative px-4 md:px-6">
-                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible pb-8 md:pb-0 scrollbar-hide snap-x snap-mandatory max-w-5xl mx-auto">
-                  {PRESENTES.map((p, i) => (
-                    <div 
-                      key={i} 
-                      className="min-w-[280px] md:min-w-0 snap-center bg-white p-3 pb-8 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
-                      style={{ 
-                        transform: `rotate(${i % 2 === 0 ? '-1.5' : '1.5'}deg)`,
-                        transition: 'all 0.4s ease-out'
-                      }}
-                    >
-                      <div className="aspect-square bg-gray-50 flex items-center justify-center mb-6 overflow-hidden rounded-sm relative group">
-                        {p.foto && (
-                          <img 
-                            src={p.foto} 
-                            alt={p.nome} 
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                          />
-                        )}
-
-                      </div>
-                      
-                      <div className="px-2 text-center flex flex-col items-center">
-                        <h4 className="font-['Montserrat'] font-semibold text-[13px] text-[#462F29] mb-2 uppercase tracking-[0.15em] leading-tight">
-                          {p.nome}
-                        </h4>
-                        <p className="text-[10px] text-[#462F29]/60 font-montserrat leading-relaxed mb-5 h-8 flex items-center justify-center max-w-[90%]">
-                          {p.descricao}
-                        </p>
-                        
-                        <div className="text-[8px] font-bold text-[#462F29]/30 mb-5 tracking-[0.25em] uppercase">
-                          {p.valor}
-                        </div>
-
-                        <button 
-                          onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })} 
-                          className="w-full bg-[#462F29] text-white py-3 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#D4AF37] transition-all duration-500 shadow-md rounded-sm"
-                        >
-                          {pixVisivel[i] ? "Ocultar Chave" : "Presentear via PIX"}
-                        </button>
-
-                        {pixVisivel[i] && (
-                          <div className="mt-4 p-4 bg-wedding-terracotta/5 border border-wedding-terracotta/10 text-[11px] animate-in fade-in zoom-in duration-300 rounded-sm text-left">
-                            <div className="flex items-start gap-2 mb-3 text-wedding-terracotta/80">
-                              <span className="text-xs">⚠️</span>
-                              <p className="font-montserrat leading-tight text-[10px]">Confirme o destinatário:<br/><strong>Daniel e Mariana</strong></p>
-                            </div>
-                            <p className="text-[#888] uppercase mb-1 tracking-widest text-[8px]">Chave PIX</p>
-                            <p className="font-mono break-all bg-white p-2 border border-wedding-blush/30 text-[10px]">{p.pix}</p>
-                            <button 
-                              onClick={() => copiarPix(i, p.pix)} 
-                              className={`mt-3 w-full py-2 uppercase tracking-widest transition-all text-[9px] border border-wedding-terracotta/20 ${pixCopiado === i ? 'bg-green-50 text-green-600 border-green-200 font-bold' : 'bg-white text-wedding-terracotta hover:bg-wedding-terracotta hover:text-white'}`}
-                            >
-                              {pixCopiado === i ? "✓ Chave Copiada!" : "Copiar Chave PIX"}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </FadeSection>
-
-            {/* Confirmação de Presença */}
-            <div className="bg-[#462F29] py-20 md:py-32">
               <FadeSection className="max-w-[700px] mx-auto px-6 text-center">
                 <div className="text-center mb-12">
                   <h2 className="font-cormorant font-light text-white text-[28px] md:text-[42px] leading-tight mb-4">Confirmação de Presença</h2>
@@ -618,6 +500,130 @@ export default function Confirmacao() {
                     )}
                   </div>
                 )}
+              </FadeSection>
+            </div>
+
+            {/* 3. Nossa História */}
+            <section className="relative px-4 sm:px-6 mb-16 md:mb-32">
+              <SectionDivider title="Nossa História" />
+              <div className="relative max-w-5xl mx-auto">
+                {GALLERY_ITEMS.map((item, index) => (
+                  <div key={index} className="sticky top-0 min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20">
+                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-[#462F29] p-6 md:p-4 rounded-sm shadow-sm md:shadow-none">
+                      <h3 className="font-cormorant text-[24px] md:text-[36px] text-white mb-4 md:mb-6">{item.titulo}</h3>
+                      <p className="font-montserrat text-[13px] md:text-[16px] text-white/80 leading-relaxed">{item.texto}</p>
+                    </div>
+                    <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
+                      <div className="bg-white p-1.5 pb-6 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500" style={{ transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)` }}>
+                        <div className="relative w-[240px] h-[300px] sm:w-[320px] sm:h-[400px] overflow-hidden">
+                          <img src={item.url} alt={item.titulo} className="w-full h-full object-cover" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* 4. Presentes */}
+            <FadeSection className="mb-24 md:mb-32">
+              <SectionDivider title="Presentes" />
+              <div className="relative px-4 md:px-6">
+                <p className="text-center font-montserrat text-[10px] md:text-[12px] text-wedding-charcoal/40 uppercase tracking-[0.2em] mb-6">
+                  Arraste para o lado para ver todos os presentes →
+                </p>
+                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible pb-8 md:pb-0 scrollbar-hide snap-x snap-mandatory max-w-5xl mx-auto">
+                  {PRESENTES.map((p, i) => (
+                    <div 
+                      key={i} 
+                      className="min-w-[280px] md:min-w-0 snap-center bg-white p-3 pb-8 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+                      style={{ 
+                        transform: `rotate(${i % 2 === 0 ? '-1.5' : '1.5'}deg)`,
+                        transition: 'all 0.4s ease-out'
+                      }}
+                    >
+                      <div className="aspect-square bg-gray-50 flex items-center justify-center mb-6 overflow-hidden rounded-sm relative group">
+                        {p.foto && (
+                          <img 
+                            src={p.foto} 
+                            alt={p.nome} 
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                          />
+                        )}
+
+                      </div>
+                      
+                      <div className="px-2 text-center flex flex-col items-center">
+                        <h4 className="font-['Montserrat'] font-semibold text-[13px] text-[#462F29] mb-2 uppercase tracking-[0.15em] leading-tight">
+                          {p.nome}
+                        </h4>
+                        <p className="text-[10px] text-[#462F29]/60 font-montserrat leading-relaxed mb-5 h-8 flex items-center justify-center max-w-[90%]">
+                          {p.descricao}
+                        </p>
+                        
+                        <div className="text-[8px] font-bold text-[#462F29]/30 mb-5 tracking-[0.25em] uppercase">
+                          {p.valor}
+                        </div>
+
+                        <button 
+                          onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })} 
+                          className="w-full bg-[#462F29] text-white py-3 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#D4AF37] transition-all duration-500 shadow-md rounded-sm"
+                        >
+                          {pixVisivel[i] ? "Ocultar Chave" : "Presentear via PIX"}
+                        </button>
+
+                        {pixVisivel[i] && (
+                          <div className="mt-4 p-4 bg-wedding-terracotta/5 border border-wedding-terracotta/10 text-[11px] animate-in fade-in zoom-in duration-300 rounded-sm text-left">
+                            <div className="flex items-start gap-2 mb-3 text-wedding-terracotta/80">
+                              <span className="text-xs">⚠️</span>
+                              <p className="font-montserrat leading-tight text-[10px]">Confirme o destinatário:<br/><strong>Daniel e Mariana</strong></p>
+                            </div>
+                            <p className="text-[#888] uppercase mb-1 tracking-widest text-[8px]">Chave PIX</p>
+                            <p className="font-mono break-all bg-white p-2 border border-wedding-blush/30 text-[10px]">{p.pix}</p>
+                            <button 
+                              onClick={() => copiarPix(i, p.pix)} 
+                              className={`mt-3 w-full py-2 uppercase tracking-widest transition-all text-[9px] border border-wedding-terracotta/20 ${pixCopiado === i ? 'bg-green-50 text-green-600 border-green-200 font-bold' : 'bg-white text-wedding-terracotta hover:bg-wedding-terracotta hover:text-white'}`}
+                            >
+                              {pixCopiado === i ? "✓ Chave Copiada!" : "Copiar Chave PIX"}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </FadeSection>
+
+            {/* 5. Localização */}
+            <div className="bg-[#462F29] py-20 md:py-32 mb-24 md:mb-32">
+              <FadeSection className="px-6">
+                <div className="text-center mb-12">
+                  <h2 className="font-cormorant font-light text-white text-[28px] md:text-[42px] leading-tight mb-4">Localização</h2>
+                  <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />
+                </div>
+                <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
+                  <div className="text-center md:text-right space-y-6">
+                    <h3 className="font-halimun text-[32px] text-wedding-gold">Celeiro Quintal</h3>
+                    <div className="space-y-2">
+                      <p className="text-[16px] font-light text-white/90 tracking-wide">05 de Dezembro de 2026, 18:00</p>
+                      <p className="text-[14px] font-light text-white/70 leading-relaxed">R. Cônego Eugênio Leite, 1098<br />Pinheiros, São Paulo - SP</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-end">
+                      <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-wedding-gold text-white px-8 py-3 text-[10px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#462F29] transition-all shadow-lg">Ver no Mapa</a>
+                      <a href="https://www.instagram.com/celeiroquintal/" target="_blank" rel="noopener noreferrer" className="inline-block border border-wedding-gold text-wedding-gold px-8 py-3 text-[10px] uppercase tracking-[0.3em] hover:bg-wedding-gold hover:text-white transition-all shadow-lg">Conhecer o Espaço</a>
+                    </div>
+                  </div>
+                  <div className="h-[250px] md:h-[420px] bg-white p-2 rounded-sm shadow-2xl overflow-hidden transform md:rotate-1">
+                    <iframe 
+                      width="100%" 
+                      height="100%" 
+                      frameBorder="0" 
+                      style={{ filter: 'grayscale(0.2) contrast(1.1)' }}
+                      src={`https://www.google.com/maps?q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}&output=embed`} 
+                    />
+                  </div>
+                </div>
               </FadeSection>
             </div>
           </div>
