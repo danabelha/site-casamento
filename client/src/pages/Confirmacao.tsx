@@ -149,7 +149,7 @@ export default function Confirmacao() {
   const registrarPresenteMutation = trpc.registrarPresente.useMutation();
   const generatePixCodeMutation = trpc.generatePixCode.useMutation();
 
-  const [presenteEmEdicao, setPresenteEmEdicao] = useState<number | null>(null);
+
   const [pixGerado, setPixGerado] = useState<string | null>(null);
   const [carregandoPixCode, setCarregandoPixCode] = useState(false);
 
@@ -233,7 +233,7 @@ export default function Confirmacao() {
       alert(`PIX copiado!\n\nAgora é só colar o código no aplicativo do seu banco para concluir a contribuição.`);
       
       setModalPresenteAberto(null);
-      setPresenteEmEdicao(null);
+
       setValorSelecionado(null);
       setOutroValor("");
       setPixGerado(null);
@@ -789,7 +789,7 @@ export default function Confirmacao() {
                   <button
                     onClick={() => {
                       setModalPresenteAberto(null);
-                      setPresenteEmEdicao(null);
+                
                       setValorSelecionado(null);
                       setOutroValor("");
                       setPixGerado(null);
@@ -829,7 +829,7 @@ export default function Confirmacao() {
                   <button
                     onClick={() => {
                       setModalPresenteAberto(null);
-                      setPresenteEmEdicao(null);
+                
                       setValorSelecionado(null);
                       setOutroValor("");
                       setPixGerado(null);
