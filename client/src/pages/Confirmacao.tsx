@@ -445,19 +445,19 @@ export default function Confirmacao() {
               </div>
             </FadeSection>
 
-            {/* 4. Localização - Correção 3: Refinar Seção Localização */}
-            <div className="bg-[#462F29] py-16 md:py-32 mb-16 md:mb-32">
+            {/* 4. Localização */}
+            <div className="bg-[#462F29] py-16 md:py-24 border-y border-white/5">
               <FadeSection className="px-6">
-                <div className="text-center mb-12">
+                <div className="text-center mb-8">
                   <h2 className="font-cormorant font-light text-white text-[28px] md:text-[42px] leading-tight mb-4 uppercase tracking-widest">Localização</h2>
                   <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />
                 </div>
                 
-                <div className="max-w-5xl mx-auto flex flex-col items-center text-center space-y-10">
+                <div className="max-w-2xl mx-auto flex flex-col items-center text-center space-y-8">
                   <div className="space-y-6">
                     <h3 className="font-halimun text-[32px] md:text-[42px] text-wedding-gold">Celeiro Quintal</h3>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <p className="text-[16px] md:text-[18px] font-light text-white/90 tracking-[0.1em]">05 de Dezembro de 2026 • 18h</p>
                       <div className="text-[14px] md:text-[16px] font-light text-white/70 leading-relaxed uppercase tracking-widest">
                         <p>R. Cônego Eugênio Leite, 1098</p>
@@ -465,12 +465,12 @@ export default function Confirmacao() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
                       <a 
                         href={MAPS_URL} 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        className="inline-block bg-wedding-gold text-white px-10 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#462F29] transition-all shadow-lg font-bold min-w-[220px]"
+                        className="inline-block bg-wedding-gold text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#462F29] transition-all shadow-lg font-bold min-w-[200px]"
                       >
                         Ver no Mapa
                       </a>
@@ -478,22 +478,11 @@ export default function Confirmacao() {
                         href="https://www.instagram.com/celeiroquintal/" 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        className="inline-block border border-wedding-gold text-wedding-gold px-10 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-wedding-gold hover:text-white transition-all shadow-lg font-bold min-w-[220px]"
+                        className="inline-block border border-wedding-gold text-wedding-gold px-8 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-wedding-gold hover:text-white transition-all shadow-lg font-bold min-w-[200px]"
                       >
                         Conhecer o Espaço
                       </a>
                     </div>
-                  </div>
-
-                  {/* Mapa com altura reduzida */}
-                  <div className="w-full h-[220px] md:h-[420px] bg-white p-2 rounded-sm shadow-2xl overflow-hidden transform md:rotate-1">
-                    <iframe 
-                      width="100%" 
-                      height="100%" 
-                      frameBorder="0" 
-                      style={{ filter: 'grayscale(0.2) contrast(1.1)' }}
-                      src={`https://www.google.com/maps?q=${encodeURIComponent("Celeiro Quintal " + ENDERECO_CURTO)}&output=embed`} 
-                    />
                   </div>
                 </div>
               </FadeSection>
