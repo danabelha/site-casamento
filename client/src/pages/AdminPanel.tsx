@@ -47,6 +47,11 @@ export default function AdminPanel() {
     retry: false,
   });
 
+  const getRankingPresentes = trpc.adminRouter.getRankingPresentes.useQuery(undefined, {
+    enabled: autenticado,
+    retry: false,
+  });
+
   const adicionarConvidadoMutation = trpc.adminRouter.adicionarConvidado.useMutation();
   const atualizarConvidadoMutation = trpc.adminRouter.atualizarConvidado.useMutation();
   const deletarConvidadoMutation = trpc.adminRouter.deletarConvidado.useMutation();
@@ -281,6 +286,31 @@ export default function AdminPanel() {
           </div>
           <input type="text" placeholder="Buscar por nome..." value={busca} onChange={(e) => setBusca(e.target.value)} style={{ ...inputStyle, width: "300px" }} />
         </div>
+
+        {/* Demonstrativo de Presentes */}
+        {getRankingPresentes.data && (getRankingPresentes.data as any).length > 0 && (
+          <div style={{ backgroundColor: "#FFF", border: "1px solid #E8CECE", padding: "24px", marginBottom: "32px" }}>
+            <h3 style={{ fontSize: "16px", fontWeight: "bold", color: "#2C2C2C", marginBottom: "16px", textTransform: "uppercase", letterSpacing: "0.1em" }}>Ranking de Presentes</h3>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ backgroundColor: "#FDFAF6" }}>
+                  <th style={thStyle}>Presente</th>
+                  <th style={thStyle}>Quantidade</th>
+                  <th style={thStyle}>Valor Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(getRankingPresentes.data as any).map((p: any, idx: number) => (
+                  <tr key={idx}>
+                    <td style={tdStyle}>{p.presenteNome}</td>
+                    <td style={tdStyle}>{p.quantidade}</td>
+                    <td style={tdStyle}>R$ {p.valorTotal.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {/* Tabela de Convidados */}
         <div style={{ backgroundColor: "#FFF", border: "1px solid #E8CECE", overflowX: "auto" }}>
