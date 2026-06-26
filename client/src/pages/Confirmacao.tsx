@@ -840,7 +840,6 @@ export default function Confirmacao() {
                   </button>
                 </>
               )}
-              </button>
             </div>
           </div>
         )}
