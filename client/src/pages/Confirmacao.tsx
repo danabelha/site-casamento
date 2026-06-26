@@ -4,7 +4,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { trpc } from "../lib/trpc";
-// CalligraphicDivider removido conforme solicitado para limpar o visual do cabeçalho
 
 // Importar imagens
 import manualImg from "../assets/images/manual_final_v2.png";
@@ -136,7 +135,6 @@ export default function Confirmacao() {
   const [criancas, setCriancas] = useState<{ nome: string; idade: string }[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [sucesso, setSucesso] = useState(false);
-  const [pixVisivel] = useState<Record<number, boolean>>({});
   const [pixCopiado, setPixCopiado] = useState<number | null>(null);
   const [carregandoBusca, setCarregandoBusca] = useState(false);
   const [modalPresenteAberto, setModalPresenteAberto] = useState<number | null>(null);
@@ -149,11 +147,25 @@ export default function Confirmacao() {
   const registrarPresenteMutation = trpc.registrarPresente.useMutation();
   const generatePixCodeMutation = trpc.generatePixCode.useMutation();
 
-
   const [pixGerado, setPixGerado] = useState<string | null>(null);
   const [carregandoPixCode, setCarregandoPixCode] = useState(false);
 
-  // Correção 1: Eliminar efeito de zoom / salto após localizar convidado
+  // Formatação de moeda BRL
+  const formatarMoeda = (valor: string) => {
+    const limpo = valor.replace(/\D/g, "");
+    const numero = parseFloat(limpo) / 100;
+    if (isNaN(numero)) return "";
+    return numero.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
+
+  const parseMoedaParaNumero = (valor: string) => {
+    const limpo = valor.replace(/\D/g, "");
+    return parseFloat(limpo) / 100;
+  };
+
   useEffect(() => {
     if (convidadoSelecionado) {
       window.scrollTo({
@@ -181,14 +193,8 @@ export default function Confirmacao() {
     }
   };
 
-  const copiarPix = (index: number, pix: string) => {
-    navigator.clipboard.writeText(pix);
-    setPixCopiado(index);
-    setTimeout(() => setPixCopiado(null), 3000);
-  };
-
   const handleGerarPixCode = async (presenteIndex: number) => {
-    const valor = valorSelecionado || (outroValor ? parseFloat(outroValor) : null);
+    const valor = valorSelecionado || (outroValor ? parseMoedaParaNumero(outroValor) : null);
     
     if (!valor || valor <= 0) {
       alert("Por favor, selecione um valor válido.");
@@ -213,7 +219,7 @@ export default function Confirmacao() {
   const handleCopiarPixCode = async (presenteIndex: number) => {
     if (!convidadoSelecionado || !pixGerado) return;
     const presente = PRESENTES[presenteIndex];
-    const valor = valorSelecionado || (outroValor ? parseFloat(outroValor) : null);
+    const valor = valorSelecionado || (outroValor ? parseMoedaParaNumero(outroValor) : null);
     
     if (!valor || valor <= 0) return;
 
@@ -233,7 +239,6 @@ export default function Confirmacao() {
       alert(`PIX copiado!\n\nAgora é só colar o código no aplicativo do seu banco para concluir a contribuição.`);
       
       setModalPresenteAberto(null);
-
       setValorSelecionado(null);
       setOutroValor("");
       setPixGerado(null);
@@ -278,9 +283,6 @@ export default function Confirmacao() {
       alert("Erro ao confirmar presença.");
     }
   };
-
-  const totalAcompanhantes = adultos.length + criancas.length;
-  const limiteAtingido = totalAcompanhantes >= (convidadoSelecionado?.limite || 0);
 
   const getSucessoMensagem = () => {
     if (resposta === "Confirmado") {
@@ -334,7 +336,7 @@ export default function Confirmacao() {
 
   return (
     <div className={`min-h-screen bg-[#FDFAF6] text-wedding-charcoal ${!convidadoSelecionado ? 'h-screen overflow-hidden' : ''}`}>
-      <main className={`max-w-6xl mx-auto ${!convidadoSelecionado ? 'h-full flex flex-col items-center justify-center py-4' : 'pt-10 md:pt-20 pb-20'}`}>
+      <main className={`max-w-6xl mx-auto ${!convidadoSelecionado ? 'h-full flex flex-col items-center justify-center py-4' : 'pt-10 md:pt-20 pb-0'}`}>
         {/* Cabeçalho (Logo do Casal) */}
         <FadeSection className={`px-4 flex justify-center ${!convidadoSelecionado ? 'mb-6 md:mb-8' : 'mb-12 md:mb-16'}`}>
           <img 
@@ -376,29 +378,41 @@ export default function Confirmacao() {
                 Olá, {convidadoSelecionado.nome}!
               </h2>
               <p className="font-montserrat text-[14px] md:text-[18px] text-wedding-charcoal/70 leading-relaxed max-w-[600px] mx-auto">
-                Nossa história também tem você, por isso queremos viver esse momento único ao seu lado.
+                Nossa história também tem você, por isso preparamos este espaço com todo carinho para compartilhar cada detalhe do nosso grande dia.
               </p>
             </FadeSection>
 
             {/* 2. Nossa História */}
-            <section className="relative mb-16 md:mb-32">
+            <section className="relative px-4 sm:px-6 mb-16 md:mb-24">
               <SectionDivider title="Nossa História" />
-              <div className="max-w-5xl mx-auto">
+              <div className="relative max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
                   <div 
                     key={index} 
-                    className="sticky top-0 min-h-[70vh] md:min-h-[85vh] flex flex-col md:flex-row items-center justify-center gap-4 md:gap-16 px-4 sm:px-6 py-10 md:py-20"
+                    className="sticky top-0 min-h-[70vh] md:min-h-[85vh] flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 py-10 md:py-16 bg-[#FDFAF6]"
                   >
-                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-[#462F29] p-5 md:p-8 rounded-sm shadow-2xl">
-                      <h3 className="font-cormorant text-[22px] md:text-[36px] text-white mb-2 md:mb-6">{item.titulo}</h3>
-                      <p className="font-montserrat text-[12px] md:text-[16px] text-white/80 leading-relaxed">{item.texto}</p>
-                    </div>
-                    <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
-                      <div className="bg-white p-1.5 pb-6 md:p-4 md:pb-16 shadow-2xl transform" style={{ transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)` }}>
-                        <div className="relative w-[200px] h-[250px] sm:w-[320px] sm:h-[400px] overflow-hidden">
-                          <img src={item.url} alt={item.titulo} className="w-full h-full object-cover" />
+                    <div className={`w-full md:w-1/2 flex justify-center transition-all duration-700 animate-in fade-in zoom-in-95`}>
+                      <div 
+                        className="bg-white p-3 pb-12 shadow-2xl transform transition-transform hover:rotate-0 duration-500"
+                        style={{ rotate: index % 2 === 0 ? '-2deg' : '2deg' }}
+                      >
+                        <img 
+                          src={item.url} 
+                          alt={item.titulo} 
+                          className="w-[200px] h-[250px] md:w-[350px] md:h-[450px] object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-500"
+                        />
+                        <div className="absolute bottom-4 left-0 right-0 text-center font-halimun text-wedding-gold text-lg md:text-2xl">
+                          Mari & Dani
                         </div>
                       </div>
+                    </div>
+                    <div className="w-full md:w-1/2 text-center md:text-left space-y-4 md:space-y-6 px-4">
+                      <h3 className="font-cormorant text-[28px] md:text-[42px] text-[#462F29] leading-tight">
+                        {item.titulo}
+                      </h3>
+                      <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed font-light">
+                        {item.texto}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -406,104 +420,73 @@ export default function Confirmacao() {
             </section>
 
             {/* 3. Presentes */}
-            <FadeSection className="mb-16 md:mb-32">
+            <section className="px-4 sm:px-6 mb-16 md:mb-24 overflow-x-hidden">
               <SectionDivider title="Presentes" />
-              <div className="relative px-4 md:px-6">
-                {/* Correção 2: Dica discreta de navegação horizontal */}
-                <p className="text-center font-montserrat text-[10px] md:text-[12px] text-wedding-charcoal/40 uppercase tracking-[0.2em] mb-6 md:hidden">
+              <div className="max-w-6xl mx-auto">
+                <p className="text-center font-montserrat text-[10px] md:text-[11px] text-wedding-gold uppercase tracking-[0.2em] mb-8 md:hidden">
                   Deslize para descobrir mais presentes →
                 </p>
-                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible pb-8 md:pb-0 scrollbar-hide snap-x snap-mandatory max-w-[100vw] mx-auto px-4 md:px-0">
+                <div className="flex overflow-x-auto pb-12 gap-6 md:grid md:grid-cols-3 md:overflow-visible scrollbar-hide px-4 md:px-0">
                   {PRESENTES.map((p, i) => (
-                    <div 
-                      key={i} 
-                      className="min-w-[85vw] sm:min-w-[300px] md:min-w-0 snap-center bg-white p-4 pb-8 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
-                      style={{ 
-                        transform: `rotate(${i % 2 === 0 ? '-1' : '1'}deg)`,
-                        transition: 'all 0.4s ease-out'
-                      }}
-                    >
-                      <div className="aspect-square bg-gray-50 flex items-center justify-center mb-6 overflow-hidden rounded-sm relative group">
-                        {p.foto && (
+                    <FadeSection key={i} className="min-w-[85vw] md:min-w-0 group">
+                      <div className="bg-white border border-[#D4AF37]/20 p-4 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col h-full rounded-sm transform hover:-translate-y-2">
+                        <div className="overflow-hidden mb-6 aspect-[4/5] relative">
                           <img 
                             src={p.foto} 
                             alt={p.nome} 
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                            className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
                           />
-                        )}
-
-                      </div>
-                      
-                      <div className="px-2 text-center flex flex-col items-center">
-                        <h4 className="font-['Montserrat'] font-bold text-[12px] md:text-[13px] text-[#462F29] mb-3 uppercase tracking-[0.15em] leading-snug break-words max-w-full">
-                          {p.nome}
-                        </h4>
-                        <p className="text-[10px] text-[#462F29]/60 font-montserrat leading-relaxed mb-6 h-auto min-h-[40px] flex items-center justify-center max-w-[90%]">
-                          {p.descricao}
-                        </p>
-                        
-                        {p.valor && (
-                          <div className="text-[8px] font-bold text-[#462F29]/30 mb-5 tracking-[0.25em] uppercase">
-                            {p.valor}
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500" />
+                        </div>
+                        <div className="flex-grow text-center flex flex-col justify-between px-2">
+                          <div>
+                            <h3 className="font-montserrat font-bold text-[12px] md:text-[13px] text-[#462F29] uppercase tracking-[0.15em] mb-3 leading-snug break-words">
+                              {p.nome}
+                            </h3>
+                            <p className="font-montserrat text-[11px] md:text-[12px] text-[#462F29]/60 leading-relaxed italic min-h-[40px] mb-6">
+                              {p.descricao}
+                            </p>
                           </div>
-                        )}
-
-                        <button 
-                          onClick={() => setModalPresenteAberto(i)} 
-                          className="w-full bg-[#462F29] text-white py-3 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#D4AF37] transition-all duration-500 shadow-md rounded-sm"
-                        >
-                          Presentear via PIX
-                        </button>
-
-                        {pixVisivel[i] && (
-                          <div className="mt-4 p-4 bg-wedding-terracotta/5 border border-wedding-terracotta/10 text-[11px] animate-in fade-in zoom-in duration-300 rounded-sm text-left">
-                            <div className="flex items-start gap-2 mb-3 text-wedding-terracotta/80">
-                              <span className="text-xs">⚠️</span>
-                              <p className="font-montserrat leading-tight text-[10px]">Confirme o destinatário:<br/><strong>Daniel e Mariana</strong></p>
-                            </div>
-                            <p className="text-[#888] uppercase mb-1 tracking-widest text-[8px]">Chave PIX</p>
-                            <p className="font-mono break-all bg-white p-2 border border-wedding-blush/30 text-[10px]">{p.pix}</p>
-                            <button 
-                              onClick={() => copiarPix(i, p.pix)} 
-                              className={`mt-3 w-full py-2 uppercase tracking-widest transition-all text-[9px] border border-wedding-terracotta/20 ${pixCopiado === i ? 'bg-green-50 text-green-600 border-green-200 font-bold' : 'bg-white text-wedding-terracotta hover:bg-wedding-terracotta hover:text-white'}`}
-                            >
-                              {pixCopiado === i ? "✓ Chave Copiada!" : "Copiar Chave PIX"}
-                            </button>
-                          </div>
-                        )}
+                          <button 
+                            onClick={() => {
+                              setModalPresenteAberto(i);
+                              setValorSelecionado(null);
+                              setOutroValor("");
+                              setPixGerado(null);
+                            }}
+                            className="w-full border border-[#462F29] text-[#462F29] py-3 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#462F29] hover:text-white transition-all duration-300"
+                          >
+                            Presentear via PIX
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    </FadeSection>
                   ))}
                 </div>
               </div>
-            </FadeSection>
+            </section>
 
             {/* 4. Localização */}
-            <div className="bg-[#462F29] py-16 md:py-24 border-y border-white/5">
-              <FadeSection className="px-6">
-                <div className="text-center mb-8">
-                  <h2 className="font-cormorant font-light text-white text-[28px] md:text-[42px] leading-tight mb-4 uppercase tracking-widest">Localização</h2>
-                  <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />
-                </div>
-                
-                <div className="max-w-2xl mx-auto flex flex-col items-center text-center space-y-8">
+            <div className="bg-[#FDFAF6] py-16 md:py-24 border-t border-b border-wedding-gold/10">
+              <FadeSection className="max-w-4xl mx-auto px-6 text-center">
+                <SectionDivider title="Localização" />
+                <div className="space-y-12">
                   <div className="space-y-6">
-                    <h3 className="font-halimun text-[32px] md:text-[42px] text-wedding-gold">Celeiro Quintal</h3>
-                    
-                    <div className="space-y-4">
-                      <p className="text-[16px] md:text-[18px] font-light text-white/90 tracking-[0.1em]">05 de Dezembro de 2026 • 18h</p>
-                      <div className="text-[14px] md:text-[16px] font-light text-white/70 leading-relaxed uppercase tracking-widest">
-                        <p>R. Cônego Eugênio Leite, 1098</p>
-                        <p>Pinheiros • São Paulo</p>
-                      </div>
+                    <h3 className="font-halimun text-[32px] md:text-[42px] text-[#462F29]">Celeiro Quintal</h3>
+                    <p className="font-montserrat text-[12px] md:text-[14px] text-wedding-gold uppercase tracking-[0.3em] font-bold">
+                      05 de Dezembro de 2026 • 18h
+                    </p>
+                    <div className="space-y-2">
+                      <p className="font-montserrat text-[14px] md:text-[16px] text-[#462F29] font-light">R. Cônego Eugênio Leite, 1098</p>
+                      <p className="font-montserrat text-[14px] md:text-[16px] text-[#462F29] font-light">Pinheiros • São Paulo</p>
                     </div>
-
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+                    
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-4 pt-6">
                       <a 
                         href={MAPS_URL} 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        className="inline-block bg-wedding-gold text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#462F29] transition-all shadow-lg font-bold min-w-[200px]"
+                        className="inline-block bg-[#462F29] text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-wedding-gold hover:text-white transition-all shadow-lg font-bold min-w-[200px]"
                       >
                         Ver no Mapa
                       </a>
@@ -511,7 +494,7 @@ export default function Confirmacao() {
                         href="https://www.instagram.com/celeiroquintal/" 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        className="inline-block border border-wedding-gold text-wedding-gold px-8 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-wedding-gold hover:text-white transition-all shadow-lg font-bold min-w-[200px]"
+                        className="inline-block border border-[#462F29] text-[#462F29] px-8 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-[#462F29] hover:text-white transition-all shadow-lg font-bold min-w-[200px]"
                       >
                         Conhecer o Espaço
                       </a>
@@ -763,16 +746,17 @@ export default function Confirmacao() {
 
                 <div className="flex gap-2 items-center">
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="Outro valor"
                     value={outroValor}
                     onChange={(e) => {
-                      setOutroValor(e.target.value);
+                      const formatado = formatarMoeda(e.target.value);
+                      setOutroValor(formatado);
                       setValorSelecionado(null);
                     }}
-                    className="flex-1 px-3 py-2 border border-[#462F29]/20 rounded-sm text-[12px] focus:outline-none focus:border-[#D4AF37]"
+                    className="flex-1 px-3 py-3 border border-[#462F29]/20 rounded-sm text-[16px] focus:outline-none focus:border-[#D4AF37] font-montserrat"
                   />
-                  <span className="text-[12px] font-montserrat text-[#462F29]/60">R$</span>
                 </div>
               </div>
 
@@ -789,7 +773,6 @@ export default function Confirmacao() {
                   <button
                     onClick={() => {
                       setModalPresenteAberto(null);
-                
                       setValorSelecionado(null);
                       setOutroValor("");
                       setPixGerado(null);
@@ -809,7 +792,11 @@ export default function Confirmacao() {
                     <p className="text-[12px] text-[#462F29] mb-4">{PRESENTES[modalPresenteAberto].nome}</p>
                     
                     <p className="text-[11px] font-montserrat text-[#462F29]/70 mb-2 uppercase tracking-[0.1em]">Valor:</p>
-                    <p className="text-[13px] font-semibold text-[#D4AF37] mb-4">R$ {(valorSelecionado || parseFloat(outroValor)).toFixed(2)}</p>
+                    <p className="text-[13px] font-semibold text-[#D4AF37] mb-4">
+                      {valorSelecionado 
+                        ? valorSelecionado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) 
+                        : outroValor}
+                    </p>
                     
                     <p className="text-[10px] font-montserrat text-[#462F29]/60 text-center italic mb-3">PIX gerado com sucesso.</p>
                     
@@ -829,7 +816,6 @@ export default function Confirmacao() {
                   <button
                     onClick={() => {
                       setModalPresenteAberto(null);
-                
                       setValorSelecionado(null);
                       setOutroValor("");
                       setPixGerado(null);
