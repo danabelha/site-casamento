@@ -42,44 +42,44 @@ const GALLERY_ITEMS = [
 
 const PRESENTES = [
   { 
-    nome: "👑 Manutenção da Princesa", 
-    descricao: "Ajude Mariana a manter os altos padrões de realeza pelos próximos 50 anos.", 
-    valor: "Qualquer valor", 
+    nome: "👑 QUOTA PARA NOIVA CONTINUAR PRINCESA", 
+    descricao: "Ajude a Mary a manter os altos padrões de realeza pelos próximos 50 anos.", 
+    valor: "", 
     pix: "casamento@danielemariana.com", 
     foto: princesaImg
   },
   { 
-    nome: "🚜 Projeto Fazenda", 
-    descricao: "Daniel ainda acredita que um dia terá uma fazenda com cavalos, vacas e um apiário.", 
-    valor: "Qualquer valor", 
+    nome: "🚜 QUOTA PARA PROJETO BEEFARM", 
+    descricao: "Abelha ainda acredita que um dia terá uma fazenda com algumas novilhas e um apiário para produzir o puro mel da abelha virgem.", 
+    valor: "", 
     pix: "casamento@danielemariana.com", 
     foto: fazendeiroImg
   },
   { 
-    nome: "👕 Reabilitação Fashion", 
-    descricao: "Ajude Mariana nesta importante missão social.", 
-    valor: "Qualquer valor", 
+    nome: "👕 QUOTA PARA O NOIVO NÃO USAR CAMISA DE TIME", 
+    descricao: "Ajude a Mary nesta importante missão social.", 
+    valor: "", 
     pix: "casamento@danielemariana.com", 
     foto: camisaTimeImg
   },
   { 
-    nome: "🏖️ Pool Party Pós-Casamento", 
-    descricao: "A festa acaba, mas a ressaca emocional continua.", 
-    valor: "Qualquer valor", 
+    nome: "🏖️ QUOTA PARA POOL PARTY PÓS-CASAMENTO", 
+    descricao: "O casamento acaba, mas o show tem que continuar.", 
+    valor: "", 
     pix: "casamento@danielemariana.com", 
     foto: poolPartyImg
   },
   { 
-    nome: "🏥 Plano de Saúde Premium", 
+    nome: "🏥 QUOTA PARA MANTER O PLANO DE SAÚDE PREMIUM DA NOIVA", 
     descricao: "Nem a ciência explica como alguém consegue gostar tanto de hospital.", 
-    valor: "Qualquer valor", 
+    valor: "", 
     pix: "casamento@danielemariana.com", 
     foto: planoSaudeImg
   },
   { 
-    nome: "🎶 Fundo do Cavaco", 
-    descricao: '"MANDEEEEEEI MEU CAVACO CHORAR"', 
-    valor: "Qualquer valor", 
+    nome: "🎶 FUNDO DO CAVACO", 
+    descricao: 'Quota para pedir a música "MANDEEEEEEI MEU CAVACO CHORAR".', 
+    valor: "", 
     pix: "casamento@danielemariana.com", 
     foto: cavacoImg
   },
@@ -407,13 +407,15 @@ export default function Confirmacao() {
                         <h4 className="font-['Montserrat'] font-semibold text-[13px] text-[#462F29] mb-2 uppercase tracking-[0.15em] leading-tight">
                           {p.nome}
                         </h4>
-                        <p className="text-[10px] text-[#462F29]/60 font-montserrat leading-relaxed mb-5 h-8 flex items-center justify-center max-w-[90%]">
+                        <p className="text-[10px] text-[#462F29]/60 font-montserrat leading-relaxed mb-6 h-auto min-h-[40px] flex items-center justify-center max-w-[90%]">
                           {p.descricao}
                         </p>
                         
-                        <div className="text-[8px] font-bold text-[#462F29]/30 mb-5 tracking-[0.25em] uppercase">
-                          {p.valor}
-                        </div>
+                        {p.valor && (
+                          <div className="text-[8px] font-bold text-[#462F29]/30 mb-5 tracking-[0.25em] uppercase">
+                            {p.valor}
+                          </div>
+                        )}
 
                         <button 
                           onClick={() => setModalPresenteAberto(i)} 
