@@ -305,8 +305,8 @@ export default function Confirmacao() {
   );
 
   return (
-    <div className={`min-h-screen bg-[#FDFAF6] text-wedding-charcoal w-full overflow-x-hidden ${!convidadoSelecionado ? 'h-screen overflow-hidden' : ''}`}>
-      <main className={`max-w-6xl mx-auto w-full px-0 ${!convidadoSelecionado ? 'h-full flex flex-col items-center justify-center py-4' : 'pt-10 md:pt-20 pb-20'}`}>
+    <div className={`min-h-screen bg-[#FDFAF6] text-wedding-charcoal ${!convidadoSelecionado ? 'h-screen overflow-hidden' : ''}`}>
+      <main className={`max-w-6xl mx-auto ${!convidadoSelecionado ? 'h-full flex flex-col items-center justify-center py-4' : 'pt-10 md:pt-20 pb-20'}`}>
         {/* Cabeçalho (Logo do Casal) */}
         <FadeSection className={`px-4 flex justify-center ${!convidadoSelecionado ? 'mb-6 md:mb-8' : 'mb-12 md:mb-16'}`}>
           <img 
@@ -382,7 +382,7 @@ export default function Confirmacao() {
                 <p className="text-center font-montserrat text-[10px] md:text-[12px] text-wedding-charcoal/40 uppercase tracking-[0.2em] mb-6 md:hidden">
                   Deslize para descobrir mais presentes →
                 </p>
-                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible pb-8 md:pb-0 scrollbar-hide snap-x snap-mandatory max-w-full mx-auto px-4 md:px-0">
+                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible pb-8 md:pb-0 scrollbar-hide snap-x snap-mandatory max-w-[100vw] mx-auto px-4 md:px-0">
                   {PRESENTES.map((p, i) => (
                     <div 
                       key={i} 
