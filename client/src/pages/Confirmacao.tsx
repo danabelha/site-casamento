@@ -353,17 +353,20 @@ export default function Confirmacao() {
             </FadeSection>
 
             {/* 2. Nossa História */}
-            <section className="relative px-4 sm:px-6 mb-16 md:mb-32">
+            <section className="relative mb-16 md:mb-32">
               <SectionDivider title="Nossa História" />
-              <div className="relative max-w-5xl mx-auto">
+              <div className="max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
-                  <div key={index} className="sticky top-0 min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 py-10 md:py-20">
-                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-[#462F29] p-6 md:p-4 rounded-sm shadow-sm md:shadow-none">
+                  <div 
+                    key={index} 
+                    className="sticky top-0 h-screen flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 px-4 sm:px-6"
+                  >
+                    <div className="flex-1 text-center md:text-left order-2 md:order-1 max-w-[400px] z-30 bg-[#462F29] p-6 md:p-8 rounded-sm shadow-2xl">
                       <h3 className="font-cormorant text-[24px] md:text-[36px] text-white mb-4 md:mb-6">{item.titulo}</h3>
                       <p className="font-montserrat text-[13px] md:text-[16px] text-white/80 leading-relaxed">{item.texto}</p>
                     </div>
                     <div className="flex-1 flex justify-center order-1 md:order-2 z-10">
-                      <div className="bg-white p-1.5 pb-6 md:p-3 md:pb-12 shadow-xl md:shadow-2xl transform transition-transform duration-500" style={{ transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)` }}>
+                      <div className="bg-white p-2 pb-8 md:p-4 md:pb-16 shadow-2xl transform" style={{ transform: `rotate(${index % 2 === 0 ? '-2' : '2'}deg)` }}>
                         <div className="relative w-[240px] h-[300px] sm:w-[320px] sm:h-[400px] overflow-hidden">
                           <img src={item.url} alt={item.titulo} className="w-full h-full object-cover" />
                         </div>
