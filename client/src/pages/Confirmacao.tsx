@@ -139,9 +139,14 @@ export default function Confirmacao() {
   const [pixVisivel, setPixVisivel] = useState<Record<number, boolean>>({});
   const [pixCopiado, setPixCopiado] = useState<number | null>(null);
   const [carregandoBusca, setCarregandoBusca] = useState(false);
+  const [modalPresenteAberto, setModalPresenteAberto] = useState<number | null>(null);
+  const [valorSelecionado, setValorSelecionado] = useState<number | null>(null);
+  const [outroValor, setOutroValor] = useState<string>("");
+  const [carregandoRegistro, setCarregandoRegistro] = useState(false);
 
   const searchMutation = trpc.searchConvidados.useMutation();
   const confirmarMutation = trpc.confirmarPresenca.useMutation();
+  const registrarPresenteMutation = trpc.registrarPresente.useMutation();
 
   // Correção 1: Eliminar efeito de zoom / salto após localizar convidado
   useEffect(() => {
@@ -175,6 +180,41 @@ export default function Confirmacao() {
     navigator.clipboard.writeText(pix);
     setPixCopiado(index);
     setTimeout(() => setPixCopiado(null), 3000);
+  };
+
+  const handleRegistrarPresente = async (presenteIndex: number) => {
+    if (!convidadoSelecionado) return;
+    const presente = PRESENTES[presenteIndex];
+    const valor = valorSelecionado || (outroValor ? parseFloat(outroValor) : null);
+    
+    if (!valor || valor <= 0) {
+      alert("Por favor, selecione um valor válido.");
+      return;
+    }
+
+    try {
+      setCarregandoRegistro(true);
+      await registrarPresenteMutation.mutateAsync({
+        convidadoId: convidadoSelecionado.id,
+        convidadoNome: convidadoSelecionado.nome,
+        presenteNome: presente.nome,
+        valor: valor,
+        pix: presente.pix,
+        status: "Pix copiado",
+      });
+      
+      navigator.clipboard.writeText(presente.pix);
+      alert(`Chave PIX copiada! Obrigado pelo carinho.\n\nPresente: ${presente.nome}\nValor: R$ ${valor.toFixed(2)}`);
+      
+      setModalPresenteAberto(null);
+      setValorSelecionado(null);
+      setOutroValor("");
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao registrar presente. Tente novamente.");
+    } finally {
+      setCarregandoRegistro(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -376,10 +416,10 @@ export default function Confirmacao() {
                         </div>
 
                         <button 
-                          onClick={() => setPixVisivel({ ...pixVisivel, [i]: !pixVisivel[i] })} 
+                          onClick={() => setModalPresenteAberto(i)} 
                           className="w-full bg-[#462F29] text-white py-3 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#D4AF37] transition-all duration-500 shadow-md rounded-sm"
                         >
-                          {pixVisivel[i] ? "Ocultar Chave" : "Presentear via PIX"}
+                          Presentear via PIX
                         </button>
 
                         {pixVisivel[i] && (
@@ -661,6 +701,77 @@ export default function Confirmacao() {
                   </div>
                 )}
               </FadeSection>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Cotas de Presentes */}
+        {modalPresenteAberto !== null && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+            <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 md:p-8 animate-in zoom-in duration-300">
+              <h3 className="font-cormorant text-[28px] text-[#462F29] mb-2 text-center">
+                {PRESENTES[modalPresenteAberto].nome}
+              </h3>
+              <p className="text-center text-[12px] text-[#462F29]/60 font-montserrat mb-6">
+                {PRESENTES[modalPresenteAberto].descricao}
+              </p>
+
+              <div className="mb-6">
+                <p className="text-[12px] font-montserrat font-semibold text-[#462F29] mb-3 uppercase tracking-[0.1em]">
+                  Selecione um valor:
+                </p>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {[50, 100, 150, 200].map(valor => (
+                    <button
+                      key={valor}
+                      onClick={() => {
+                        setValorSelecionado(valor);
+                        setOutroValor("");
+                      }}
+                      className={`py-2 px-3 rounded-sm text-[12px] font-bold uppercase tracking-[0.1em] transition-all ${
+                        valorSelecionado === valor
+                          ? 'bg-[#D4AF37] text-[#462F29]'
+                          : 'bg-[#462F29]/10 text-[#462F29] hover:bg-[#462F29]/20'
+                      }`}
+                    >
+                      R$ {valor}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="number"
+                    placeholder="Outro valor"
+                    value={outroValor}
+                    onChange={(e) => {
+                      setOutroValor(e.target.value);
+                      setValorSelecionado(null);
+                    }}
+                    className="flex-1 px-3 py-2 border border-[#462F29]/20 rounded-sm text-[12px] focus:outline-none focus:border-[#D4AF37]"
+                  />
+                  <span className="text-[12px] font-montserrat text-[#462F29]/60">R$</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleRegistrarPresente(modalPresenteAberto)}
+                disabled={carregandoRegistro}
+                className="w-full bg-[#462F29] text-white py-3 rounded-sm font-bold uppercase tracking-[0.1em] text-[12px] hover:bg-[#D4AF37] hover:text-[#462F29] transition-all disabled:opacity-50"
+              >
+                {carregandoRegistro ? "Registrando..." : "Confirmar e Copiar PIX"}
+              </button>
+
+              <button
+                onClick={() => {
+                  setModalPresenteAberto(null);
+                  setValorSelecionado(null);
+                  setOutroValor("");
+                }}
+                className="w-full mt-2 text-[#462F29] py-2 text-[12px] font-montserrat hover:text-[#D4AF37] transition-all"
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         )}
