@@ -147,6 +147,11 @@ export default function Confirmacao() {
   const searchMutation = trpc.searchConvidados.useMutation();
   const confirmarMutation = trpc.confirmarPresenca.useMutation();
   const registrarPresenteMutation = trpc.registrarPresente.useMutation();
+  const generatePixCodeMutation = trpc.generatePixCode.useMutation();
+
+  const [presenteEmEdicao, setPresenteEmEdicao] = useState<number | null>(null);
+  const [pixGerado, setPixGerado] = useState<string | null>(null);
+  const [carregandoPixCode, setCarregandoPixCode] = useState(false);
 
   // Correção 1: Eliminar efeito de zoom / salto após localizar convidado
   useEffect(() => {
@@ -182,9 +187,7 @@ export default function Confirmacao() {
     setTimeout(() => setPixCopiado(null), 3000);
   };
 
-  const handleRegistrarPresente = async (presenteIndex: number) => {
-    if (!convidadoSelecionado) return;
-    const presente = PRESENTES[presenteIndex];
+  const handleGerarPixCode = async (presenteIndex: number) => {
     const valor = valorSelecionado || (outroValor ? parseFloat(outroValor) : null);
     
     if (!valor || valor <= 0) {
@@ -193,22 +196,47 @@ export default function Confirmacao() {
     }
 
     try {
+      setCarregandoPixCode(true);
+      const resultado = await generatePixCodeMutation.mutateAsync({
+        value: valor,
+        presenteNome: PRESENTES[presenteIndex].nome,
+      });
+      setPixGerado(resultado.brCode);
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao gerar código PIX. Tente novamente.");
+    } finally {
+      setCarregandoPixCode(false);
+    }
+  };
+
+  const handleCopiarPixCode = async (presenteIndex: number) => {
+    if (!convidadoSelecionado || !pixGerado) return;
+    const presente = PRESENTES[presenteIndex];
+    const valor = valorSelecionado || (outroValor ? parseFloat(outroValor) : null);
+    
+    if (!valor || valor <= 0) return;
+
+    try {
       setCarregandoRegistro(true);
+      
       await registrarPresenteMutation.mutateAsync({
         convidadoId: convidadoSelecionado.id,
         convidadoNome: convidadoSelecionado.nome,
         presenteNome: presente.nome,
         valor: valor,
-        pix: presente.pix,
-        status: "Pix copiado",
+        pix: pixGerado,
+        status: "PIX copiado",
       });
       
-      navigator.clipboard.writeText(presente.pix);
-      alert(`Chave PIX copiada! Obrigado pelo carinho.\n\nPresente: ${presente.nome}\nValor: R$ ${valor.toFixed(2)}`);
+      navigator.clipboard.writeText(pixGerado);
+      alert(`PIX copiado!\n\nAgora é só colar o código no aplicativo do seu banco para concluir a contribuição.`);
       
       setModalPresenteAberto(null);
+      setPresenteEmEdicao(null);
       setValorSelecionado(null);
       setOutroValor("");
+      setPixGerado(null);
     } catch (error) {
       console.error(error);
       alert("Erro ao registrar presente. Tente novamente.");
@@ -748,23 +776,70 @@ export default function Confirmacao() {
                 </div>
               </div>
 
-              <button
-                onClick={() => handleRegistrarPresente(modalPresenteAberto)}
-                disabled={carregandoRegistro}
-                className="w-full bg-[#462F29] text-white py-3 rounded-sm font-bold uppercase tracking-[0.1em] text-[12px] hover:bg-[#D4AF37] hover:text-[#462F29] transition-all disabled:opacity-50"
-              >
-                {carregandoRegistro ? "Registrando..." : "Confirmar e Copiar PIX"}
-              </button>
+              {!pixGerado ? (
+                <>
+                  <button
+                    onClick={() => handleGerarPixCode(modalPresenteAberto)}
+                    disabled={carregandoPixCode}
+                    className="w-full bg-[#462F29] text-white py-3 rounded-sm font-bold uppercase tracking-[0.1em] text-[12px] hover:bg-[#D4AF37] hover:text-[#462F29] transition-all disabled:opacity-50"
+                  >
+                    {carregandoPixCode ? "Gerando..." : "Gerar Chave PIX"}
+                  </button>
 
-              <button
-                onClick={() => {
-                  setModalPresenteAberto(null);
-                  setValorSelecionado(null);
-                  setOutroValor("");
-                }}
-                className="w-full mt-2 text-[#462F29] py-2 text-[12px] font-montserrat hover:text-[#D4AF37] transition-all"
-              >
-                Cancelar
+                  <button
+                    onClick={() => {
+                      setModalPresenteAberto(null);
+                      setPresenteEmEdicao(null);
+                      setValorSelecionado(null);
+                      setOutroValor("");
+                      setPixGerado(null);
+                    }}
+                    className="w-full mt-2 text-[#462F29] py-2 text-[12px] font-montserrat hover:text-[#D4AF37] transition-all"
+                  >
+                    Cancelar
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="bg-[#462F29]/5 p-4 rounded-sm mb-4 border border-[#D4AF37]">
+                    <p className="text-[11px] font-montserrat text-[#462F29]/70 mb-2 uppercase tracking-[0.1em]">Recebedor:</p>
+                    <p className="text-[13px] font-semibold text-[#462F29] mb-4">Daniel Abelha Torres</p>
+                    
+                    <p className="text-[11px] font-montserrat text-[#462F29]/70 mb-2 uppercase tracking-[0.1em]">Contribuição:</p>
+                    <p className="text-[12px] text-[#462F29] mb-4">{PRESENTES[modalPresenteAberto].nome}</p>
+                    
+                    <p className="text-[11px] font-montserrat text-[#462F29]/70 mb-2 uppercase tracking-[0.1em]">Valor:</p>
+                    <p className="text-[13px] font-semibold text-[#D4AF37] mb-4">R$ {(valorSelecionado || parseFloat(outroValor)).toFixed(2)}</p>
+                    
+                    <p className="text-[10px] font-montserrat text-[#462F29]/60 text-center italic mb-3">PIX gerado com sucesso.</p>
+                    
+                    <div className="bg-white p-3 rounded-sm mb-4 border border-[#462F29]/20">
+                      <p className="text-[10px] font-mono text-[#462F29] break-all text-center">{pixGerado}</p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleCopiarPixCode(modalPresenteAberto)}
+                    disabled={carregandoRegistro}
+                    className="w-full bg-[#D4AF37] text-[#462F29] py-3 rounded-sm font-bold uppercase tracking-[0.1em] text-[12px] hover:bg-[#462F29] hover:text-white transition-all disabled:opacity-50"
+                  >
+                    {carregandoRegistro ? "Copiando..." : "Copiar PIX"}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setModalPresenteAberto(null);
+                      setPresenteEmEdicao(null);
+                      setValorSelecionado(null);
+                      setOutroValor("");
+                      setPixGerado(null);
+                    }}
+                    className="w-full mt-2 text-[#462F29] py-2 text-[12px] font-montserrat hover:text-[#D4AF37] transition-all"
+                  >
+                    Fechar
+                  </button>
+                </>
+              )}
               </button>
             </div>
           </div>
