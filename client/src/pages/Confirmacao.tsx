@@ -305,8 +305,8 @@ export default function Confirmacao() {
   );
 
   return (
-    <div className={`min-h-screen bg-[#FDFAF6] text-wedding-charcoal ${!convidadoSelecionado ? 'overflow-hidden' : ''}`}>
-      <main className={`max-w-6xl mx-auto ${!convidadoSelecionado ? 'h-screen flex flex-col items-center justify-center py-4' : 'pt-20 pb-20'}`}>
+    <div className={`min-h-screen bg-[#FDFAF6] text-wedding-charcoal w-full overflow-x-hidden ${!convidadoSelecionado ? 'h-screen overflow-hidden' : ''}`}>
+      <main className={`max-w-6xl mx-auto w-full px-0 ${!convidadoSelecionado ? 'h-full flex flex-col items-center justify-center py-4' : 'pt-10 md:pt-20 pb-20'}`}>
         {/* Cabeçalho (Logo do Casal) */}
         <FadeSection className={`px-4 flex justify-center ${!convidadoSelecionado ? 'mb-6 md:mb-8' : 'mb-12 md:mb-16'}`}>
           <img 
@@ -382,13 +382,13 @@ export default function Confirmacao() {
                 <p className="text-center font-montserrat text-[10px] md:text-[12px] text-wedding-charcoal/40 uppercase tracking-[0.2em] mb-6 md:hidden">
                   Deslize para descobrir mais presentes →
                 </p>
-                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible pb-8 md:pb-0 scrollbar-hide snap-x snap-mandatory max-w-5xl mx-auto">
+                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible pb-8 md:pb-0 scrollbar-hide snap-x snap-mandatory max-w-full mx-auto px-4 md:px-0">
                   {PRESENTES.map((p, i) => (
                     <div 
                       key={i} 
-                      className="min-w-[280px] md:min-w-0 snap-center bg-white p-3 pb-8 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+                      className="min-w-[85vw] sm:min-w-[300px] md:min-w-0 snap-center bg-white p-4 pb-8 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
                       style={{ 
-                        transform: `rotate(${i % 2 === 0 ? '-1.5' : '1.5'}deg)`,
+                        transform: `rotate(${i % 2 === 0 ? '-1' : '1'}deg)`,
                         transition: 'all 0.4s ease-out'
                       }}
                     >
@@ -404,7 +404,7 @@ export default function Confirmacao() {
                       </div>
                       
                       <div className="px-2 text-center flex flex-col items-center">
-                        <h4 className="font-['Montserrat'] font-semibold text-[13px] text-[#462F29] mb-2 uppercase tracking-[0.15em] leading-tight">
+                        <h4 className="font-['Montserrat'] font-bold text-[12px] md:text-[13px] text-[#462F29] mb-3 uppercase tracking-[0.15em] leading-snug break-words max-w-full">
                           {p.nome}
                         </h4>
                         <p className="text-[10px] text-[#462F29]/60 font-montserrat leading-relaxed mb-6 h-auto min-h-[40px] flex items-center justify-center max-w-[90%]">
