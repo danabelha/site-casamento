@@ -1,6 +1,7 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import { z } from "zod";
+import { generatePixBrCode } from "./pixUtils";
 // @ts-ignore
 import {
   buscarConvidados,
@@ -61,6 +62,35 @@ const appRouter = t.router({
     .mutation(async ({ input }) => {
       const ok = await salvarConfirmacao(input);
       return { success: ok };
+    }),
+
+  generatePixCode: publicProcedure
+    .input(
+      z.object({
+        value: z.number().min(1, "O valor deve ser maior que zero"),
+        presenteNome: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const pixKey = process.env.PIX_KEY;
+      const receiverName = process.env.PIX_RECEIVER_NAME;
+      const receiverCity = process.env.PIX_RECEIVER_CITY;
+
+      if (!pixKey || !receiverName || !receiverCity) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Configurações PIX incompletas no servidor.",
+        });
+      }
+
+      const brCode = generatePixBrCode({
+        pixKey,
+        receiverName,
+        receiverCity,
+        value: input.value,
+        transactionId: input.presenteNome ? input.presenteNome.substring(0, 25) : undefined, // Limita o tamanho do transactionId
+      });
+      return { brCode };
     }),
 
   registrarPresente: publicProcedure
