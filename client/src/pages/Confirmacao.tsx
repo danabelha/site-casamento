@@ -136,7 +136,7 @@ export default function Confirmacao() {
   const [criancas, setCriancas] = useState<{ nome: string; idade: string }[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [sucesso, setSucesso] = useState(false);
-  const [pixVisivel, setPixVisivel] = useState<Record<number, boolean>>({});
+  const [pixVisivel] = useState<Record<number, boolean>>({});
   const [pixCopiado, setPixCopiado] = useState<number | null>(null);
   const [carregandoBusca, setCarregandoBusca] = useState(false);
   const [modalPresenteAberto, setModalPresenteAberto] = useState<number | null>(null);

@@ -10,7 +10,6 @@ import {
   atualizarConvidado,
   deletarConvidado,
   registrarIntencaoPresente,
-  listarIntencoesPresentes,
   calcularRankingPresentes,
 } from "./googleSheets";
 
