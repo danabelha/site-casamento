@@ -54,20 +54,6 @@ export interface PresenteIntencaoRow {
 
 const SHEET_PRESENTES_NAME = "Presentes";
 
-  id: string;
-  nome: string;
-  email: string;
-  telefone: string;
-  status: string;
-  acompanhantes: number;
-  criancas: number;
-  menores8: number;
-  dataConfirmacao: string;
-  acompanhanteDetalhes?: string;
-  mensagem?: string;
-  limite: number;
-}
-
 function normalizar(texto: string) {
   return texto
     .toLowerCase()
@@ -384,38 +370,4 @@ export async function calcularRankingPresentes() {
   ranking.sort((a, b) => b.valorTotal - a.valorTotal);
 
   return ranking;
-}
-
-  const sheetId = getSheetId();
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: sheetId,
-    range: `${SHEET_NAME}!A:A`,
-  });
-  
-  const rows = response.data.values || [];
-  const index = rows.findIndex((row, i) => i > 0 && row[0] === id);
-  if (index === -1) return false;
-
-  const sheet = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
-  const sheetObj = sheet.data.sheets?.find(s => s.properties?.title === SHEET_NAME);
-  const sheetInternalId = sheetObj?.properties?.sheetId;
-
-  await sheets.spreadsheets.batchUpdate({
-    spreadsheetId: sheetId,
-    requestBody: {
-      requests: [{
-        deleteDimension: {
-          range: {
-            sheetId: sheetInternalId,
-            dimension: "ROWS",
-            startIndex: index,
-            endIndex: index + 1
-          }
-        }
-      }]
-    }
-  });
-
-  cacheConvidados = null;
-  return true;
 }
