@@ -135,7 +135,6 @@ export default function Confirmacao() {
   const [criancas, setCriancas] = useState<{ nome: string; idade: string }[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [sucesso, setSucesso] = useState(false);
-  const [pixCopiado, setPixCopiado] = useState<number | null>(null);
   const [carregandoBusca, setCarregandoBusca] = useState(false);
   const [modalPresenteAberto, setModalPresenteAberto] = useState<number | null>(null);
   const [valorSelecionado, setValorSelecionado] = useState<number | null>(null);
@@ -197,7 +196,7 @@ export default function Confirmacao() {
     const valor = valorSelecionado || (outroValor ? parseMoedaParaNumero(outroValor) : null);
     
     if (!valor || valor <= 0) {
-      alert("Por favor, selecione um valor válido.");
+      alert("Informe um valor maior que R$ 0,00 para gerar o PIX.");
       return;
     }
 
@@ -333,6 +332,10 @@ export default function Confirmacao() {
       <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
     </div>
   );
+
+  const limiteAtingido = (adultos.length + criancas.length) >= (convidadoSelecionado?.limite || 0);
+
+  const valorInvalido = !valorSelecionado && (!outroValor || parseMoedaParaNumero(outroValor) <= 0);
 
   return (
     <div className={`min-h-screen bg-[#FDFAF6] text-wedding-charcoal ${!convidadoSelecionado ? 'h-screen overflow-hidden' : ''}`}>
@@ -744,19 +747,26 @@ export default function Confirmacao() {
                   ))}
                 </div>
 
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="Outro valor"
-                    value={outroValor}
-                    onChange={(e) => {
-                      const formatado = formatarMoeda(e.target.value);
-                      setOutroValor(formatado);
-                      setValorSelecionado(null);
-                    }}
-                    className="flex-1 px-3 py-3 border border-[#462F29]/20 rounded-sm text-[16px] focus:outline-none focus:border-[#D4AF37] font-montserrat"
-                  />
+                <div className="flex flex-col gap-2">
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="Outro valor"
+                      value={outroValor}
+                      onChange={(e) => {
+                        const formatado = formatarMoeda(e.target.value);
+                        setOutroValor(formatado);
+                        setValorSelecionado(null);
+                      }}
+                      className="flex-1 px-3 py-3 border border-[#462F29]/20 rounded-sm text-[16px] focus:outline-none focus:border-[#D4AF37] font-montserrat"
+                    />
+                  </div>
+                  {valorInvalido && !valorSelecionado && outroValor !== "" && (
+                    <p className="text-[10px] text-red-500 font-montserrat italic">
+                      Informe um valor maior que R$ 0,00 para gerar o PIX.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -764,7 +774,7 @@ export default function Confirmacao() {
                 <>
                   <button
                     onClick={() => handleGerarPixCode(modalPresenteAberto)}
-                    disabled={carregandoPixCode}
+                    disabled={carregandoPixCode || valorInvalido}
                     className="w-full bg-[#462F29] text-white py-3 rounded-sm font-bold uppercase tracking-[0.1em] text-[12px] hover:bg-[#D4AF37] hover:text-[#462F29] transition-all disabled:opacity-50"
                   >
                     {carregandoPixCode ? "Gerando..." : "Gerar Chave PIX"}

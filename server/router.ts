@@ -67,7 +67,7 @@ const appRouter = t.router({
   generatePixCode: publicProcedure
     .input(
       z.object({
-        value: z.number().min(1, "O valor deve ser maior que zero"),
+        value: z.number().gt(0, "O valor deve ser maior que zero"),
         presenteNome: z.string().optional(),
       })
     )
@@ -99,7 +99,7 @@ const appRouter = t.router({
         convidadoId: z.string(),
         convidadoNome: z.string(),
         presenteNome: z.string(),
-        valor: z.number().min(1, "O valor deve ser maior que zero"),
+        valor: z.number().gt(0, "O valor deve ser maior que zero"),
         pix: z.string(),
         status: z.string(),
       })
