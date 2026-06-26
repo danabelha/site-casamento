@@ -143,6 +143,16 @@ export default function Confirmacao() {
   const searchMutation = trpc.searchConvidados.useMutation();
   const confirmarMutation = trpc.confirmarPresenca.useMutation();
 
+  // Correção 1: Eliminar efeito de zoom / salto após localizar convidado
+  useEffect(() => {
+    if (convidadoSelecionado) {
+      window.scrollTo({
+        top: 0,
+        behavior: "instant"
+      });
+    }
+  }, [convidadoSelecionado]);
+
   const handleSearch = async () => {
     if (!nomeBusca.trim() || carregandoBusca) return;
     try {
@@ -328,6 +338,7 @@ export default function Confirmacao() {
             <FadeSection className="mb-16 md:mb-32">
               <SectionDivider title="Presentes" />
               <div className="relative px-4 md:px-6">
+                {/* Correção 2: Dica discreta de navegação horizontal */}
                 <p className="text-center font-montserrat text-[10px] md:text-[12px] text-wedding-charcoal/40 uppercase tracking-[0.2em] mb-6 md:hidden">
                   Deslize para descobrir mais presentes →
                 </p>
@@ -394,26 +405,48 @@ export default function Confirmacao() {
               </div>
             </FadeSection>
 
-            {/* 4. Localização */}
+            {/* 4. Localização - Correção 3: Refinar Seção Localização */}
             <div className="bg-[#462F29] py-16 md:py-32 mb-16 md:mb-32">
               <FadeSection className="px-6">
                 <div className="text-center mb-12">
-                  <h2 className="font-cormorant font-light text-white text-[28px] md:text-[42px] leading-tight mb-4">Localização</h2>
+                  <h2 className="font-cormorant font-light text-white text-[28px] md:text-[42px] leading-tight mb-4 uppercase tracking-widest">Localização</h2>
                   <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />
                 </div>
-                <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
-                  <div className="text-center md:text-right space-y-6">
-                    <h3 className="font-halimun text-[32px] text-wedding-gold">Celeiro Quintal</h3>
-                    <div className="space-y-2">
-                      <p className="text-[16px] font-light text-white/90 tracking-wide">05 de Dezembro de 2026, 18:00</p>
-                      <p className="text-[14px] font-light text-white/70 leading-relaxed">R. Cônego Eugênio Leite, 1098<br />Pinheiros, São Paulo - SP</p>
+                
+                <div className="max-w-5xl mx-auto flex flex-col items-center text-center space-y-10">
+                  <div className="space-y-6">
+                    <h3 className="font-halimun text-[32px] md:text-[42px] text-wedding-gold">Celeiro Quintal</h3>
+                    
+                    <div className="space-y-3">
+                      <p className="text-[16px] md:text-[18px] font-light text-white/90 tracking-[0.1em]">05 de Dezembro de 2026 • 18h</p>
+                      <div className="text-[14px] md:text-[16px] font-light text-white/70 leading-relaxed uppercase tracking-widest">
+                        <p>R. Cônego Eugênio Leite, 1098</p>
+                        <p>Pinheiros • São Paulo</p>
+                      </div>
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-end">
-                      <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-block bg-wedding-gold text-white px-8 py-3 text-[10px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#462F29] transition-all shadow-lg">Ver no Mapa</a>
-                      <a href="https://www.instagram.com/celeiroquintal/" target="_blank" rel="noopener noreferrer" className="inline-block border border-wedding-gold text-wedding-gold px-8 py-3 text-[10px] uppercase tracking-[0.3em] hover:bg-wedding-gold hover:text-white transition-all shadow-lg">Conhecer o Espaço</a>
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                      <a 
+                        href={MAPS_URL} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="inline-block bg-wedding-gold text-white px-10 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#462F29] transition-all shadow-lg font-bold min-w-[220px]"
+                      >
+                        Ver no Mapa
+                      </a>
+                      <a 
+                        href="https://www.instagram.com/celeiroquintal/" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="inline-block border border-wedding-gold text-wedding-gold px-10 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-wedding-gold hover:text-white transition-all shadow-lg font-bold min-w-[220px]"
+                      >
+                        Conhecer o Espaço
+                      </a>
                     </div>
                   </div>
-                  <div className="h-[240px] md:h-[420px] bg-white p-2 rounded-sm shadow-2xl overflow-hidden transform md:rotate-1">
+
+                  {/* Mapa com altura reduzida */}
+                  <div className="w-full h-[220px] md:h-[420px] bg-white p-2 rounded-sm shadow-2xl overflow-hidden transform md:rotate-1">
                     <iframe 
                       width="100%" 
                       height="100%" 
