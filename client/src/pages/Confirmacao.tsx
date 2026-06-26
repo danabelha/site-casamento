@@ -341,7 +341,7 @@ export default function Confirmacao() {
             </button>
           </FadeSection>
         ) : (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <div className="">
             {/* 1. Boas-vindas */}
             <FadeSection className="text-center mb-16 md:mb-24 px-6">
               <h2 className="font-halimun text-[32px] md:text-[48px] text-[#462F29] mb-6">
