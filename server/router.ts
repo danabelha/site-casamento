@@ -9,7 +9,11 @@ import {
   adicionarConvidado,
   atualizarConvidado,
   deletarConvidado,
+  registrarIntencaoPresente,
+  listarIntencoesPresentes,
+  calcularRankingPresentes,
 } from "./googleSheets";
+
 
 // 1. Definição do Contexto
 export type Context = CreateExpressContextOptions;
@@ -57,6 +61,22 @@ const appRouter = t.router({
     )
     .mutation(async ({ input }) => {
       const ok = await salvarConfirmacao(input);
+      return { success: ok };
+    }),
+
+  registrarPresente: publicProcedure
+    .input(
+      z.object({
+        convidadoId: z.string(),
+        convidadoNome: z.string(),
+        presenteNome: z.string(),
+        valor: z.number().min(1, "O valor deve ser maior que zero"),
+        pix: z.string(),
+        status: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const ok = await registrarIntencaoPresente(input);
       return { success: ok };
     }),
 
@@ -134,6 +154,10 @@ const appRouter = t.router({
       });
 
       return stats;
+    }),
+
+    getRankingPresentes: adminProcedure.query(async () => {
+      return await calcularRankingPresentes();
     }),
   }),
 });

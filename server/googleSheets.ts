@@ -41,6 +41,33 @@ export interface ConvidadoRow {
   limite: number;
 }
 
+export interface PresenteIntencaoRow {
+  id?: string; // Gerado automaticamente
+  convidadoId: string;
+  convidadoNome: string;
+  presenteNome: string;
+  valor: number;
+  pix: string;
+  status: string;
+  dataHora?: string; // Gerado automaticamente
+}
+
+const SHEET_PRESENTES_NAME = "Presentes";
+
+  id: string;
+  nome: string;
+  email: string;
+  telefone: string;
+  status: string;
+  acompanhantes: number;
+  criancas: number;
+  menores8: number;
+  dataConfirmacao: string;
+  acompanhanteDetalhes?: string;
+  mensagem?: string;
+  limite: number;
+}
+
 function normalizar(texto: string) {
   return texto
     .toLowerCase()
@@ -210,6 +237,155 @@ export async function atualizarConvidado(id: string, data: Partial<ConvidadoRow>
 }
 
 export async function deletarConvidado(id: string) {
+  const sheetId = getSheetId();
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${SHEET_NAME}!A:A`,
+  });
+  
+  const rows = response.data.values || [];
+  const index = rows.findIndex((row, i) => i > 0 && row[0] === id);
+  if (index === -1) return false;
+
+  const sheet = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
+  const sheetObj = sheet.data.sheets?.find(s => s.properties?.title === SHEET_NAME);
+  const sheetInternalId = sheetObj?.properties?.sheetId;
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: [{
+        deleteDimension: {
+          range: {
+            sheetId: sheetInternalId,
+            dimension: "ROWS",
+            startIndex: index,
+            endIndex: index + 1
+          }
+        }
+      }]
+    }
+  });
+
+  cacheConvidados = null;
+  return true;
+}
+
+async function garantirAbaPresentes() {
+  const sheetId = getSheetId();
+  const sheetsMeta = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
+  const abaPresentesExiste = sheetsMeta.data.sheets?.some(s => s.properties?.title === SHEET_PRESENTES_NAME);
+
+  if (!abaPresentesExiste) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: {
+        requests: [{
+          addSheet: {
+            properties: {
+              title: SHEET_PRESENTES_NAME,
+            },
+          },
+        }],
+      },
+    });
+
+    // Adicionar cabeçalhos
+    const headers = ["id", "convidadoId", "convidadoNome", "presenteNome", "valor", "pix", "status", "dataHora"];
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${SHEET_PRESENTES_NAME}!A1`,
+      valueInputOption: "RAW",
+      requestBody: { values: [headers] },
+    });
+  }
+}
+
+export async function registrarIntencaoPresente(data: PresenteIntencaoRow) {
+  await garantirAbaPresentes();
+  const sheetId = getSheetId();
+
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${SHEET_PRESENTES_NAME}!A:A`,
+  });
+  const rows = response.data.values || [];
+  let novoId = 1;
+  if (rows.length > 1) { // Ignora o cabeçalho
+    const ids = rows.slice(1).map(row => parseInt(row[0])).filter(id => !isNaN(id));
+    if (ids.length > 0) novoId = Math.max(...ids) + 1;
+  }
+
+  const novaLinha = [
+    novoId.toString(),
+    data.convidadoId,
+    data.convidadoNome,
+    data.presenteNome,
+    data.valor.toString(),
+    data.pix,
+    data.status,
+    new Date().toLocaleString("pt-BR"),
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${SHEET_PRESENTES_NAME}!A:H`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [novaLinha] },
+  });
+
+  return true;
+}
+
+export async function listarIntencoesPresentes(): Promise<PresenteIntencaoRow[]> {
+  await garantirAbaPresentes();
+  const sheetId = getSheetId();
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${SHEET_PRESENTES_NAME}!A:H`,
+  });
+
+  const rows = response.data.values || [];
+  if (rows.length <= 1) return []; // Apenas cabeçalho
+
+  return rows.slice(1).map(row => ({
+    id: row[0],
+    convidadoId: row[1],
+    convidadoNome: row[2],
+    presenteNome: row[3],
+    valor: parseFloat(row[4]),
+    pix: row[5],
+    status: row[6],
+    dataHora: row[7],
+  }));
+}
+
+export async function calcularRankingPresentes() {
+  const intencoes = await listarIntencoesPresentes();
+  const rankingMap = new Map<string, { quantidade: number; valorTotal: number }>();
+
+  intencoes.forEach(intencao => {
+    if (rankingMap.has(intencao.presenteNome)) {
+      const current = rankingMap.get(intencao.presenteNome)!;
+      current.quantidade++;
+      current.valorTotal += intencao.valor;
+      rankingMap.set(intencao.presenteNome, current);
+    } else {
+      rankingMap.set(intencao.presenteNome, { quantidade: 1, valorTotal: intencao.valor });
+    }
+  });
+
+  const ranking = Array.from(rankingMap.entries()).map(([presenteNome, data]) => ({
+    presenteNome,
+    quantidade: data.quantidade,
+    valorTotal: data.valorTotal,
+  }));
+
+  ranking.sort((a, b) => b.valorTotal - a.valorTotal);
+
+  return ranking;
+}
+
   const sheetId = getSheetId();
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
