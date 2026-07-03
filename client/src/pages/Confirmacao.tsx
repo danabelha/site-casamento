@@ -398,21 +398,21 @@ export default function Confirmacao() {
             </FadeSection>
 
             {/* 2. Nossa História */}
-            <section className="relative px-4 sm:px-6 mb-11 md:mb-17">
+            <section className="relative px-4 sm:px-6 mb-11 md:mb-22">
               <SectionDivider title="Nossa História" />
               <div className="relative max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
                   <div 
                     key={index} 
-                    className="sticky top-0 h-[75vh] md:h-[85vh] flex flex-col md:flex-row items-center justify-center gap-3 md:gap-5 py-2"
+                    className="sticky top-0 h-[75vh] md:h-[85vh] flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6 py-2"
                   >
                     <div className={`w-full md:w-1/2 flex justify-center transition-all duration-700 animate-in fade-in zoom-in-95`}>
                       <div 
-                        className={`bg-white p-3 md:p-4 shadow-[0_30px_70px_rgba(0,0,0,0.38)] transition-all duration-700 hover:scale-[1.03]
-                          ${index === 0 ? 'rotate-[-2deg] translate-x-[-12px] translate-y-[-8px]' : 
-                            index === 1 ? 'rotate-[3deg] translate-x-[15px] translate-y-[10px]' : 
-                            index === 2 ? 'rotate-[-4deg] translate-x-[-20px] translate-y-[-12px]' : 
-                            'rotate-[2deg] translate-x-[18px] translate-y-[8px]'}`}
+                        className={`bg-white p-3 md:p-4 shadow-[0_35px_80px_rgba(0,0,0,0.4)] transition-all duration-700 hover:scale-[1.03]
+                          ${index === 0 ? 'rotate-[-2.5deg] translate-x-[-14px] translate-y-[-10px]' : 
+                            index === 1 ? 'rotate-[3.5deg] translate-x-[18px] translate-y-[12px]' : 
+                            index === 2 ? 'rotate-[-4.5deg] translate-x-[-22px] translate-y-[-15px]' : 
+                            'rotate-[2.5deg] translate-x-[20px] translate-y-[10px]'}`}
                       >
                         <img 
                           src={item.url} 
@@ -486,12 +486,12 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 4. Localização */}
-            <div className="bg-[#FDFAF6] py-12 md:py-18">
+            <div className="bg-[#FDFAF6] py-13 md:py-19">
               <FadeSection className="max-w-4xl mx-auto px-6 text-center">
                 <SectionDivider title="Localização" />
                 <div className="space-y-6">
                   <div className="space-y-4">
-                    <h3 className="font-halimun text-[35px] md:text-[46px] text-[#462F29] font-medium">Celeiro Quintal</h3>
+                    <h3 className="font-halimun text-[35.5px] md:text-[46.5px] text-[#462F29] font-medium">Celeiro Quintal</h3>
                     <p className="font-montserrat text-[12px] md:text-[14px] text-wedding-gold uppercase tracking-[0.3em] font-bold">
                       05 de Dezembro de 2026 • 18h
                     </p>
@@ -526,7 +526,7 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 5. Confirmação de Presença */}
-            <div id="rsvp-section" className="bg-[#462F29] py-13 md:py-26">
+            <div id="rsvp-section" className="bg-[#462F29] py-13 md:py-25">
               <FadeSection className="max-w-[700px] mx-auto px-6 text-center">
                 <div className="text-center mb-8">
                   <p className="font-montserrat text-[10px] md:text-[12px] text-white/40 uppercase tracking-[0.25em] mb-4">
