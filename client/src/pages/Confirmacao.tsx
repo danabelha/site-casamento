@@ -101,6 +101,18 @@ function SectionDivider({ title, isVerification = false }: { title: string; isVe
   );
 }
 
+function SectionSeparator() {
+  return (
+    <div className="w-full flex justify-center py-12 md:py-20 opacity-20">
+      <div className="flex items-center gap-4">
+        <div className="w-16 md:w-32 h-[0.5px] bg-wedding-gold"></div>
+        <div className="w-2 h-2 border border-wedding-gold rotate-45"></div>
+        <div className="w-16 md:w-32 h-[0.5px] bg-wedding-gold"></div>
+      </div>
+    </div>
+  );
+}
+
 function FadeSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -392,28 +404,28 @@ export default function Confirmacao() {
                 {GALLERY_ITEMS.map((item, index) => (
                   <div 
                     key={index} 
-                    className="sticky top-0 min-h-[70vh] md:min-h-[85vh] flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 py-10 md:py-16 bg-[#FDFAF6]"
+                    className="sticky top-0 h-[75vh] md:h-[85vh] flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 py-6"
                   >
                     <div className={`w-full md:w-1/2 flex justify-center transition-all duration-700 animate-in fade-in zoom-in-95`}>
                       <div 
-                        className="bg-white p-3 pb-12 shadow-2xl transform transition-transform hover:rotate-0 duration-500"
-                        style={{ rotate: index % 2 === 0 ? '-2deg' : '2deg' }}
+                        className={`bg-white p-3 md:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-700 hover:scale-105
+                          ${index === 0 ? 'rotate-[-1deg] translate-x-[-5px]' : 
+                            index === 1 ? 'rotate-[2deg] translate-x-[10px]' : 
+                            index === 2 ? 'rotate-[-2deg] translate-x-[-8px]' : 
+                            'rotate-[1deg] translate-x-[5px]'}`}
                       >
                         <img 
                           src={item.url} 
                           alt={item.titulo} 
-                          className="w-[200px] h-[250px] md:w-[350px] md:h-[450px] object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-500"
+                          className="w-[180px] h-[230px] md:w-[320px] md:h-[420px] object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-500"
                         />
-                        <div className="absolute bottom-4 left-0 right-0 text-center font-halimun text-wedding-gold text-lg md:text-2xl">
-                          Mari & Dani
-                        </div>
                       </div>
                     </div>
-                    <div className="w-full md:w-1/2 text-center md:text-left space-y-4 md:space-y-6 px-4">
-                      <h3 className="font-cormorant text-[28px] md:text-[42px] text-[#462F29] leading-tight">
+                    <div className="w-full md:w-1/2 text-center md:text-left space-y-3 md:space-y-4 px-8 py-8 bg-[#462F29] shadow-2xl relative z-10">
+                      <h3 className="font-cormorant text-[24px] md:text-[36px] text-wedding-gold uppercase tracking-widest leading-tight">
                         {item.titulo}
                       </h3>
-                      <p className="font-montserrat text-[14px] md:text-[16px] text-wedding-charcoal/70 leading-relaxed font-light">
+                      <p className="font-montserrat text-[12px] md:text-[14px] text-white/90 leading-relaxed font-light">
                         {item.texto}
                       </p>
                     </div>
@@ -422,17 +434,19 @@ export default function Confirmacao() {
               </div>
             </section>
 
+            <SectionSeparator />
+
             {/* 3. Presentes */}
             <section className="px-4 sm:px-6 mb-16 md:mb-24 overflow-x-hidden">
               <SectionDivider title="Presentes" />
               <div className="max-w-6xl mx-auto">
-                <p className="text-center font-montserrat text-[10px] md:text-[11px] text-wedding-gold uppercase tracking-[0.2em] mb-8 md:hidden">
+                <p className="text-center font-montserrat text-[9px] md:text-[10px] text-wedding-gold/40 uppercase tracking-[0.2em] mb-8 md:hidden">
                   Deslize para descobrir mais presentes →
                 </p>
                 <div className="flex overflow-x-auto pb-12 gap-6 md:grid md:grid-cols-3 md:overflow-visible scrollbar-hide px-4 md:px-0">
                   {PRESENTES.map((p, i) => (
                     <FadeSection key={i} className="min-w-[85vw] md:min-w-0 group">
-                      <div className="bg-white border border-[#D4AF37]/20 p-4 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col h-full rounded-sm transform hover:-translate-y-2">
+                      <div className="bg-white border border-[#D4AF37]/10 p-4 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col h-full rounded-sm transform hover:-translate-y-2">
                         <div className="overflow-hidden mb-6 aspect-[4/5] relative">
                           <img 
                             src={p.foto} 
@@ -469,8 +483,10 @@ export default function Confirmacao() {
               </div>
             </section>
 
+            <SectionSeparator />
+
             {/* 4. Localização */}
-            <div className="bg-[#FDFAF6] py-16 md:py-24 border-t border-b border-wedding-gold/10">
+            <div className="bg-[#FDFAF6] py-16 md:py-24">
               <FadeSection className="max-w-4xl mx-auto px-6 text-center">
                 <SectionDivider title="Localização" />
                 <div className="space-y-12">
@@ -506,6 +522,8 @@ export default function Confirmacao() {
                 </div>
               </FadeSection>
             </div>
+
+            <SectionSeparator />
 
             {/* 5. Confirmação de Presença */}
             <div className="bg-[#462F29] py-16 md:py-32">
