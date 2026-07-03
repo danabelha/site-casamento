@@ -486,12 +486,12 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 4. Localização */}
-            <div className="bg-[#FDFAF6] py-16 md:py-24">
+            <div className="bg-[#FDFAF6] py-12 md:py-16">
               <FadeSection className="max-w-4xl mx-auto px-6 text-center">
                 <SectionDivider title="Localização" />
-                <div className="space-y-12">
+                <div className="space-y-8">
                   <div className="space-y-6">
-                    <h3 className="font-halimun text-[32px] md:text-[42px] text-[#462F29]">Celeiro Quintal</h3>
+                    <h3 className="font-halimun text-[35px] md:text-[46px] text-[#462F29] font-medium">Celeiro Quintal</h3>
                     <p className="font-montserrat text-[12px] md:text-[14px] text-wedding-gold uppercase tracking-[0.3em] font-bold">
                       05 de Dezembro de 2026 • 18h
                     </p>
@@ -526,9 +526,9 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 5. Confirmação de Presença */}
-            <div className="bg-[#462F29] py-16 md:py-32">
+            <div id="rsvp-section" className="bg-[#462F29] py-12 md:py-20">
               <FadeSection className="max-w-[700px] mx-auto px-6 text-center">
-                <div className="text-center mb-12">
+                <div className="text-center mb-10">
                   <p className="font-montserrat text-[10px] md:text-[12px] text-white/40 uppercase tracking-[0.25em] mb-4">
                     Esperamos você para celebrar conosco.
                   </p>
