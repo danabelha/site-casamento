@@ -398,26 +398,26 @@ export default function Confirmacao() {
             </FadeSection>
 
             {/* 2. Nossa História */}
-            <section className="relative px-4 sm:px-6 mb-16 md:mb-24">
+            <section className="relative px-4 sm:px-6 mb-10 md:mb-16">
               <SectionDivider title="Nossa História" />
               <div className="relative max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
                   <div 
                     key={index} 
-                    className="sticky top-0 h-[75vh] md:h-[85vh] flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 py-6"
+                    className="sticky top-0 h-[75vh] md:h-[85vh] flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 py-2"
                   >
                     <div className={`w-full md:w-1/2 flex justify-center transition-all duration-700 animate-in fade-in zoom-in-95`}>
                       <div 
-                        className={`bg-white p-3 md:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-700 hover:scale-105
-                          ${index === 0 ? 'rotate-[-1deg] translate-x-[-5px]' : 
-                            index === 1 ? 'rotate-[2deg] translate-x-[10px]' : 
-                            index === 2 ? 'rotate-[-2deg] translate-x-[-8px]' : 
-                            'rotate-[1deg] translate-x-[5px]'}`}
+                        className={`bg-white p-3 md:p-4 shadow-[0_30px_70px_rgba(0,0,0,0.38)] transition-all duration-700 hover:scale-[1.03]
+                          ${index === 0 ? 'rotate-[-2deg] translate-x-[-12px] translate-y-[-8px]' : 
+                            index === 1 ? 'rotate-[3deg] translate-x-[15px] translate-y-[10px]' : 
+                            index === 2 ? 'rotate-[-4deg] translate-x-[-20px] translate-y-[-12px]' : 
+                            'rotate-[2deg] translate-x-[18px] translate-y-[8px]'}`}
                       >
                         <img 
                           src={item.url} 
                           alt={item.titulo} 
-                          className="w-[180px] h-[230px] md:w-[320px] md:h-[420px] object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-500"
+                          className="w-[207px] h-[265px] md:w-[352px] md:h-[462px] object-cover grayscale-[5%] hover:grayscale-0 transition-all duration-500"
                         />
                       </div>
                     </div>
@@ -437,10 +437,10 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 3. Presentes */}
-            <section className="px-4 sm:px-6 mb-16 md:mb-24 overflow-x-hidden">
+            <section className="px-4 sm:px-6 mb-12 md:mb-18 overflow-x-hidden">
               <SectionDivider title="Presentes" />
-              <div className="max-w-6xl mx-auto">
-                <p className="text-center font-montserrat text-[9px] md:text-[10px] text-wedding-gold/40 uppercase tracking-[0.2em] mb-8 md:hidden">
+              <div className="max-w-6xl mx-auto -mt-6">
+                <p className="text-center font-montserrat text-[9px] md:text-[10px] text-wedding-gold/25 uppercase tracking-[0.2em] mb-4 md:hidden">
                   Deslize para descobrir mais presentes →
                 </p>
                 <div className="flex overflow-x-auto pb-12 gap-6 md:grid md:grid-cols-3 md:overflow-visible scrollbar-hide px-4 md:px-0">
@@ -486,12 +486,12 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 4. Localização */}
-            <div className="bg-[#FDFAF6] py-12 md:py-16">
+            <div className="bg-[#FDFAF6] py-12 md:py-18">
               <FadeSection className="max-w-4xl mx-auto px-6 text-center">
                 <SectionDivider title="Localização" />
-                <div className="space-y-8">
-                  <div className="space-y-6">
-                    <h3 className="font-halimun text-[35px] md:text-[46px] text-[#462F29] font-medium">Celeiro Quintal</h3>
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <h3 className="font-halimun text-[36px] md:text-[48px] text-[#462F29] font-medium">Celeiro Quintal</h3>
                     <p className="font-montserrat text-[12px] md:text-[14px] text-wedding-gold uppercase tracking-[0.3em] font-bold">
                       05 de Dezembro de 2026 • 18h
                     </p>
@@ -526,9 +526,9 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 5. Confirmação de Presença */}
-            <div id="rsvp-section" className="bg-[#462F29] py-12 md:py-20">
+            <div id="rsvp-section" className="bg-[#462F29] py-12 md:py-24">
               <FadeSection className="max-w-[700px] mx-auto px-6 text-center">
-                <div className="text-center mb-10">
+                <div className="text-center mb-8">
                   <p className="font-montserrat text-[10px] md:text-[12px] text-white/40 uppercase tracking-[0.25em] mb-4">
                     Esperamos você para celebrar conosco.
                   </p>
