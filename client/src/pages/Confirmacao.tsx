@@ -404,24 +404,24 @@ export default function Confirmacao() {
                 {GALLERY_ITEMS.map((item, index) => (
                   <div 
                     key={index} 
-                    className="sticky top-0 h-[75vh] md:h-[85vh] flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6 py-2"
+                    className="sticky top-0 h-[75vh] md:h-[85vh] flex flex-col md:flex-row items-center justify-center gap-1 md:gap-4 py-1"
                   >
                     <div className={`w-full md:w-1/2 flex justify-center transition-all duration-700 animate-in fade-in zoom-in-95`}>
                       <div 
-                        className={`bg-white p-3 md:p-4 shadow-[0_35px_80px_rgba(0,0,0,0.4)] transition-all duration-700 hover:scale-[1.03]
-                          ${index === 0 ? 'rotate-[-2.5deg] translate-x-[-14px] translate-y-[-10px]' : 
-                            index === 1 ? 'rotate-[3.5deg] translate-x-[18px] translate-y-[12px]' : 
-                            index === 2 ? 'rotate-[-4.5deg] translate-x-[-22px] translate-y-[-15px]' : 
-                            'rotate-[2.5deg] translate-x-[20px] translate-y-[10px]'}`}
+                        className={`bg-white p-4 md:p-5 shadow-[0_40px_90px_rgba(0,0,0,0.45)] transition-all duration-700 hover:scale-[1.02]
+                          ${index === 0 ? 'rotate-[-2.8deg] translate-x-[-16px] translate-y-[-12px]' : 
+                            index === 1 ? 'rotate-[3.8deg] translate-x-[20px] translate-y-[14px]' : 
+                            index === 2 ? 'rotate-[-4.8deg] translate-x-[-24px] translate-y-[-18px]' : 
+                            'rotate-[2.8deg] translate-x-[22px] translate-y-[12px]'}`}
                       >
                         <img 
                           src={item.url} 
                           alt={item.titulo} 
-                          className="w-[207px] h-[265px] md:w-[352px] md:h-[462px] object-cover grayscale-[5%] hover:grayscale-0 transition-all duration-500"
+                          className="w-[238px] h-[305px] md:w-[387px] md:h-[508px] object-cover grayscale-[5%] hover:grayscale-0 transition-all duration-500"
                         />
                       </div>
                     </div>
-                    <div className="w-full md:w-1/2 text-center md:text-left space-y-3 md:space-y-4 px-8 py-8 bg-[#462F29] shadow-2xl relative z-10">
+                    <div className="w-full md:w-1/2 text-center md:text-left space-y-2 md:space-y-3 px-7 py-7 bg-[#462F29] shadow-2xl relative z-10">
                       <h3 className="font-cormorant text-[24px] md:text-[36px] text-wedding-gold uppercase tracking-widest leading-tight">
                         {item.titulo}
                       </h3>
