@@ -103,11 +103,11 @@ function SectionDivider({ title, isVerification = false }: { title: string; isVe
 
 function SectionSeparator() {
   return (
-    <div className="w-full flex justify-center py-12 md:py-20 opacity-20">
-      <div className="flex items-center gap-4">
-        <div className="w-16 md:w-32 h-[0.5px] bg-wedding-gold"></div>
-        <div className="w-2 h-2 border border-wedding-gold rotate-45"></div>
-        <div className="w-16 md:w-32 h-[0.5px] bg-wedding-gold"></div>
+    <div className="w-full flex justify-center py-8 md:py-12 opacity-[0.28]">
+      <div className="flex items-center gap-3">
+        <div className="w-12 md:w-20 h-[0.5px] bg-wedding-gold"></div>
+        <div className="w-1.5 h-1.5 border border-wedding-gold rotate-45"></div>
+        <div className="w-12 md:w-20 h-[0.5px] bg-wedding-gold"></div>
       </div>
     </div>
   );
@@ -398,7 +398,7 @@ export default function Confirmacao() {
             </FadeSection>
 
             {/* 2. Nossa História */}
-            <section className="relative px-4 sm:px-6 mb-11 md:mb-22">
+            <section className="relative px-4 sm:px-6 mb-8 md:mb-16">
               <SectionDivider title="Nossa História" />
               <div className="relative max-w-5xl mx-auto">
                 {GALLERY_ITEMS.map((item, index) => (
@@ -437,7 +437,7 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 3. Presentes */}
-            <section className="px-4 sm:px-6 mb-12 md:mb-18 overflow-x-hidden">
+            <section className="px-4 sm:px-6 mb-10 md:mb-14 overflow-x-hidden">
               <SectionDivider title="Presentes" />
               <div className="max-w-6xl mx-auto -mt-6">
                 <p className="text-center font-montserrat text-[9px] md:text-[10px] text-wedding-gold/25 uppercase tracking-[0.2em] mb-4 md:hidden">
@@ -486,7 +486,7 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 4. Localização */}
-            <div className="bg-[#FDFAF6] py-13 md:py-19">
+            <div className="bg-[#FDFAF6] py-11 md:py-15">
               <FadeSection className="max-w-4xl mx-auto px-6 text-center">
                 <SectionDivider title="Localização" />
                 <div className="space-y-6">
@@ -526,7 +526,7 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 5. Confirmação de Presença */}
-            <div id="rsvp-section" className="bg-[#462F29] py-13 md:py-25">
+            <div id="rsvp-section" className="bg-[#462F29] py-11 md:py-20">
               <FadeSection className="max-w-[700px] mx-auto px-6 text-center">
                 <div className="text-center mb-8">
                   <p className="font-montserrat text-[10px] md:text-[12px] text-white/40 uppercase tracking-[0.25em] mb-4">
