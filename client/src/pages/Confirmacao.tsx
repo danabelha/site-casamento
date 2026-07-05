@@ -140,6 +140,21 @@ function FadeSection({ children, className = "" }: { children: React.ReactNode; 
 // ===== COMPONENTE PRINCIPAL =====
 
 export default function Confirmacao() {
+  // Adicionando animação customizada para a seta de navegação
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes bounce-x {
+        0%, 100% { transform: translateX(0); }
+        50% { transform: translateX(5px); }
+      }
+      .animate-bounce-x {
+        animation: bounce-x 1.5s infinite;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => { document.head.removeChild(style); };
+  }, []);
   const [nomeBusca, setNomeBusca] = useState("");
   const [convidadoSelecionado, setConvidadoSelecionado] = useState<any>(null);
   const [resposta, setResposta] = useState<"Confirmado" | "Talvez" | "Não Irá" | null>(null);
@@ -440,27 +455,27 @@ export default function Confirmacao() {
             <section className="px-4 sm:px-6 mb-10 md:mb-14 overflow-x-hidden">
               <SectionDivider title="Presentes" />
               <div className="max-w-6xl mx-auto -mt-6">
-                <p className="text-center font-montserrat text-[9px] md:text-[10px] text-wedding-gold/25 uppercase tracking-[0.2em] mb-4 md:hidden">
-                  Deslize para descobrir mais presentes →
+                <p className="text-center font-montserrat text-[9px] md:text-[10px] text-wedding-gold/20 uppercase tracking-[0.25em] mb-6 md:hidden animate-in fade-in duration-1000">
+                  Deslize para descobrir mais presentes <span className="inline-block animate-bounce-x ml-1">→</span>
                 </p>
-                <div className="flex overflow-x-auto pb-12 gap-6 md:grid md:grid-cols-3 md:overflow-visible scrollbar-hide px-4 md:px-0">
+                <div className="flex overflow-x-auto pb-12 gap-5 md:grid md:grid-cols-3 md:overflow-visible scrollbar-hide px-6 md:px-0 snap-x snap-mandatory scroll-smooth">
                   {PRESENTES.map((p, i) => (
-                    <FadeSection key={i} className="min-w-[85vw] md:min-w-0 group">
-                      <div className="bg-white border border-[#D4AF37]/10 p-4 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col h-full rounded-sm transform hover:-translate-y-2">
-                        <div className="overflow-hidden mb-6 aspect-[4/5] relative">
+                    <FadeSection key={i} className="min-w-[78vw] md:min-w-0 group snap-center">
+                      <div className="bg-white border border-[#D4AF37]/5 p-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] transition-all duration-[220ms] flex flex-col h-full rounded-[2px] transform hover:-translate-y-1 active:scale-[0.98] md:active:scale-100">
+                        <div className="overflow-hidden mb-5 aspect-[4/5] relative rounded-[1px]">
                           <img 
                             src={p.foto} 
                             alt={p.nome} 
-                            className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
+                            className="w-full h-full object-cover grayscale-[25%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
                           />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500" />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-500" />
                         </div>
-                        <div className="flex-grow text-center flex flex-col justify-between px-2">
+                        <div className="flex-grow text-center flex flex-col justify-between px-1">
                           <div>
-                            <h3 className="font-montserrat font-bold text-[12px] md:text-[13px] text-[#462F29] uppercase tracking-[0.15em] mb-3 leading-snug break-words">
+                            <h3 className="font-montserrat font-bold text-[12px] md:text-[13px] text-[#462F29] uppercase tracking-[0.12em] mb-2.5 leading-snug break-words">
                               {p.nome}
                             </h3>
-                            <p className="font-montserrat text-[11px] md:text-[12px] text-[#462F29]/60 leading-relaxed italic min-h-[40px] mb-6">
+                            <p className="font-montserrat text-[11px] md:text-[12px] text-[#462F29]/60 leading-relaxed italic min-h-[40px] mb-5">
                               {p.descricao}
                             </p>
                           </div>
@@ -471,7 +486,7 @@ export default function Confirmacao() {
                               setOutroValor("");
                               setPixGerado(null);
                             }}
-                            className="w-full border border-[#462F29] text-[#462F29] py-3 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#462F29] hover:text-white transition-all duration-300"
+                            className="w-full border border-[#462F29] text-[#462F29] py-3 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#462F29] hover:text-white transition-all duration-[220ms]"
                           >
                             Presentear via PIX
                           </button>
@@ -742,60 +757,65 @@ export default function Confirmacao() {
                 {PRESENTES[modalPresenteAberto].descricao}
               </p>
 
-              <div className="mb-6">
-                <p className="text-[12px] font-montserrat font-semibold text-[#462F29] mb-3 uppercase tracking-[0.1em]">
-                  Selecione um valor:
-                </p>
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  {[50, 100, 150, 200].map(valor => (
-                    <button
-                      key={valor}
-                      onClick={() => {
-                        setValorSelecionado(valor);
-                        setOutroValor("");
-                      }}
-                      className={`py-2 px-3 rounded-sm text-[12px] font-bold uppercase tracking-[0.1em] transition-all ${
-                        valorSelecionado === valor
-                          ? 'bg-[#D4AF37] text-[#462F29]'
-                          : 'bg-[#462F29]/10 text-[#462F29] hover:bg-[#462F29]/20'
-                      }`}
-                    >
-                      R$ {valor}
-                    </button>
-                  ))}
+              <div className="space-y-5 mb-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="text-center">
+                  <p className="text-[10px] font-montserrat text-[#462F29]/40 uppercase tracking-[0.2em] mb-1">Cota selecionada:</p>
+                  <h4 className="text-[14px] font-bold text-[#462F29] uppercase tracking-wide leading-tight px-4">{PRESENTES[modalPresenteAberto].nome}</h4>
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <div className="flex gap-2 items-center">
+                <div className="space-y-3">
+                  <p className="text-[11px] font-montserrat text-[#462F29]/80 uppercase tracking-[0.1em] text-center">
+                    Escolha um valor:
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[50, 100, 200, 300, 500, 1000].map((valor) => (
+                      <button
+                        key={valor}
+                        onClick={() => {
+                          setValorSelecionado(valor);
+                          setOutroValor("");
+                        }}
+                        className={`py-2.5 px-3 rounded-[2px] text-[12px] font-bold uppercase tracking-[0.1em] transition-all duration-200 ${
+                          valorSelecionado === valor
+                            ? 'bg-[#D4AF37] text-[#462F29] shadow-md scale-[1.02]'
+                            : 'bg-[#462F29]/5 text-[#462F29] border border-[#462F29]/10 hover:bg-[#462F29]/10'
+                        }`}
+                      >
+                        R$ {valor}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col gap-2">
                     <input
                       type="text"
                       inputMode="numeric"
-                      placeholder="Outro valor"
+                      placeholder="Ou digite outro valor"
                       value={outroValor}
                       onChange={(e) => {
                         const formatado = formatarMoeda(e.target.value);
                         setOutroValor(formatado);
                         setValorSelecionado(null);
                       }}
-                      className="flex-1 px-3 py-3 border border-[#462F29]/20 rounded-sm text-[16px] focus:outline-none focus:border-[#D4AF37] font-montserrat"
+                      className="w-full px-4 py-3.5 border border-[#462F29]/10 rounded-[2px] text-[16px] focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/20 font-montserrat transition-all placeholder:text-[#462F29]/30"
                     />
+                    {valorInvalido && !valorSelecionado && outroValor !== "" && (
+                      <p className="text-[10px] text-red-500 font-montserrat italic text-center">
+                        Informe um valor maior que R$ 0,00 para gerar o PIX.
+                      </p>
+                    )}
                   </div>
-                  {valorInvalido && !valorSelecionado && outroValor !== "" && (
-                    <p className="text-[10px] text-red-500 font-montserrat italic">
-                      Informe um valor maior que R$ 0,00 para gerar o PIX.
-                    </p>
-                  )}
                 </div>
               </div>
 
               {!pixGerado ? (
-                <>
+                <div className="animate-in fade-in duration-500">
                   <button
                     onClick={() => handleGerarPixCode(modalPresenteAberto)}
                     disabled={carregandoPixCode || valorInvalido}
-                    className="w-full bg-[#462F29] text-white py-3 rounded-sm font-bold uppercase tracking-[0.1em] text-[12px] hover:bg-[#D4AF37] hover:text-[#462F29] transition-all disabled:opacity-50"
+                    className="w-full bg-[#462F29] text-white py-4 rounded-[2px] font-bold uppercase tracking-[0.15em] text-[12px] hover:bg-[#D4AF37] hover:text-[#462F29] transition-all duration-300 disabled:opacity-30 shadow-lg active:scale-[0.98]"
                   >
-                    {carregandoPixCode ? "Gerando..." : "Gerar Chave PIX"}
+                    {carregandoPixCode ? "Gerando código..." : "Gerar Chave PIX"}
                   </button>
 
                   <button
@@ -811,34 +831,49 @@ export default function Confirmacao() {
                   </button>
                 </>
               ) : (
-                <>
-                  <div className="bg-[#462F29]/5 p-4 rounded-sm mb-4 border border-[#D4AF37]">
-                    <p className="text-[11px] font-montserrat text-[#462F29]/70 mb-2 uppercase tracking-[0.1em]">Recebedor:</p>
-                    <p className="text-[13px] font-semibold text-[#462F29] mb-4">Daniel Abelha Torres</p>
-                    
-                    <p className="text-[11px] font-montserrat text-[#462F29]/70 mb-2 uppercase tracking-[0.1em]">Contribuição:</p>
-                    <p className="text-[12px] text-[#462F29] mb-4">{PRESENTES[modalPresenteAberto].nome}</p>
-                    
-                    <p className="text-[11px] font-montserrat text-[#462F29]/70 mb-2 uppercase tracking-[0.1em]">Valor:</p>
-                    <p className="text-[13px] font-semibold text-[#D4AF37] mb-4">
-                      {valorSelecionado 
-                        ? valorSelecionado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) 
-                        : outroValor}
-                    </p>
-                    
-                    <p className="text-[10px] font-montserrat text-[#462F29]/60 text-center italic mb-3">PIX gerado com sucesso.</p>
-                    
-                    <div className="bg-white p-3 rounded-sm mb-4 border border-[#462F29]/20">
-                      <p className="text-[10px] font-mono text-[#462F29] break-all text-center">{pixGerado}</p>
+                <div className="animate-in fade-in zoom-in-95 duration-500">
+                  <div className="bg-[#462F29]/5 p-5 rounded-[2px] mb-6 border border-[#D4AF37]/30 shadow-inner">
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-[10px] font-montserrat text-[#462F29]/50 mb-1 uppercase tracking-[0.15em]">Recebedor:</p>
+                        <p className="text-[14px] font-bold text-[#462F29]">Daniel Abelha Torres</p>
+                      </div>
+                      
+                      <div className="flex justify-between items-end border-t border-[#462F29]/10 pt-4">
+                        <div className="text-left">
+                          <p className="text-[10px] font-montserrat text-[#462F29]/50 mb-1 uppercase tracking-[0.15em]">Valor da Cota:</p>
+                          <p className="text-[16px] font-bold text-[#D4AF37]">
+                            {valorSelecionado 
+                              ? valorSelecionado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) 
+                              : outroValor}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] font-montserrat text-green-600 font-bold uppercase tracking-widest bg-green-50 px-2 py-0.5 rounded-full border border-green-100">Código Ativo</p>
+                        </div>
+                      </div>
                     </div>
+                    
+                    <div className="mt-6 bg-white p-4 rounded-[1px] border border-[#462F29]/10 shadow-sm relative group">
+                      <p className="text-[10px] font-mono text-[#462F29]/70 break-all text-center leading-relaxed">{pixGerado}</p>
+                      <div className="absolute inset-0 bg-wedding-gold/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-wedding-gold">Pronto para copiar</span>
+                      </div>
+                    </div>
+                    <p className="text-[10px] font-montserrat text-[#462F29]/40 text-center italic mt-3">Clique no botão abaixo para copiar o código.</p>
                   </div>
 
                   <button
                     onClick={() => handleCopiarPixCode(modalPresenteAberto)}
                     disabled={carregandoRegistro}
-                    className="w-full bg-[#D4AF37] text-[#462F29] py-3 rounded-sm font-bold uppercase tracking-[0.1em] text-[12px] hover:bg-[#462F29] hover:text-white transition-all disabled:opacity-50"
+                    className="w-full bg-[#D4AF37] text-[#462F29] py-4 rounded-[2px] font-bold uppercase tracking-[0.2em] text-[13px] hover:bg-[#462F29] hover:text-white transition-all duration-300 shadow-xl active:scale-[0.98] flex items-center justify-center gap-2"
                   >
-                    {carregandoRegistro ? "Copiando..." : "Copiar PIX"}
+                    {carregandoRegistro ? "Registrando..." : (
+                      <>
+                        <span>📋</span>
+                        <span>COPIAR CÓDIGO PIX</span>
+                      </>
+                    )}
                   </button>
 
                   <button
