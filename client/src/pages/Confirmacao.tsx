@@ -350,28 +350,28 @@ export default function Confirmacao() {
   const valorInvalido = !valorSelecionado && (!outroValor || parseMoedaParaNumero(outroValor) <= 0);
 
   return (
-    <div className={`min-h-screen bg-[#FDFAF6] text-wedding-charcoal ${!convidadoSelecionado ? 'h-screen overflow-hidden' : ''}`}>
-      <main className={`max-w-6xl mx-auto ${!convidadoSelecionado ? 'h-full flex flex-col items-center justify-center py-4' : 'pt-10 md:pt-20 pb-0'}`}>
+    <div className={`min-h-screen bg-[#FDFAF6] text-wedding-charcoal ${!convidadoSelecionado ? 'h-[100dvh] overflow-hidden' : ''}`}>
+      <main className={`max-w-6xl mx-auto ${!convidadoSelecionado ? 'h-[100dvh] flex flex-col pt-[15dvh] px-4' : 'pt-10 md:pt-20 pb-0'}`}>
         {/* Cabeçalho (Logo do Casal) */}
-        <FadeSection className={`px-4 flex justify-center ${!convidadoSelecionado ? 'mb-6 md:mb-8' : 'mb-12 md:mb-16'}`}>
+        <FadeSection className={`flex justify-center ${!convidadoSelecionado ? 'mb-4 md:mb-6' : 'mb-12 md:mb-16'}`}>
           <img 
             src={headerLogo} 
             alt="Mariana & Daniel - 05 de Dezembro de 2026" 
-            className={`w-full h-auto object-contain transition-all duration-500 ${!convidadoSelecionado ? 'max-w-[300px] md:max-w-[450px]' : 'max-w-[380px] md:max-w-[650px]'}`}
+            className={`w-full h-auto object-contain transition-all duration-500 ${!convidadoSelecionado ? 'max-w-[280px] md:max-w-[400px]' : 'max-w-[380px] md:max-w-[650px]'}`}
           />
         </FadeSection>
 
         {!convidadoSelecionado ? (
-          <FadeSection className="w-full max-w-[450px] mx-auto px-6 text-center p-6 md:p-8 bg-white shadow-xl rounded-lg border border-gray-100 animate-in fade-in zoom-in-95 duration-500">
-            <div className="mb-6 md:mb-8">
-              <h2 className="font-montserrat text-[12px] md:text-[14px] font-bold tracking-[0.2em] text-[#462F29] uppercase mb-2">IDENTIFIQUE-SE</h2>
+          <FadeSection className="w-full max-w-[420px] mx-auto text-center p-6 md:p-8 bg-white shadow-xl rounded-lg border border-gray-100 animate-in fade-in zoom-in-95 duration-500">
+            <div className="mb-4 md:mb-6">
+              <h2 className="font-montserrat text-[12px] md:text-[14px] font-bold tracking-[0.2em] text-[#462F29] uppercase mb-1">IDENTIFIQUE-SE</h2>
               <p className="font-light text-[#888] text-[11px] md:text-[13px]">Digite seu nome completo para localizar seu convite.</p>
             </div>
             
             <input 
               type="text" 
               placeholder="Ex.: Daniel Abelha" 
-              className="wedding-input mb-6 !text-[15px] md:!text-[16px] !py-3 md:!py-4"
+              className="wedding-input mb-4 !text-[16px] !py-3 md:!py-4"
               value={nomeBusca}
               onChange={(e) => setNomeBusca(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
