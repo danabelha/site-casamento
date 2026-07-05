@@ -91,12 +91,12 @@ const MAPS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURI
 
 function SectionDivider({ title, isVerification = false }: { title: string; isVerification?: boolean } ) {
   return (
-    <div className="text-center mb-8 md:mb-12 px-4">
-      <h2 className={`font-cormorant font-light text-[#462F29] leading-tight mb-4 whitespace-nowrap
+    <div className="text-center mb-8 md:mb-12 px-4 animate-in fade-in duration-700">
+      <h2 className={`font-cormorant font-light text-[#462F29] leading-tight mb-4 tracking-wide whitespace-nowrap
         ${isVerification ? 'text-[22px] sm:text-[28px] md:text-[42px]' : 'text-[28px] md:text-[42px]'}`}>
         {title}
       </h2>
-      <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />
+      <div className="w-10 h-[1px] bg-wedding-gold mx-auto opacity-60" />
     </div>
   );
 }
@@ -404,10 +404,10 @@ export default function Confirmacao() {
           <div className="">
             {/* 1. Boas-vindas */}
             <FadeSection className="text-center mb-16 md:mb-24 px-6">
-              <h2 className="font-halimun text-[32px] md:text-[48px] text-[#462F29] mb-6">
+              <h2 className="font-halimun text-[32px] md:text-[48px] text-[#462F29] mb-6 leading-tight">
                 Olá, {convidadoSelecionado.nome}!
               </h2>
-              <p className="font-montserrat text-[14px] md:text-[18px] text-wedding-charcoal/70 leading-relaxed max-w-[600px] mx-auto">
+              <p className="font-montserrat text-[14px] md:text-[17px] text-wedding-charcoal/60 leading-relaxed max-w-[550px] mx-auto font-light tracking-wide">
                 Nossa história também tem você, por isso preparamos este espaço com todo carinho para compartilhar cada detalhe do nosso grande dia.
               </p>
             </FadeSection>
@@ -423,7 +423,7 @@ export default function Confirmacao() {
                   >
                     <div className={`w-full md:w-1/2 flex justify-center transition-all duration-700 animate-in fade-in zoom-in-95`}>
                       <div 
-                        className={`bg-white p-4 md:p-5 shadow-[0_40px_90px_rgba(0,0,0,0.45)] transition-all duration-700 hover:scale-[1.02]
+                        className={`bg-white p-4 md:p-5 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.35)] transition-all duration-700 hover:scale-[1.015]
                           ${index === 0 ? 'rotate-[-2.8deg] translate-x-[-16px] translate-y-[-12px]' : 
                             index === 1 ? 'rotate-[3.8deg] translate-x-[20px] translate-y-[14px]' : 
                             index === 2 ? 'rotate-[-4.8deg] translate-x-[-24px] translate-y-[-18px]' : 
@@ -436,11 +436,11 @@ export default function Confirmacao() {
                         />
                       </div>
                     </div>
-                    <div className="w-full md:w-1/2 text-center md:text-left space-y-2 md:space-y-3 px-7 py-7 bg-[#462F29] shadow-2xl relative z-10">
-                      <h3 className="font-cormorant text-[24px] md:text-[36px] text-wedding-gold uppercase tracking-widest leading-tight">
+                    <div className="w-full md:w-1/2 text-center md:text-left space-y-2 md:space-y-3 px-8 py-8 bg-[#462F29] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] relative z-10 rounded-[1px]">
+                      <h3 className="font-cormorant text-[24px] md:text-[34px] text-wedding-gold uppercase tracking-[0.15em] leading-tight">
                         {item.titulo}
                       </h3>
-                      <p className="font-montserrat text-[12px] md:text-[14px] text-white/90 leading-relaxed font-light">
+                      <p className="font-montserrat text-[12px] md:text-[14px] text-white/80 leading-relaxed font-light tracking-wide">
                         {item.texto}
                       </p>
                     </div>
@@ -520,7 +520,7 @@ export default function Confirmacao() {
                         href={MAPS_URL} 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        className="inline-block bg-[#462F29] text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-wedding-gold hover:text-white transition-all shadow-lg font-bold min-w-[200px]"
+                        className="inline-block bg-[#462F29] text-white px-8 py-4.5 text-[11px] uppercase tracking-[0.25em] hover:bg-wedding-gold hover:text-white transition-all duration-300 shadow-lg font-bold min-w-[220px] active:scale-[0.98]"
                       >
                         Ver no Mapa
                       </a>
@@ -528,7 +528,7 @@ export default function Confirmacao() {
                         href="https://www.instagram.com/celeiroquintal/" 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        className="inline-block border border-[#462F29] text-[#462F29] px-8 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-[#462F29] hover:text-white transition-all shadow-lg font-bold min-w-[200px]"
+                        className="inline-block border border-[#462F29] text-[#462F29] px-8 py-4.5 text-[11px] uppercase tracking-[0.25em] hover:bg-[#462F29] hover:text-white transition-all duration-300 shadow-lg font-bold min-w-[220px] active:scale-[0.98]"
                       >
                         Conhecer o Espaço
                       </a>
@@ -615,9 +615,9 @@ export default function Confirmacao() {
                         <button
                           key={opt.id}
                           onClick={() => setResposta(opt.id as any)}
-                          className={`p-5 border text-[10px] md:text-[11px] uppercase tracking-widest transition-all h-full flex items-center justify-center text-center
+                          className={`p-5 border text-[10px] md:text-[11px] uppercase tracking-[0.15em] transition-all duration-300 h-full flex items-center justify-center text-center rounded-[2px]
                             ${resposta === opt.id 
-                              ? "bg-wedding-gold text-white border-wedding-gold shadow-xl scale-105" 
+                              ? "bg-wedding-gold text-white border-wedding-gold shadow-xl scale-[1.03]" 
                               : "bg-white/5 text-white/80 border-white/10 hover:border-wedding-gold hover:bg-white/10"}`}
                         >
                           {opt.label}
@@ -732,7 +732,7 @@ export default function Confirmacao() {
                           <button
                             onClick={handleSubmit}
                             disabled={confirmarMutation.isPending}
-                            className="w-full bg-wedding-gold text-white py-5 tracking-[0.4em] uppercase text-[12px] shadow-2xl hover:bg-white hover:text-[#462F29] transition-all disabled:opacity-50 font-bold"
+                            className="w-full bg-wedding-gold text-white py-5 tracking-[0.3em] uppercase text-[12px] shadow-2xl hover:bg-white hover:text-[#462F29] transition-all duration-300 disabled:opacity-50 font-bold active:scale-[0.99] rounded-[2px]"
                           >
                             {confirmarMutation.isPending ? "Enviando..." : "Enviar Resposta"}
                           </button>
