@@ -829,7 +829,7 @@ export default function Confirmacao() {
                   >
                     Cancelar
                   </button>
-                </>
+                </div>
               ) : (
                 <div className="animate-in fade-in zoom-in-95 duration-500">
                   <div className="bg-[#462F29]/5 p-5 rounded-[2px] mb-6 border border-[#D4AF37]/30 shadow-inner">
@@ -887,7 +887,7 @@ export default function Confirmacao() {
                   >
                     Fechar
                   </button>
-                </>
+                </div>
               )}
             </div>
           </div>
