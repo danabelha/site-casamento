@@ -2,9 +2,9 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import { z } from "zod";
 import { generatePixBrCode } from "./pixUtils";
+import { guestCacheService } from "./services/cache/GuestCacheService";
 // @ts-ignore
 import {
-  buscarConvidados,
   salvarConfirmacao,
   buscarTodosConvidados,
   adicionarConvidado,
@@ -44,7 +44,7 @@ const appRouter = t.router({
   searchConvidados: publicProcedure
     .input(z.object({ nome: z.string() }))
     .mutation(async ({ input }) => {
-      return await buscarConvidados(input.nome);
+      return await guestCacheService.buscar(input.nome);
     }),
 
   confirmarPresenca: publicProcedure
@@ -110,8 +110,17 @@ const appRouter = t.router({
     }),
 
   adminRouter: t.router({
+    getCacheStats: adminProcedure.query(async () => {
+      return guestCacheService.getStats();
+    }),
+
+    refreshCache: adminProcedure.mutation(async () => {
+      await guestCacheService.refreshCache();
+      return { success: true };
+    }),
+
     getAllConvidados: adminProcedure.query(async () => {
-      return await buscarTodosConvidados();
+      return await guestCacheService.getConvidados();
     }),
 
     adicionarConvidado: adminProcedure

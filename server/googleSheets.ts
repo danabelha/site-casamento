@@ -146,7 +146,6 @@ export async function salvarConfirmacao(data: {
     requestBody: { values: [novosValores] },
   });
 
-  cacheConvidados = null; // Limpa cache após alteração
   return true;
 }
 
@@ -182,7 +181,6 @@ export async function adicionarConvidado(data: {
     requestBody: { values: [novaLinha] },
   });
 
-  cacheConvidados = null;
   return true;
 }
 
@@ -218,7 +216,6 @@ export async function atualizarConvidado(id: string, data: Partial<ConvidadoRow>
     requestBody: { values: [novosValores] },
   });
 
-  cacheConvidados = null;
   return true;
 }
 
@@ -253,7 +250,6 @@ export async function deletarConvidado(id: string) {
     }
   });
 
-  cacheConvidados = null;
   return true;
 }
 
