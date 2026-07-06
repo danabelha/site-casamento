@@ -1,4 +1,4 @@
-import { buscarTodosConvidados, ConvidadoRow } from "../../googleSheets";
+import { buscarTodosConvidados, type ConvidadoRow } from "../../googleSheets";
 
 interface CachedGuest extends ConvidadoRow {
   nomeNormalizado: string;
