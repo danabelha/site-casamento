@@ -1,8 +1,8 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import { z } from "zod";
-import { generatePixBrCode } from "./pixUtils";
-import { guestCacheService } from "./services/cache/GuestCacheService";
+import { generatePixBrCode } from "./pixUtils.js";
+import { guestCacheService } from "./services/cache/GuestCacheService.js";
 // @ts-ignore
 import {
   salvarConfirmacao,
@@ -12,7 +12,7 @@ import {
   deletarConvidado,
   registrarIntencaoPresente,
   calcularRankingPresentes,
-} from "./googleSheets";
+} from "./googleSheets.js";
 
 
 // 1. Definição do Contexto

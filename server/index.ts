@@ -27,7 +27,7 @@ app.listen(PORT, "0.0.0.0", async () => {
   
   // Inicialização do cache na subida do servidor para evitar cold start
   try {
-    const { guestCacheService } = await import("./services/cache/GuestCacheService");
+    const { guestCacheService } = await import("./services/cache/GuestCacheService.js");
     await guestCacheService.refreshCache();
     console.log("[Server] Cache de convidados inicializado com sucesso.");
   } catch (error) {
