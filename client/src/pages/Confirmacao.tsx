@@ -178,6 +178,7 @@ export default function Confirmacao() {
   const [pixCopiado, setPixCopiado] = useState(false);
   const [carregandoPixCode, setCarregandoPixCode] = useState(false);
   const [carregandoRefresh, setCarregandoRefresh] = useState(false);
+  const [erroBusca, setErroBusca] = useState<string | null>(null);
 
   // Formatação de moeda BRL
   const formatarMoeda = (valor: string) => {
@@ -206,17 +207,26 @@ export default function Confirmacao() {
 
   const handleSearch = async () => {
     if (!nomeBusca.trim() || carregandoBusca) return;
+    const startTime = Date.now();
+    setErroBusca(null);
     try {
       setCarregandoBusca(true);
       const resultado = await searchMutation.mutateAsync({ nome: nomeBusca });
+      
+      const duration = Date.now() - startTime;
+      const minDuration = 600;
+      if (duration < minDuration) {
+        await new Promise(resolve => setTimeout(resolve, minDuration - duration));
+      }
+
       if (resultado && (resultado as any).length > 0) {
         setConvidadoSelecionado((resultado as any)[0]);
       } else {
-        alert("Convidado não encontrado. Verifique se o nome está exatamente como no convite.");
+        setErroBusca("Tivemos dificuldade para localizar seu convite. Confira se o nome foi digitado corretamente. Caso o problema continue, entre em contato com os noivos para que possamos ajudá-lo.");
       }
     } catch (error) {
       console.error(error);
-      alert("Erro ao buscar convidado. Tente novamente.");
+      setErroBusca("Ocorreu um erro ao buscar seu convite. Por favor, tente novamente em instantes.");
     } finally {
       setCarregandoBusca(false);
     }
@@ -433,10 +443,13 @@ export default function Confirmacao() {
             
             <input 
               type="text" 
-              placeholder="Ex.: Daniel Abelha" 
+              placeholder="Nome Sobrenome" 
               className="wedding-input mb-4 !text-[16px] !py-3 md:!py-4"
               value={nomeBusca}
-              onChange={(e) => setNomeBusca(e.target.value)}
+              onChange={(e) => {
+                setNomeBusca(e.target.value);
+                if (erroBusca) setErroBusca(null);
+              }}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             />
             
@@ -453,21 +466,13 @@ export default function Confirmacao() {
               ) : "Verificar Convite"}
             </button>
 
-            <div className="mt-8 pt-6 border-t border-gray-100">
-              <p className="text-[10px] text-gray-400 font-montserrat uppercase tracking-widest mb-3">Não encontrou seu nome?</p>
-              <button 
-                onClick={handleRefreshCache}
-                disabled={carregandoRefresh}
-                className="text-[10px] text-wedding-gold hover:text-[#462F29] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 mx-auto"
-              >
-                {carregandoRefresh ? (
-                  <span className="animate-spin">⏳</span>
-                ) : (
-                  <span>🔄</span>
-                )}
-                {carregandoRefresh ? "Atualizando..." : "Atualizar Lista de Convidados"}
-              </button>
-            </div>
+            {erroBusca && (
+              <div className="mt-6 p-4 bg-red-50 border border-red-100 rounded-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                <p className="text-[12px] text-red-800 leading-relaxed font-light">
+                  {erroBusca}
+                </p>
+              </div>
+            )}
           </FadeSection>
         ) : (
           <div className="">
