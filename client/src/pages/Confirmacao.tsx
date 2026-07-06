@@ -399,6 +399,15 @@ export default function Confirmacao() {
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
+        @keyframes shimmer {
+          0% { background-position: -1000px 0; }
+          100% { background-position: 1000px 0; }
+        }
+        .skeleton-shimmer {
+          background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+          background-size: 1000px 100%;
+          animation: shimmer 2s infinite linear;
+        }
       `}</style>
       <main className={`max-w-6xl mx-auto ${!convidadoSelecionado ? 'h-[100dvh] flex flex-col pt-[15dvh] px-4' : 'pt-10 md:pt-20 pb-0'}`}>
         {/* Cabeçalho (Logo do Casal) */}
@@ -429,9 +438,14 @@ export default function Confirmacao() {
             <button 
               onClick={handleSearch}
               disabled={carregandoBusca}
-              className={`w-full bg-[#462F29] text-white py-4 md:py-5 tracking-[0.3em] uppercase text-[11px] md:text-[12px] font-bold transition-all hover:bg-[#2d1e1a] shadow-lg active:scale-[0.98] ${carregandoBusca ? 'opacity-50' : 'opacity-100'}`}
+              className={`w-full bg-[#462F29] text-white py-4 md:py-5 tracking-[0.3em] uppercase text-[11px] md:text-[12px] font-bold transition-all hover:bg-[#2d1e1a] shadow-lg active:scale-[0.98] ${carregandoBusca ? 'opacity-50' : 'opacity-100'} flex items-center justify-center gap-3`}
             >
-              {carregandoBusca ? "Verificando..." : "Verificar Convite"}
+              {carregandoBusca ? (
+                <>
+                  <span className="animate-spin-slow text-lg">⏳</span>
+                  <span>Verificando...</span>
+                </>
+              ) : "Verificar Convite"}
             </button>
 
             <div className="mt-8 pt-6 border-t border-gray-100">
@@ -465,27 +479,28 @@ export default function Confirmacao() {
             {/* 2. Nossa História */}
             <section className="relative px-4 sm:px-6 mb-8 md:mb-16">
               <SectionDivider title="Nossa História" />
-              <div className="relative max-w-5xl mx-auto">
-                {GALLERY_ITEMS.map((item, index) => (
-                  <div 
-                    key={index} 
-                    className="sticky top-0 h-[75vh] md:h-[85vh] flex flex-col md:flex-row items-center justify-center gap-1 md:gap-4 py-1"
-                  >
-                    <div className={`w-full md:w-1/2 flex justify-center transition-all duration-700 animate-in fade-in zoom-in-95`}>
-                      <div 
-                        className={`bg-white p-4 md:p-5 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.35)] transition-all duration-700 hover:scale-[1.015]
-                          ${index === 0 ? 'rotate-[-2.8deg] translate-x-[-16px] translate-y-[-12px]' : 
-                            index === 1 ? 'rotate-[3.8deg] translate-x-[20px] translate-y-[14px]' : 
-                            index === 2 ? 'rotate-[-4.8deg] translate-x-[-24px] translate-y-[-18px]' : 
-                            'rotate-[2.8deg] translate-x-[22px] translate-y-[12px]'}`}
-                      >
-                        <img 
-                          src={item.url} 
-                          alt={item.titulo} 
-                          className="w-[238px] h-[305px] md:w-[387px] md:h-[508px] object-cover grayscale-[5%] hover:grayscale-0 transition-all duration-500"
-                        />
-                      </div>
+            <div className="relative max-w-5xl mx-auto">
+              {GALLERY_ITEMS.map((item, index) => (
+                <div 
+                  key={index} 
+                  className="sticky top-0 h-[75vh] md:h-[85vh] flex flex-col md:flex-row items-center justify-center gap-1 md:gap-4 py-1"
+                >
+                  <div className={`w-full md:w-1/2 flex justify-center transition-all duration-700 animate-in fade-in zoom-in-95`}>
+                    <div 
+                      className={`bg-white p-4 md:p-5 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.35)] transition-all duration-700 hover:scale-[1.015]
+                        ${index === 0 ? 'rotate-[-2.8deg] translate-x-[-16px] translate-y-[-12px]' : 
+                          index === 1 ? 'rotate-[3.8deg] translate-x-[20px] translate-y-[14px]' : 
+                          index === 2 ? 'rotate-[-4.8deg] translate-x-[-24px] translate-y-[-18px]' : 
+                          'rotate-[2.8deg] translate-x-[22px] translate-y-[12px]'}`}
+                    >
+                      <img 
+                        src={item.url} 
+                        alt={item.titulo} 
+                        loading={index === 0 ? "eager" : "lazy"}
+                        className="w-[238px] h-[305px] md:w-[387px] md:h-[508px] object-cover grayscale-[5%] hover:grayscale-0 transition-all duration-500"
+                      />
                     </div>
+                  </div>
                     <div className="w-full md:w-1/2 text-center md:text-left space-y-2 md:space-y-3 px-8 py-8 bg-[#462F29] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] relative z-10 rounded-[1px]">
                       <h3 className="font-cormorant text-[24px] md:text-[34px] text-wedding-gold uppercase tracking-[0.15em] leading-tight">
                         {item.titulo}

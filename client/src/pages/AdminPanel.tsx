@@ -66,7 +66,7 @@ export default function AdminPanel() {
     const isAuth = sessionStorage.getItem("admin_auth") === "true";
     if (isAuth) setAutenticado(true);
 
-    // Estilos globais para Safari/Mobile stability
+    // Estilos globais para Safari/Mobile stability e Skeletons
     const style = document.createElement('style');
     style.innerHTML = `
       :root { --dvh: 100dvh; }
@@ -75,6 +75,14 @@ export default function AdminPanel() {
       .no-scroll { overflow: hidden; }
       @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       .animate-spin-slow { animation: spin 2s linear infinite; }
+      @keyframes skeleton-loading {
+        0% { background-color: #f3f4f6; }
+        50% { background-color: #e5e7eb; }
+        100% { background-color: #f3f4f6; }
+      }
+      .skeleton {
+        animation: skeleton-loading 1.5s ease-in-out infinite;
+      }
     `;
     document.head.appendChild(style);
     return () => { document.head.removeChild(style); };
@@ -216,6 +224,28 @@ export default function AdminPanel() {
     };
   }, [getAllConvidados.data, getRankingPresentes.data]);
 
+  const SkeletonCard = () => (
+    <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm space-y-4 skeleton">
+      <div className="h-3 w-20 bg-gray-200 rounded"></div>
+      <div className="space-y-3">
+        <div className="h-2 w-full bg-gray-100 rounded"></div>
+        <div className="h-2 w-full bg-gray-100 rounded"></div>
+        <div className="h-2 w-full bg-gray-100 rounded"></div>
+      </div>
+    </div>
+  );
+
+  const SkeletonStat = () => (
+    <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm skeleton">
+      <div className="flex justify-between items-center mb-2">
+        <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+        <div className="w-16 h-6 bg-gray-200 rounded"></div>
+      </div>
+      <div className="h-2 w-20 bg-gray-100 rounded mb-1"></div>
+      <div className="h-2 w-12 bg-gray-100 rounded"></div>
+    </div>
+  );
+
   // --- RENDER HELPERS ---
   if (!autenticado) {
     return (
@@ -297,51 +327,55 @@ export default function AdminPanel() {
         {/* 2. Cache Info & Stats Dashboard */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Cache Info Card */}
-          <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm space-y-4">
-            <div className="flex justify-between items-start">
-              <h3 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Status do Cache</h3>
-              <span className="text-[10px] font-mono text-wedding-gold">v1.2.0</span>
+          {getCacheStats.isLoading ? <SkeletonCard /> : (
+            <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm space-y-4">
+              <div className="flex justify-between items-start">
+                <h3 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Status do Cache</h3>
+                <span className="text-[10px] font-mono text-wedding-gold">v1.2.0</span>
+              </div>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-[11px] text-gray-500">Convidados</span>
+                  <span className="text-[11px] font-bold text-[#462F29]">{getCacheStats.data?.count || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[11px] text-gray-500">Última Sinc.</span>
+                  <span className="text-[11px] font-bold text-[#462F29]">
+                    {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleTimeString('pt-BR') : '--:--'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[11px] text-gray-500">Idade</span>
+                  <span className="text-[11px] font-bold text-[#462F29]">{getCacheStats.data?.cacheAgeSeconds || 0}s</span>
+                </div>
+              </div>
+              {carregando && (
+                <div className="pt-2 border-t border-[#FDFAF6]">
+                  <p className="text-[9px] text-wedding-gold animate-pulse uppercase tracking-widest font-bold text-center">Sincronizando com Google Sheets...</p>
+                </div>
+              )}
             </div>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-[11px] text-gray-500">Convidados</span>
-                <span className="text-[11px] font-bold text-[#462F29]">{getCacheStats.data?.count || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[11px] text-gray-500">Última Sinc.</span>
-                <span className="text-[11px] font-bold text-[#462F29]">
-                  {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleTimeString('pt-BR') : '--:--'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[11px] text-gray-500">Idade</span>
-                <span className="text-[11px] font-bold text-[#462F29]">{getCacheStats.data?.cacheAgeSeconds || 0}s</span>
-              </div>
-            </div>
-            {carregando && (
-              <div className="pt-2 border-t border-[#FDFAF6]">
-                <p className="text-[9px] text-wedding-gold animate-pulse uppercase tracking-widest font-bold text-center">Sincronizando com Google Sheets...</p>
-              </div>
-            )}
-          </div>
+          )}
 
           {/* Stats Grid */}
           <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: "Confirmados", val: stats.confirmados, sub: "Pessoas", icon: "✨", color: "text-green-600" },
-              { label: "Pendentes", val: stats.pendentes, sub: "Convites", icon: "⏳", color: "text-gray-400" },
-              { label: "Taxa Conf.", val: `${stats.taxaConfirmacao}%`, sub: "Engajamento", icon: "📈", color: "text-wedding-gold" },
-              { label: "Presentes", val: stats.valorPresentes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }), sub: "Estimado", icon: "🎁", color: "text-[#462F29]" },
-            ].map((s, i) => (
-              <div key={i} className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-xl">{s.icon}</span>
-                  <span className={`text-[18px] font-bold ${s.color}`}>{s.val}</span>
+            {getAllConvidados.isLoading ? Array(4).fill(0).map((_, i) => <SkeletonStat key={i} />) : (
+              [
+                { label: "Confirmados", val: stats.confirmados, sub: "Pessoas", icon: "✨", color: "text-green-600" },
+                { label: "Pendentes", val: stats.pendentes, sub: "Convites", icon: "⏳", color: "text-gray-400" },
+                { label: "Taxa Conf.", val: `${stats.taxaConfirmacao}%`, sub: "Engajamento", icon: "📈", color: "text-wedding-gold" },
+                { label: "Presentes", val: stats.valorPresentes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }), sub: "Estimado", icon: "🎁", color: "text-[#462F29]" },
+              ].map((s, i) => (
+                <div key={i} className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xl">{s.icon}</span>
+                    <span className={`text-[18px] font-bold ${s.color}`}>{s.val}</span>
+                  </div>
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">{s.label}</p>
+                  <p className="text-[8px] text-gray-300 uppercase tracking-tighter">{s.sub}</p>
                 </div>
-                <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">{s.label}</p>
-                <p className="text-[8px] text-gray-300 uppercase tracking-tighter">{s.sub}</p>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -385,7 +419,17 @@ export default function AdminPanel() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#FDFAF6]">
-                {convidadosFiltrados.length > 0 ? convidadosFiltrados.map((c) => (
+                {getAllConvidados.isLoading ? (
+                  Array(5).fill(0).map((_, i) => (
+                    <tr key={i} className="skeleton">
+                      <td className="px-6 py-6"><div className="h-4 w-32 bg-gray-200 rounded"></div></td>
+                      <td className="px-6 py-6"><div className="h-4 w-20 bg-gray-200 rounded"></div></td>
+                      <td className="px-6 py-6"><div className="h-4 w-8 bg-gray-200 rounded mx-auto"></div></td>
+                      <td className="px-6 py-6 hidden lg:table-cell"><div className="h-4 w-48 bg-gray-200 rounded"></div></td>
+                      <td className="px-6 py-6"><div className="h-4 w-16 bg-gray-200 rounded ml-auto"></div></td>
+                    </tr>
+                  ))
+                ) : convidadosFiltrados.length > 0 ? convidadosFiltrados.map((c) => (
                   <tr key={c.id} className="hover:bg-[#FDFAF6]/50 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="font-bold text-[#462F29] text-[13px]">{c.nome}</div>
