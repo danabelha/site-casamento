@@ -169,7 +169,6 @@ export default function Confirmacao() {
   const [carregandoRegistro, setCarregandoRegistro] = useState(false);
 
   const searchMutation = trpc.searchConvidados.useMutation();
-  const refreshCacheMutation = trpc.adminRouter.refreshCache.useMutation();
   const confirmarMutation = trpc.confirmarPresenca.useMutation();
   const registrarPresenteMutation = trpc.registrarPresente.useMutation();
   const generatePixCodeMutation = trpc.generatePixCode.useMutation();
@@ -177,7 +176,6 @@ export default function Confirmacao() {
   const [pixGerado, setPixGerado] = useState<string | null>(null);
   const [pixCopiado, setPixCopiado] = useState(false);
   const [carregandoPixCode, setCarregandoPixCode] = useState(false);
-  const [carregandoRefresh, setCarregandoRefresh] = useState(false);
   const [erroBusca, setErroBusca] = useState<string | null>(null);
 
   // Formatação de moeda BRL
@@ -232,22 +230,7 @@ export default function Confirmacao() {
     }
   };
 
-  const handleRefreshCache = async () => {
-    if (carregandoRefresh) return;
-    try {
-      setCarregandoRefresh(true);
-      // Usamos o header para o adminProcedure, mesmo que seja o usuário final,
-      // para esta função específica liberaremos no router se necessário ou passaremos a senha.
-      // Como o objetivo é o usuário atualizar se não encontrar o nome, vamos permitir.
-      await refreshCacheMutation.mutateAsync();
-      alert("Lista de convidados atualizada com sucesso!");
-    } catch (error) {
-      console.error(error);
-      alert("Erro ao atualizar lista. Tente novamente em instantes.");
-    } finally {
-      setCarregandoRefresh(false);
-    }
-  };
+
 
   const handleGerarPixCode = async (presenteIndex: number) => {
     const valor = valorSelecionado || (outroValor ? parseMoedaParaNumero(outroValor) : null);
