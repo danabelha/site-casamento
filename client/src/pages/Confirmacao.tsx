@@ -384,7 +384,22 @@ export default function Confirmacao() {
   const valorInvalido = !valorSelecionado && (!outroValor || parseMoedaParaNumero(outroValor) <= 0);
 
   return (
-    <div className={`min-h-screen bg-[#FDFAF6] text-wedding-charcoal ${!convidadoSelecionado ? 'h-[100dvh] overflow-hidden' : ''}`}>
+    <div className={`min-h-screen bg-[#FDFAF6] text-wedding-charcoal ${!convidadoSelecionado ? 'h-[100dvh] overflow-hidden fixed inset-0' : ''}`}>
+      <style>{`
+        :root {
+          --dvh: 100dvh;
+        }
+        input, select, textarea {
+          font-size: 16px !important;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
       <main className={`max-w-6xl mx-auto ${!convidadoSelecionado ? 'h-[100dvh] flex flex-col pt-[15dvh] px-4' : 'pt-10 md:pt-20 pb-0'}`}>
         {/* Cabeçalho (Logo do Casal) */}
         <FadeSection className={`flex justify-center ${!convidadoSelecionado ? 'mb-4 md:mb-6' : 'mb-12 md:mb-16'}`}>
@@ -781,132 +796,147 @@ export default function Confirmacao() {
           </div>
         )}
 
-        {/* Modal de Cotas de Presentes */}
+        {/* Bottom Sheet de Cotas de Presentes (Premium Flow) */}
         {modalPresenteAberto !== null && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
-            <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 md:p-8 animate-in zoom-in duration-300">
-              <h3 className="font-cormorant text-[28px] text-[#462F29] mb-2 text-center">
-                {PRESENTES[modalPresenteAberto].nome}
-              </h3>
-              <p className="text-center text-[12px] text-[#462F29]/60 font-montserrat mb-6">
-                {PRESENTES[modalPresenteAberto].descricao}
-              </p>
-
-              <div className="space-y-5 mb-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <div className="text-center">
-                  <p className="text-[10px] font-montserrat text-[#462F29]/40 uppercase tracking-[0.2em] mb-1">Cota selecionada:</p>
-                  <h4 className="text-[14px] font-bold text-[#462F29] uppercase tracking-wide leading-tight px-4">{PRESENTES[modalPresenteAberto].nome}</h4>
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-[11px] font-montserrat text-[#462F29]/80 uppercase tracking-[0.1em] text-center">
-                    Escolha um valor:
+          <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center">
+            {/* Overlay */}
+            <div 
+              className="absolute inset-0 bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-300" 
+              onClick={() => {
+                setModalPresenteAberto(null);
+                setValorSelecionado(null);
+                setOutroValor("");
+                setPixGerado(null);
+              }}
+            ></div>
+            
+            {/* Bottom Sheet / Modal Content */}
+            <div className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[24px] shadow-2xl p-6 md:p-8 animate-in slide-in-from-bottom-full sm:zoom-in duration-300 max-h-[92vh] overflow-y-auto no-scrollbar">
+              {/* Handle mobile */}
+              <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 sm:hidden"></div>
+              
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-grow">
+                  <h3 className="font-cormorant text-[26px] md:text-[32px] text-[#462F29] leading-tight mb-1">
+                    {PRESENTES[modalPresenteAberto].nome}
+                  </h3>
+                  <p className="text-[12px] text-[#462F29]/60 font-montserrat leading-relaxed">
+                    {PRESENTES[modalPresenteAberto].descricao}
                   </p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[50, 100, 200, 300, 500, 1000].map((valor) => (
-                      <button
-                        key={valor}
-                        onClick={() => {
-                          setValorSelecionado(valor);
-                          setOutroValor("");
-                        }}
-                        className={`py-2.5 px-3 rounded-[2px] text-[12px] font-bold uppercase tracking-[0.1em] transition-all duration-200 ${
-                          valorSelecionado === valor
-                            ? 'bg-[#D4AF37] text-[#462F29] shadow-md scale-[1.02]'
-                            : 'bg-[#462F29]/5 text-[#462F29] border border-[#462F29]/10 hover:bg-[#462F29]/10'
-                        }`}
-                      >
-                        R$ {valor}
-                      </button>
-                    ))}
+                </div>
+                <button 
+                  onClick={() => setModalPresenteAberto(null)}
+                  className="p-2 text-[#462F29]/40 hover:text-[#462F29] transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="h-[1px] bg-[#462F29]/5 w-full mb-6"></div>
+
+              {!pixGerado ? (
+                <div className="space-y-6 animate-in fade-in duration-250">
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-montserrat text-[#462F29]/40 uppercase tracking-[0.2em] font-bold">Escolha um valor sugerido</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[50, 100, 200, 300, 500, 1000].map((valor) => (
+                        <button
+                          key={valor}
+                          onClick={() => {
+                            setValorSelecionado(valor);
+                            setOutroValor("");
+                          }}
+                          className={`py-3.5 px-3 rounded-xl text-[13px] font-bold transition-all duration-200 ${
+                            valorSelecionado === valor
+                              ? 'bg-[#D4AF37] text-[#462F29] shadow-lg -translate-y-0.5'
+                              : 'bg-[#FDFAF6] text-[#462F29] border border-[#462F29]/5 hover:border-[#D4AF37]/30'
+                          }`}
+                        >
+                          R$ {valor}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="Ou digite outro valor"
-                      value={outroValor}
-                      onChange={(e) => {
-                        const formatado = formatarMoeda(e.target.value);
-                        setOutroValor(formatado);
-                        setValorSelecionado(null);
-                      }}
-                      className="w-full px-4 py-3.5 border border-[#462F29]/10 rounded-[2px] text-[16px] focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/20 font-montserrat transition-all placeholder:text-[#462F29]/30"
-                    />
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-montserrat text-[#462F29]/40 uppercase tracking-[0.2em] font-bold">Ou contribua com outro valor</p>
+                    <div className="relative group">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="R$ 0,00"
+                        value={outroValor}
+                        onChange={(e) => {
+                          const formatado = formatarMoeda(e.target.value);
+                          setOutroValor(formatado);
+                          setValorSelecionado(null);
+                        }}
+                        className="w-full px-5 py-4 bg-[#FDFAF6] border border-[#462F29]/5 rounded-xl text-[18px] font-bold text-[#462F29] focus:outline-none focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/5 transition-all placeholder:text-[#462F29]/20"
+                      />
+                    </div>
                     {valorInvalido && !valorSelecionado && outroValor !== "" && (
-                      <p className="text-[10px] text-red-500 font-montserrat italic text-center">
-                        Informe um valor maior que R$ 0,00 para gerar o PIX.
+                      <p className="text-[10px] text-red-500 font-montserrat italic text-center animate-in fade-in duration-200">
+                        Por favor, informe um valor para continuar.
                       </p>
                     )}
                   </div>
-                </div>
-              </div>
 
-              {!pixGerado ? (
-                <div className="animate-in fade-in duration-500">
                   <button
                     onClick={() => handleGerarPixCode(modalPresenteAberto)}
                     disabled={carregandoPixCode || valorInvalido}
-                    className="w-full bg-[#462F29] text-white py-4 rounded-[2px] font-bold uppercase tracking-[0.15em] text-[12px] hover:bg-[#D4AF37] hover:text-[#462F29] transition-all duration-300 disabled:opacity-30 shadow-lg active:scale-[0.98]"
+                    className="w-full bg-[#462F29] text-white py-4.5 rounded-xl font-bold uppercase tracking-[0.2em] text-[12px] hover:bg-[#D4AF37] hover:text-[#462F29] transition-all duration-250 disabled:opacity-30 shadow-xl active:scale-[0.98] flex items-center justify-center gap-3"
                   >
-                    {carregandoPixCode ? "Gerando código..." : "Gerar Chave PIX"}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setModalPresenteAberto(null);
-                      setValorSelecionado(null);
-                      setOutroValor("");
-                      setPixGerado(null);
-                    }}
-                    className="w-full mt-2 text-[#462F29] py-2 text-[12px] font-montserrat hover:text-[#D4AF37] transition-all"
-                  >
-                    Cancelar
+                    {carregandoPixCode ? (
+                      <>
+                        <span className="animate-spin text-lg">⏳</span>
+                        <span>Gerando PIX...</span>
+                      </>
+                    ) : (
+                      <span>Gerar Chave PIX</span>
+                    )}
                   </button>
                 </div>
               ) : (
-                <div className="animate-in fade-in zoom-in-95 duration-500">
-                  <div className="bg-[#462F29]/5 p-5 rounded-[2px] mb-6 border border-[#D4AF37]/30 shadow-inner">
-                    <div className="space-y-4">
+                <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-250">
+                  <div className="bg-[#FDFAF6] p-6 rounded-2xl border border-[#D4AF37]/20 shadow-sm space-y-5">
+                    <div className="flex justify-between items-start">
                       <div>
-                        <p className="text-[10px] font-montserrat text-[#462F29]/50 mb-1 uppercase tracking-[0.15em]">Recebedor:</p>
-                        <p className="text-[14px] font-bold text-[#462F29]">Daniel Abelha Torres</p>
+                        <p className="text-[9px] font-montserrat text-[#462F29]/40 mb-1 uppercase tracking-[0.2em] font-bold">Recebedor</p>
+                        <p className="text-[15px] font-bold text-[#462F29]">Daniel Abelha Torres</p>
                       </div>
-                      
-                      <div className="flex justify-between items-end border-t border-[#462F29]/10 pt-4">
-                        <div className="text-left">
-                          <p className="text-[10px] font-montserrat text-[#462F29]/50 mb-1 uppercase tracking-[0.15em]">Valor da Cota:</p>
-                          <p className="text-[16px] font-bold text-[#D4AF37]">
-                            {valorSelecionado 
-                              ? valorSelecionado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) 
-                              : outroValor}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[9px] font-montserrat text-green-600 font-bold uppercase tracking-widest bg-green-50 px-2 py-0.5 rounded-full border border-green-100">Código Ativo</p>
-                        </div>
-                      </div>
+                      <span className="bg-green-100 text-green-700 text-[8px] px-2.5 py-1 rounded-full font-bold uppercase tracking-widest">PIX Gerado</span>
                     </div>
                     
-                    <div className="mt-6 bg-white p-4 rounded-[1px] border border-[#462F29]/10 shadow-sm relative group">
-                      <p className="text-[10px] font-mono text-[#462F29]/70 break-all text-center leading-relaxed">{pixGerado}</p>
-                      <div className="absolute inset-0 bg-wedding-gold/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-wedding-gold">Pronto para copiar</span>
-                      </div>
+                    <div>
+                      <p className="text-[9px] font-montserrat text-[#462F29]/40 mb-1 uppercase tracking-[0.2em] font-bold">Valor da Contribuição</p>
+                      <p className="text-[22px] font-bold text-[#D4AF37]">
+                        {valorSelecionado 
+                          ? valorSelecionado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) 
+                          : outroValor}
+                      </p>
                     </div>
-                    <p className="text-[10px] font-montserrat text-[#462F29]/40 text-center italic mt-3">Clique no botão abaixo para copiar o código.</p>
+
+                    <div className="pt-4 border-t border-[#462F29]/5">
+                      <p className="text-[9px] font-montserrat text-[#462F29]/40 mb-2 uppercase tracking-[0.2em] font-bold">Código PIX</p>
+                      <div className="bg-white p-4 rounded-xl border border-[#462F29]/5 shadow-inner relative group cursor-pointer active:scale-[0.99] transition-transform" onClick={() => handleCopiarPixCode(modalPresenteAberto)}>
+                        <p className="text-[11px] font-mono text-[#462F29]/60 break-all text-center leading-relaxed pr-8">{pixGerado}</p>
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-wedding-gold text-lg opacity-40 group-hover:opacity-100 transition-opacity">📋</span>
+                      </div>
+                      <p className="text-[9px] text-center text-[#462F29]/30 mt-3 italic">Toque no código acima ou no botão abaixo para copiar.</p>
+                    </div>
                   </div>
 
                   <button
                     onClick={() => handleCopiarPixCode(modalPresenteAberto)}
                     disabled={carregandoRegistro}
-                    className="w-full bg-[#D4AF37] text-[#462F29] py-4 rounded-[2px] font-bold uppercase tracking-[0.2em] text-[13px] hover:bg-[#462F29] hover:text-white transition-all duration-300 shadow-xl active:scale-[0.98] flex items-center justify-center gap-2"
+                    className="w-full bg-[#D4AF37] text-[#462F29] py-5 rounded-xl font-bold uppercase tracking-[0.25em] text-[13px] hover:bg-[#462F29] hover:text-white transition-all duration-250 shadow-xl active:scale-[0.98] flex items-center justify-center gap-3"
                   >
-                    {carregandoRegistro ? "Registrando..." : (
+                    {carregandoRegistro ? (
+                      <span className="animate-spin text-lg">⏳</span>
+                    ) : (
                       <>
-                        <span>📋</span>
-                        <span>COPIAR CÓDIGO PIX</span>
+                        <span className="text-xl">📋</span>
+                        <span>COPIAR PIX</span>
                       </>
                     )}
                   </button>
@@ -918,7 +948,7 @@ export default function Confirmacao() {
                       setOutroValor("");
                       setPixGerado(null);
                     }}
-                    className="w-full mt-2 text-[#462F29] py-2 text-[12px] font-montserrat hover:text-[#D4AF37] transition-all"
+                    className="w-full text-[#462F29]/40 py-2 text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#462F29] transition-all"
                   >
                     Fechar
                   </button>
