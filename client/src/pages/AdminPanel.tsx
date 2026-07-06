@@ -1,9 +1,9 @@
 /**
- * Admin Panel - Gerenciamento de Convidados
- * Design Philosophy: Minimalismo Japonês Contemporâneo
+ * Admin Panel Premium - Release Candidate 1
+ * Design Philosophy: Editorial, Clean, and High-Performance
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { trpc } from "../lib/trpc";
 
 interface Convidado {
@@ -22,52 +22,66 @@ interface Convidado {
 }
 
 export default function AdminPanel() {
+  // --- AUTH & STATE ---
   const [senhaDigitada, setSenhaDigitada] = useState("");
   const [autenticado, setAutenticado] = useState(false);
-  const [convidados, setConvidados] = useState<Convidado[]>([]);
   const [carregando, setCarregando] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [exibirForm, setExibirForm] = useState(false);
+  const [busca, setBusca] = useState("");
+  const [filtroResposta, setFiltroResposta] = useState<"todos" | "Confirmado" | "Não Irá" | "Talvez" | "Pendente">("todos");
   
   const [formConvidado, setFormConvidado] = useState({ 
     nome: "", 
     email: "", 
     telefone: "", 
-    limite: "" as string | number, // Usar string para permitir campo vazio ao digitar
+    limite: "" as string | number,
     status: "Pendente" as any
   });
 
-  const [filtroResposta, setFiltroResposta] = useState<"todos" | "Confirmado" | "Não Irá" | "Talvez" | "Pendente">("todos");
-  const [busca, setBusca] = useState("");
-
   const SENHA_ADMIN = "casamento2026";
 
+  // --- TRPC QUERIES & MUTATIONS ---
   const getAllConvidados = trpc.adminRouter.getAllConvidados.useQuery(undefined, {
     enabled: autenticado,
     retry: false,
   });
 
-  const getRankingPresentes = trpc.adminRouter.getRankingPresentes.useQuery(undefined, {
+  const getCacheStats = trpc.adminRouter.getCacheStats.useQuery(undefined, {
     enabled: autenticado,
-    retry: false,
+    refetchInterval: 30000, // Atualiza stats a cada 30s
   });
 
+  const getRankingPresentes = trpc.adminRouter.getRankingPresentes.useQuery(undefined, {
+    enabled: autenticado,
+  });
+
+  const refreshCacheMutation = trpc.adminRouter.refreshCache.useMutation();
   const adicionarConvidadoMutation = trpc.adminRouter.adicionarConvidado.useMutation();
   const atualizarConvidadoMutation = trpc.adminRouter.atualizarConvidado.useMutation();
   const deletarConvidadoMutation = trpc.adminRouter.deletarConvidado.useMutation();
 
+  // --- EFFECTS ---
   useEffect(() => {
     const isAuth = sessionStorage.getItem("admin_auth") === "true";
     if (isAuth) setAutenticado(true);
+
+    // Estilos globais para Safari/Mobile stability
+    const style = document.createElement('style');
+    style.innerHTML = `
+      :root { --dvh: 100dvh; }
+      body { background-color: #FDFAF6; }
+      input, select, textarea { font-size: 16px !important; } /* Previne zoom no iOS */
+      .no-scroll { overflow: hidden; }
+      @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      .animate-spin-slow { animation: spin 2s linear infinite; }
+    `;
+    document.head.appendChild(style);
+    return () => { document.head.removeChild(style); };
   }, []);
 
-  useEffect(() => {
-    if (autenticado && getAllConvidados.data) {
-      setConvidados((getAllConvidados.data as Convidado[]) || []);
-    }
-  }, [autenticado, getAllConvidados.data]);
-
-  function autenticar() {
+  // --- HANDLERS ---
+  const autenticar = () => {
     if (senhaDigitada === SENHA_ADMIN) {
       setAutenticado(true);
       sessionStorage.setItem("admin_auth", "true");
@@ -77,19 +91,45 @@ export default function AdminPanel() {
       alert("Senha incorreta!");
       setSenhaDigitada("");
     }
-  }
+  };
 
-  function sair() {
+  const sair = () => {
     setAutenticado(false);
     sessionStorage.removeItem("admin_auth");
     sessionStorage.removeItem("admin_auth_pass");
-  }
+  };
 
-  async function salvarConvidado() {
-    if (!formConvidado.nome.trim()) {
-      alert("Digite o nome do convidado");
-      return;
+  const handleRefreshCache = async () => {
+    if (carregando) return;
+    try {
+      setCarregando(true);
+      await refreshCacheMutation.mutateAsync();
+      await getAllConvidados.refetch();
+      await getCacheStats.refetch();
+    } catch (error) {
+      alert("Erro ao atualizar cache.");
+    } finally {
+      setCarregando(false);
     }
+  };
+
+  const handleExport = () => {
+    const data = getAllConvidados.data || [];
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + "Nome,Status,Limite,Acompanhantes,Crianças,Mensagem\n"
+      + data.map((c: any) => `"${c.nome}","${c.status}",${c.limite},${c.acompanhantes},${c.criancas},"${c.mensagem?.replace(/"/g, '""') || ''}"`).join("\n");
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `convidados_casamento_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const salvarConvidado = async () => {
+    if (!formConvidado.nome.trim()) return alert("Nome é obrigatório");
     try {
       setCarregando(true);
       const payload = {
@@ -101,37 +141,39 @@ export default function AdminPanel() {
       };
 
       if (editandoId) {
-        await atualizarConvidadoMutation.mutateAsync({
-          id: editandoId,
-          ...payload
-        });
-        alert("Convidado Alterado com sucesso");
+        await atualizarConvidadoMutation.mutateAsync({ id: editandoId, ...payload });
       } else {
         await adicionarConvidadoMutation.mutateAsync(payload);
-        alert("Convidado Cadastrado com sucesso");
       }
       await getAllConvidados.refetch();
       limparForm();
     } catch (error) {
-      alert("Erro ao processar solicitação.");
+      alert("Erro ao salvar.");
     } finally {
       setCarregando(false);
     }
-  }
+  };
 
-  function limparForm() {
-    setFormConvidado({ 
-      nome: "", 
-      email: "", 
-      telefone: "", 
-      limite: "", 
-      status: "Pendente" as any
-    });
+  const removerConvidado = async (id: string) => {
+    if (!confirm("Remover este convidado?")) return;
+    try {
+      setCarregando(true);
+      await deletarConvidadoMutation.mutateAsync({ id });
+      await getAllConvidados.refetch();
+    } catch (error) {
+      alert("Erro ao remover.");
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  const limparForm = () => {
+    setFormConvidado({ nome: "", email: "", telefone: "", limite: "", status: "Pendente" });
     setEditandoId(null);
     setExibirForm(false);
-  }
+  };
 
-  function iniciarEdicao(c: Convidado) {
+  const iniciarEdicao = (c: Convidado) => {
     setEditandoId(c.id);
     setFormConvidado({
       nome: c.nome,
@@ -141,54 +183,63 @@ export default function AdminPanel() {
       status: c.status as any
     });
     setExibirForm(true);
-  }
-
-  async function removerConvidado(id: string) {
-    if (confirm("Tem certeza que deseja remover este convidado?")) {
-      try {
-        setCarregando(true);
-        await deletarConvidadoMutation.mutateAsync({ id });
-        await getAllConvidados.refetch();
-        alert("Convidado Removido com sucesso");
-      } catch (error) {
-        alert("Erro ao remover convidado");
-      } finally {
-        setCarregando(false);
-      }
-    }
-  }
-
-  const confirmadosLista = convidados.filter(c => c.status === "Confirmado");
-  const stats = {
-    total: convidados.length,
-    // Total Evento = Titulares Confirmados + Acompanhantes + Crianças (< 8 anos)
-    confirmados: confirmadosLista.reduce((acc, c) => acc + 1 + (Number(c.acompanhantes) || 0) + (Number(c.menores8) || 0), 0),
-    naoIrao: convidados.filter(c => c.status === "Não Irá").length,
-    talvez: convidados.filter(c => c.status === "Talvez").length,
-    // ACOMPANHANTES = Acompanhantes Adultos/Pagantes
-    acompanhantes: confirmadosLista.reduce((acc, c) => acc + (Number(c.acompanhantes) || 0), 0),
-    // Crianças (< 8 anos)
-    criancasMenores8: confirmadosLista.reduce((acc, c) => acc + (Number(c.menores8) || 0), 0),
-    pendentes: convidados.filter(c => c.status === "Pendente").length,
   };
 
-  let convidadosFiltrados = Array.isArray(convidados) ? convidados : [];
-  if (filtroResposta !== "todos") convidadosFiltrados = convidadosFiltrados.filter((c) => c && c.status === filtroResposta);
-  if (busca) convidadosFiltrados = convidadosFiltrados.filter((c) => c && c.nome && c.nome.toLowerCase().includes(busca.toLowerCase()));
+  // --- DATA PROCESSING ---
+  const convidadosFiltrados = useMemo(() => {
+    let list = (getAllConvidados.data as Convidado[]) || [];
+    if (filtroResposta !== "todos") list = list.filter(c => c.status === filtroResposta);
+    if (busca) {
+      const b = busca.toLowerCase();
+      list = list.filter(c => 
+        c.nome.toLowerCase().includes(b) || 
+        c.email?.toLowerCase().includes(b) || 
+        c.telefone?.includes(b)
+      );
+    }
+    return list;
+  }, [getAllConvidados.data, filtroResposta, busca]);
 
-  const thStyle: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontWeight: "normal", color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "10px" };
-  const tdStyle: React.CSSProperties = { padding: "16px", borderTop: "1px solid #E8CECE", color: "#2C2C2C", verticalAlign: "top", fontSize: "12px" };
-  const inputStyle: React.CSSProperties = { padding: "10px 12px", border: "1px solid #E8CECE", backgroundColor: "#FDFAF6", fontFamily: "'Lato', sans-serif", fontSize: "13px", outline: "none" };
+  const stats = useMemo(() => {
+    const list = (getAllConvidados.data as Convidado[]) || [];
+    const confirmados = list.filter(c => c.status === "Confirmado");
+    const totalPresentes = (getRankingPresentes.data as any[])?.reduce((acc, p) => acc + p.valorTotal, 0) || 0;
+    
+    return {
+      totalLista: list.length,
+      confirmados: confirmados.reduce((acc, c) => acc + 1 + (c.acompanhantes || 0), 0),
+      criancas: confirmados.reduce((acc, c) => acc + (c.criancas || 0), 0),
+      pendentes: list.filter(c => c.status === "Pendente").length,
+      naoIrao: list.filter(c => c.status === "Não Irá").length,
+      taxaConfirmacao: list.length ? Math.round((confirmados.length / list.length) * 100) : 0,
+      valorPresentes: totalPresentes
+    };
+  }, [getAllConvidados.data, getRankingPresentes.data]);
 
+  // --- RENDER HELPERS ---
   if (!autenticado) {
     return (
-      <div style={{ backgroundColor: "#FDFAF6", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-        <div style={{ maxWidth: "400px", width: "100%", textAlign: "center" }}>
-          <h1 style={{ fontFamily: "'Great Vibes', cursive", fontSize: "42px", color: "#2C2C2C", marginBottom: "32px" }}>Painel Admin</h1>
-          <div style={{ border: "1px solid #E8CECE", padding: "32px 24px", backgroundColor: "#FDFAF6" }}>
-            <input type="password" placeholder="Senha" value={senhaDigitada} onChange={(e) => setSenhaDigitada(e.target.value)} onKeyPress={(e) => e.key === "Enter" && autenticar()} style={{ ...inputStyle, width: "100%", marginBottom: "16px", textAlign: "center" }} />
-            <button onClick={autenticar} style={{ width: "100%", backgroundColor: "#C4876A", color: "#FFF", border: "none", padding: "12px", cursor: "pointer", textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.1em", marginBottom: "16px" }}>Entrar</button>
-            <a href="/" style={{ display: "block", color: "#888", fontSize: "11px", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.1em" }}>Voltar para o Site</a>
+      <div className="min-h-[100dvh] flex items-center justify-center bg-[#FDFAF6] px-6">
+        <div className="w-full max-w-md text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
+          <h1 className="font-halimun text-4xl text-[#462F29]">Admin</h1>
+          <div className="bg-white p-8 border border-[#E8CECE] shadow-xl rounded-sm space-y-6">
+            <div className="space-y-2">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold">Acesso Restrito</p>
+              <input 
+                type="password" 
+                placeholder="Digite a senha" 
+                value={senhaDigitada} 
+                onChange={(e) => setSenhaDigitada(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && autenticar()}
+                className="w-full border-b border-[#E8CECE] py-3 text-center outline-none focus:border-wedding-gold transition-colors"
+              />
+            </div>
+            <button 
+              onClick={autenticar}
+              className="w-full bg-[#462F29] text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-wedding-gold transition-all active:scale-[0.98]"
+            >
+              Entrar no Painel
+            </button>
           </div>
         </div>
       </div>
@@ -196,174 +247,316 @@ export default function AdminPanel() {
   }
 
   return (
-    <div style={{ backgroundColor: "#FDFAF6", minHeight: "100vh" }}>
-      <header style={{ borderBottom: "1px solid #E8CECE", padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, backgroundColor: "#FDFAF6", zIndex: 100 }}>
-        <h1 style={{ fontFamily: "'Great Vibes', cursive", fontSize: "28px", color: "#2C2C2C", margin: 0 }}>Painel Administrativo</h1>
-        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-          <a href="/" style={{ color: "#888", fontSize: "10px", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.1em" }}>Site</a>
-          <button onClick={() => setExibirForm(true)} style={{ backgroundColor: "#C9A96E", color: "#FFF", border: "none", padding: "8px 16px", fontSize: "10px", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.1em" }}>+ Novo Convidado</button>
-          <button onClick={sair} style={{ background: "none", border: "none", color: "#C4876A", cursor: "pointer", fontSize: "12px", textTransform: "uppercase" }}>Sair</button>
+    <div className="min-h-[100dvh] bg-[#FDFAF6] font-montserrat pb-20 md:pb-10">
+      {/* 1. Barra de Ações Superior (Fixa) */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#E8CECE] px-4 md:px-8 py-4 flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <h1 className="font-halimun text-2xl text-[#462F29] hidden md:block">Admin</h1>
+          <div className="h-6 w-[1px] bg-[#E8CECE] hidden md:block mx-2"></div>
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${getCacheStats.data?.isSyncing ? 'bg-yellow-400 animate-pulse' : 'bg-green-500'}`}></div>
+            <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">
+              {getCacheStats.data?.isSyncing ? 'Sincronizando...' : 'Sistema Online'}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 md:gap-4">
+          <button 
+            onClick={handleRefreshCache}
+            disabled={carregando}
+            className="p-2.5 bg-[#FDFAF6] border border-[#E8CECE] rounded-full hover:bg-white hover:shadow-md transition-all active:scale-90 relative group"
+            title="Atualizar Cache"
+          >
+            <span className={`block ${carregando ? 'animate-spin' : ''}`}>🔄</span>
+            <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-[#462F29] text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap">Atualizar Cache</span>
+          </button>
+          
+          <button 
+            onClick={handleExport}
+            className="p-2.5 bg-[#FDFAF6] border border-[#E8CECE] rounded-full hover:bg-white hover:shadow-md transition-all active:scale-90 relative group"
+            title="Exportar CSV"
+          >
+            <span>📥</span>
+            <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-[#462F29] text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap">Exportar CSV</span>
+          </button>
+
+          <button 
+            onClick={() => setExibirForm(true)}
+            className="bg-[#462F29] text-white px-4 py-2.5 rounded-full text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-wedding-gold transition-all active:scale-95 flex items-center gap-2"
+          >
+            <span className="text-sm">+</span> <span className="hidden sm:inline">Novo Convidado</span>
+          </button>
+
+          <button onClick={sair} className="text-[9px] uppercase tracking-widest text-red-400 font-bold hover:text-red-600 transition-colors ml-2">Sair</button>
         </div>
       </header>
 
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 24px" }}>
-        {/* Dashboard de Estatísticas */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "16px", marginBottom: "40px" }}>
-          {[
-            { label: "Total Lista", valor: stats.total, cor: "#2C2C2C" },
-            { label: "Total Evento", valor: stats.confirmados, cor: "#4CAF50" },
-            { label: "Não Irão", valor: stats.naoIrao, cor: "#F44336" },
-            { label: "Talvez", valor: stats.talvez, cor: "#FF9800" },
-            { label: "ACOMPANHANTES", valor: stats.acompanhantes, cor: "#2196F3" },
-            { label: "Crianças (< 8 anos)", valor: stats.criancasMenores8, cor: "#E91E63" },
-            { label: "Pendentes", valor: stats.pendentes, cor: "#607D8B" }
-          ].map((s) => (
-            <div key={s.label} style={{ border: "1px solid #E8CECE", padding: "20px", textAlign: "center", backgroundColor: "#FFF" }}>
-              <p style={{ fontSize: "24px", fontWeight: "bold", color: s.cor, margin: "0 0 4px 0" }}>{s.valor}</p>
-              <p style={{ fontSize: "9px", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em" }}>{s.label}</p>
+      <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-8">
+        
+        {/* 2. Cache Info & Stats Dashboard */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Cache Info Card */}
+          <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm space-y-4">
+            <div className="flex justify-between items-start">
+              <h3 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Status do Cache</h3>
+              <span className="text-[10px] font-mono text-wedding-gold">v1.2.0</span>
             </div>
-          ))}
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-[11px] text-gray-500">Convidados</span>
+                <span className="text-[11px] font-bold text-[#462F29]">{getCacheStats.data?.count || 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[11px] text-gray-500">Última Sinc.</span>
+                <span className="text-[11px] font-bold text-[#462F29]">
+                  {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleTimeString('pt-BR') : '--:--'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[11px] text-gray-500">Idade</span>
+                <span className="text-[11px] font-bold text-[#462F29]">{getCacheStats.data?.cacheAgeSeconds || 0}s</span>
+              </div>
+            </div>
+            {carregando && (
+              <div className="pt-2 border-t border-[#FDFAF6]">
+                <p className="text-[9px] text-wedding-gold animate-pulse uppercase tracking-widest font-bold text-center">Sincronizando com Google Sheets...</p>
+              </div>
+            )}
+          </div>
+
+          {/* Stats Grid */}
+          <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: "Confirmados", val: stats.confirmados, sub: "Pessoas", icon: "✨", color: "text-green-600" },
+              { label: "Pendentes", val: stats.pendentes, sub: "Convites", icon: "⏳", color: "text-gray-400" },
+              { label: "Taxa Conf.", val: `${stats.taxaConfirmacao}%`, sub: "Engajamento", icon: "📈", color: "text-wedding-gold" },
+              { label: "Presentes", val: stats.valorPresentes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }), sub: "Estimado", icon: "🎁", color: "text-[#462F29]" },
+            ].map((s, i) => (
+              <div key={i} className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xl">{s.icon}</span>
+                  <span className={`text-[18px] font-bold ${s.color}`}>{s.val}</span>
+                </div>
+                <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">{s.label}</p>
+                <p className="text-[8px] text-gray-300 uppercase tracking-tighter">{s.sub}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Formulário de Adição/Edição (MODAL) */}
-        {exibirForm && (
-          <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-            <div style={{ border: "1px solid #E8CECE", padding: "32px", backgroundColor: "#FFF", width: "90%", maxWidth: "600px", boxShadow: "0 10px 25px rgba(0,0,0,0.1)", animation: "fadeIn 0.3s ease" }}>
-              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "24px", marginBottom: "24px", textAlign: "center" }}>
-                {editandoId ? "Editar Convidado" : "Incluir Novo Convidado"}
-              </h2>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px", marginBottom: "24px" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  <label style={{ fontSize: "10px", color: "#888", textTransform: "uppercase" }}>Nome Completo</label>
-                  <input type="text" placeholder="Ex: João Silva" value={formConvidado.nome} onChange={(e) => setFormConvidado({...formConvidado, nome: e.target.value})} style={inputStyle} />
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <label style={{ fontSize: "10px", color: "#888", textTransform: "uppercase" }}>E-mail</label>
-                    <input type="email" placeholder="email@exemplo.com" value={formConvidado.email} onChange={(e) => setFormConvidado({...formConvidado, email: e.target.value})} style={inputStyle} />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <label style={{ fontSize: "10px", color: "#888", textTransform: "uppercase" }}>Telefone</label>
-                    <input type="tel" placeholder="(00) 00000-0000" value={formConvidado.telefone} onChange={(e) => setFormConvidado({...formConvidado, telefone: e.target.value})} style={inputStyle} />
-                  </div>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  <label style={{ fontSize: "10px", color: "#888", textTransform: "uppercase" }}>Limite de Acompanhantes</label>
-                  <input type="number" value={formConvidado.limite} onChange={(e) => setFormConvidado({...formConvidado, limite: e.target.value === "" ? "" : parseInt(e.target.value)})} style={inputStyle} />
-                </div>
-                {editandoId && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <label style={{ fontSize: "10px", color: "#888", textTransform: "uppercase" }}>Status de Confirmação</label>
-                    <select value={formConvidado.status} onChange={(e) => setFormConvidado({...formConvidado, status: e.target.value as any})} style={inputStyle}>
-                      <option value="Pendente">Pendente</option>
-                      <option value="Confirmado">Confirmado</option>
-                      <option value="Não Irá">Não Irá</option>
-                      <option value="Talvez">Talvez</option>
-                    </select>
-                  </div>
+        {/* 3. Busca & Filtros */}
+        <div className="bg-white p-4 border border-[#E8CECE] rounded-sm shadow-sm flex flex-col md:flex-row gap-4 items-center">
+          <div className="relative flex-grow w-full">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300">🔍</span>
+            <input 
+              type="text" 
+              placeholder="Buscar por nome, e-mail ou telefone..." 
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-[#FDFAF6] border-none outline-none text-[13px] placeholder:text-gray-300 focus:ring-1 focus:ring-wedding-gold/20 transition-all rounded-sm"
+            />
+          </div>
+          <div className="flex gap-2 overflow-x-auto w-full md:w-auto no-scrollbar">
+            {["todos", "Confirmado", "Não Irá", "Talvez", "Pendente"].map((f) => (
+              <button 
+                key={f} 
+                onClick={() => setFiltroResposta(f as any)}
+                className={`px-4 py-2.5 rounded-full text-[9px] uppercase tracking-widest font-bold whitespace-nowrap transition-all
+                  ${filtroResposta === f ? 'bg-[#462F29] text-white shadow-lg' : 'bg-[#FDFAF6] text-gray-400 border border-[#E8CECE] hover:border-wedding-gold'}`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 4. Lista de Convidados */}
+        <div className="bg-white border border-[#E8CECE] rounded-sm shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-[#FDFAF6] border-b border-[#E8CECE]">
+                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Convidado</th>
+                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Status</th>
+                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold hidden md:table-cell text-center">Acomp.</th>
+                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold hidden lg:table-cell">Mensagem</th>
+                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#FDFAF6]">
+                {convidadosFiltrados.length > 0 ? convidadosFiltrados.map((c) => (
+                  <tr key={c.id} className="hover:bg-[#FDFAF6]/50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-[#462F29] text-[13px]">{c.nome}</div>
+                      <div className="text-[10px] text-gray-400 flex flex-wrap gap-x-2">
+                        <span>{c.telefone || 'Sem tel'}</span>
+                        <span className="text-gray-200">•</span>
+                        <span>Limite: {c.limite}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-[8px] uppercase tracking-widest font-bold
+                        ${c.status === 'Confirmado' ? 'bg-green-50 text-green-600' : 
+                          c.status === 'Não Irá' ? 'bg-red-50 text-red-500' : 
+                          c.status === 'Talvez' ? 'bg-orange-50 text-orange-500' : 
+                          'bg-gray-50 text-gray-400'}`}>
+                        {c.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-center hidden md:table-cell">
+                      <span className="text-[12px] font-bold text-[#462F29]">{c.acompanhantes || 0}</span>
+                      {c.criancas ? <span className="text-[10px] text-wedding-gold ml-1">+{c.criancas}👶</span> : null}
+                    </td>
+                    <td className="px-6 py-4 hidden lg:table-cell">
+                      <p className="text-[11px] text-gray-500 italic max-w-xs truncate" title={c.mensagem}>
+                        {c.mensagem || '--'}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => iniciarEdicao(c)} className="text-[10px] uppercase font-bold text-wedding-gold hover:underline">Editar</button>
+                        <button onClick={() => removerConvidado(c.id)} className="text-[10px] uppercase font-bold text-red-300 hover:text-red-500 transition-colors">Excluir</button>
+                      </div>
+                      {/* Mobile Actions (sempre visível) */}
+                      <div className="flex justify-end gap-3 md:hidden">
+                        <button onClick={() => iniciarEdicao(c)} className="text-lg">📝</button>
+                      </div>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-20 text-center">
+                      <div className="space-y-3">
+                        <span className="text-4xl block">🍃</span>
+                        <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhum convidado encontrado</p>
+                      </div>
+                    </td>
+                  </tr>
                 )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* 5. Ranking de Presentes (Visual Refinado) */}
+        {getRankingPresentes.data && (getRankingPresentes.data as any[]).length > 0 && (
+          <div className="bg-white border border-[#E8CECE] rounded-sm shadow-sm p-6">
+            <h3 className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-6">Ranking de Cotas de Presentes</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(getRankingPresentes.data as any[]).map((p, idx) => (
+                <div key={idx} className="flex items-center justify-between p-4 bg-[#FDFAF6] border border-[#E8CECE]/50 rounded-sm">
+                  <div className="space-y-1">
+                    <p className="text-[11px] font-bold text-[#462F29] uppercase truncate max-w-[180px]">{p.presenteNome}</p>
+                    <p className="text-[9px] text-gray-400 uppercase tracking-widest">{p.quantidade} Contribuições</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[13px] font-bold text-wedding-gold">
+                      {p.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* 6. Modal de Formulário (Premium) */}
+      {exibirForm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-[#462F29]/40 backdrop-blur-sm" onClick={limparForm}></div>
+          <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-sm overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="bg-[#462F29] px-8 py-6 flex justify-between items-center">
+              <h2 className="font-cormorant text-2xl text-white uppercase tracking-widest">
+                {editandoId ? 'Editar Convidado' : 'Novo Convidado'}
+              </h2>
+              <button onClick={limparForm} className="text-white/60 hover:text-white text-2xl">×</button>
+            </div>
+            
+            <div className="p-8 space-y-6">
+              <div className="grid grid-cols-1 gap-6">
+                <div className="space-y-1">
+                  <label className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Nome Completo</label>
+                  <input 
+                    type="text" 
+                    value={formConvidado.nome} 
+                    onChange={(e) => setFormConvidado({...formConvidado, nome: e.target.value})}
+                    className="w-full border-b border-[#E8CECE] py-2 outline-none focus:border-wedding-gold transition-colors text-[14px]"
+                    placeholder="Ex: Mariana Abelha"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1">
+                    <label className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">E-mail</label>
+                    <input 
+                      type="email" 
+                      value={formConvidado.email} 
+                      onChange={(e) => setFormConvidado({...formConvidado, email: e.target.value})}
+                      className="w-full border-b border-[#E8CECE] py-2 outline-none focus:border-wedding-gold transition-colors text-[14px]"
+                      placeholder="email@exemplo.com"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Telefone</label>
+                    <input 
+                      type="tel" 
+                      value={formConvidado.telefone} 
+                      onChange={(e) => setFormConvidado({...formConvidado, telefone: e.target.value})}
+                      className="w-full border-b border-[#E8CECE] py-2 outline-none focus:border-wedding-gold transition-colors text-[14px]"
+                      placeholder="(00) 00000-0000"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1">
+                    <label className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Limite Acompanhantes</label>
+                    <input 
+                      type="number" 
+                      value={formConvidado.limite} 
+                      onChange={(e) => setFormConvidado({...formConvidado, limite: e.target.value})}
+                      className="w-full border-b border-[#E8CECE] py-2 outline-none focus:border-wedding-gold transition-colors text-[14px]"
+                    />
+                  </div>
+                  {editandoId && (
+                    <div className="space-y-1">
+                      <label className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Status Atual</label>
+                      <select 
+                        value={formConvidado.status} 
+                        onChange={(e) => setFormConvidado({...formConvidado, status: e.target.value as any})}
+                        className="w-full border-b border-[#E8CECE] py-2 outline-none focus:border-wedding-gold transition-colors text-[14px] bg-transparent"
+                      >
+                        <option value="Pendente">Pendente</option>
+                        <option value="Confirmado">Confirmado</option>
+                        <option value="Não Irá">Não Irá</option>
+                        <option value="Talvez">Talvez</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-                <button onClick={salvarConvidado} disabled={carregando} style={{ backgroundColor: "#C4876A", color: "#FFF", border: "none", padding: "14px 28px", cursor: "pointer", textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.1em", flex: 1 }}>
-                  {carregando ? "Salvando..." : editandoId ? "Salvar Alterações" : "Cadastrar Convidado"}
+
+              <div className="pt-6 flex gap-4">
+                <button 
+                  onClick={salvarConvidado}
+                  disabled={carregando}
+                  className="flex-grow bg-[#462F29] text-white py-4 text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-wedding-gold transition-all active:scale-[0.98] disabled:opacity-50"
+                >
+                  {carregando ? 'Processando...' : editandoId ? 'Salvar Alterações' : 'Cadastrar Convidado'}
                 </button>
-                <button onClick={limparForm} style={{ backgroundColor: "transparent", color: "#888", border: "1px solid #E8CECE", padding: "14px 28px", cursor: "pointer", textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.1em" }}>
+                <button 
+                  onClick={limparForm}
+                  className="px-8 border border-[#E8CECE] text-gray-400 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#FDFAF6] transition-all"
+                >
                   Cancelar
                 </button>
               </div>
             </div>
           </div>
-        )}
-
-        {/* Barra de Filtros e Busca */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", gap: "16px", flexWrap: "wrap" }}>
-          <div style={{ display: "flex", gap: "8px" }}>
-            {["todos", "Confirmado", "Não Irá", "Talvez", "Pendente"].map((f) => (
-              <button key={f} onClick={() => setFiltroResposta(f as any)} style={{ background: filtroResposta === f ? "#2C2C2C" : "none", color: filtroResposta === f ? "#FFF" : "#888", border: "1px solid #E8CECE", padding: "6px 12px", fontSize: "10px", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                {f}
-              </button>
-            ))}
-          </div>
-          <input type="text" placeholder="Buscar por nome..." value={busca} onChange={(e) => setBusca(e.target.value)} style={{ ...inputStyle, width: "300px" }} />
         </div>
-
-        {/* Demonstrativo de Presentes */}
-        {getRankingPresentes.data && (getRankingPresentes.data as any).length > 0 && (
-          <div style={{ backgroundColor: "#FFF", border: "1px solid #E8CECE", padding: "24px", marginBottom: "32px" }}>
-            <h3 style={{ fontSize: "16px", fontWeight: "bold", color: "#2C2C2C", marginBottom: "16px", textTransform: "uppercase", letterSpacing: "0.1em" }}>Ranking de Presentes</h3>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ backgroundColor: "#FDFAF6" }}>
-                  <th style={thStyle}>Presente</th>
-                  <th style={thStyle}>Quantidade</th>
-                  <th style={thStyle}>Valor Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(getRankingPresentes.data as any).map((p: any, idx: number) => (
-                  <tr key={idx}>
-                    <td style={tdStyle}>{p.presenteNome}</td>
-                    <td style={tdStyle}>{p.quantidade}</td>
-                    <td style={tdStyle}>R$ {p.valorTotal.toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Tabela de Convidados */}
-        <div style={{ backgroundColor: "#FFF", border: "1px solid #E8CECE", overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ backgroundColor: "#FDFAF6" }}>
-                <th style={thStyle}>Convidado</th>
-                <th style={thStyle}>Status</th>
-                <th style={thStyle}>Acomp.</th>
-                <th style={thStyle}>Mensagem</th>
-                <th style={thStyle}>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {convidadosFiltrados.map((c) => (
-                <tr key={c.id}>
-                  <td style={tdStyle}>
-                    <div style={{ fontWeight: "bold", marginBottom: "4px" }}>{c.nome}</div>
-                    <div style={{ fontSize: "10px", color: "#888" }}>{c.email || "Sem e-mail"} • {c.telefone || "Sem tel"}</div>
-                    <div style={{ fontSize: "10px", color: "#C4876A", marginTop: "4px" }}>Limite: {c.limite || 0} acompanhantes</div>
-                  </td>
-                  <td style={tdStyle}>
-                    <span style={{ padding: "4px 8px", fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.05em", backgroundColor: c.status === "Confirmado" ? "#E8F5E9" : c.status === "Não Irá" ? "#FFEBEE" : "#F5F5F5", color: c.status === "Confirmado" ? "#2E7D32" : c.status === "Não Irá" ? "#C62828" : "#666" }}>
-                      {c.status}
-                    </span>
-                  </td>
-                  <td style={tdStyle}>
-                    {c.acompanhanteDetalhes ? (
-                      <div style={{ fontSize: "10px", color: "#666", whiteSpace: "pre-line", lineHeight: "1.4" }}>
-                        {c.acompanhanteDetalhes}
-                      </div>
-                    ) : (
-                      <span style={{color: "#AAA"}}>-</span>
-                    )}
-                  </td>
-                  <td style={tdStyle}>
-                    <div style={{ fontSize: "11px", maxWidth: "200px", color: "#666", fontStyle: "italic" }}>
-                      {c.mensagem || "-"}
-                    </div>
-                  </td>
-                  <td style={tdStyle}>
-                    <div style={{ display: "flex", gap: "12px" }}>
-                      <button onClick={() => iniciarEdicao(c)} style={{ background: "none", border: "none", color: "#2196F3", cursor: "pointer", fontSize: "10px", textTransform: "uppercase" }}>Editar</button>
-                      <button onClick={() => removerConvidado(c.id)} style={{ background: "none", border: "none", color: "#F44336", cursor: "pointer", fontSize: "10px", textTransform: "uppercase" }}>Remover</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
-// Trigger build: 2026-05-17 12:00
