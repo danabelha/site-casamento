@@ -175,6 +175,7 @@ export default function Confirmacao() {
   const generatePixCodeMutation = trpc.generatePixCode.useMutation();
 
   const [pixGerado, setPixGerado] = useState<string | null>(null);
+  const [pixCopiado, setPixCopiado] = useState(false);
   const [carregandoPixCode, setCarregandoPixCode] = useState(false);
   const [carregandoRefresh, setCarregandoRefresh] = useState(false);
 
@@ -280,13 +281,17 @@ export default function Confirmacao() {
         status: "PIX copiado",
       });
       
-      navigator.clipboard.writeText(pixGerado);
-      alert(`PIX copiado!\n\nAgora é só colar o código no aplicativo do seu banco para concluir a contribuição.`);
+      await navigator.clipboard.writeText(pixGerado);
       
-      setModalPresenteAberto(null);
-      setValorSelecionado(null);
-      setOutroValor("");
-      setPixGerado(null);
+      // Feedback visual elegante em vez de alert
+      setPixCopiado(true);
+      setTimeout(() => {
+        setPixCopiado(false);
+        setModalPresenteAberto(null);
+        setValorSelecionado(null);
+        setOutroValor("");
+        setPixGerado(null);
+      }, 2500);
     } catch (error) {
       console.error(error);
       alert("Erro ao registrar presente. Tente novamente.");
@@ -943,11 +948,18 @@ export default function Confirmacao() {
 
                   <button
                     onClick={() => handleCopiarPixCode(modalPresenteAberto)}
-                    disabled={carregandoRegistro}
-                    className="w-full bg-[#D4AF37] text-[#462F29] py-5 rounded-xl font-bold uppercase tracking-[0.25em] text-[13px] hover:bg-[#462F29] hover:text-white transition-all duration-250 shadow-xl active:scale-[0.98] flex items-center justify-center gap-3"
+                    disabled={carregandoRegistro || pixCopiado}
+                    className={`w-full py-5 rounded-xl font-bold uppercase tracking-[0.25em] text-[13px] transition-all duration-250 shadow-xl active:scale-[0.98] flex items-center justify-center gap-3 ${
+                      pixCopiado ? 'bg-green-600 text-white' : 'bg-[#D4AF37] text-[#462F29] hover:bg-[#462F29] hover:text-white'
+                    }`}
                   >
                     {carregandoRegistro ? (
                       <span className="animate-spin text-lg">⏳</span>
+                    ) : pixCopiado ? (
+                      <>
+                        <span className="text-xl">✓</span>
+                        <span>PIX COPIADO!</span>
+                      </>
                     ) : (
                       <>
                         <span className="text-xl">📋</span>
@@ -955,6 +967,12 @@ export default function Confirmacao() {
                       </>
                     )}
                   </button>
+                  
+                  {pixCopiado && (
+                    <p className="text-[11px] text-green-600 font-bold text-center animate-in fade-in slide-in-from-top-2 duration-300">
+                      Agora basta colar no app do seu banco!
+                    </p>
+                  )}
 
                   <button
                     onClick={() => {

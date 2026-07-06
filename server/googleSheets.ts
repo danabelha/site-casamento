@@ -74,31 +74,46 @@ export async function buscarTodosConvidados(forceRefresh = false): Promise<Convi
     return cacheConvidados;
   }
 
-  const sheetId = getSheetId();
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: sheetId,
-    range: `${SHEET_NAME}!A:L`,
-  });
+  try {
+    const sheetId = getSheetId();
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: `${SHEET_NAME}!A:L`,
+    });
 
-  const rows = response.data.values || [];
-  const data = rows.slice(1).map((row) => ({
-    id: row[0] || "",
-    nome: row[1] || "",
-    email: row[2] || "",
-    telefone: row[3] || "",
-    status: row[4] || "Pendente",
-    acompanhantes: parseInt(row[5]) || 0,
-    criancas: parseInt(row[6]) || 0,
-    menores8: parseInt(row[7]) || 0,
-    dataConfirmacao: row[8] || "",
-    acompanhanteDetalhes: row[9] || "",
-    mensagem: row[10] || "",
-    limite: parseInt(row[11]) || 0,
-  }));
+    const rows = response.data.values || [];
+    if (rows.length === 0) {
+      console.warn("[GoogleSheets] Planilha vazia ou sem cabeçalho.");
+      return [];
+    }
 
-  cacheConvidados = data;
-  lastCacheTime = now;
-  return data;
+    const data = rows.slice(1).map((row) => ({
+      id: row[0] || "",
+      nome: row[1] || "",
+      email: row[2] || "",
+      telefone: row[3] || "",
+      status: row[4] || "Pendente",
+      acompanhantes: parseInt(row[5]) || 0,
+      criancas: parseInt(row[6]) || 0,
+      menores8: parseInt(row[7]) || 0,
+      dataConfirmacao: row[8] || "",
+      acompanhanteDetalhes: row[9] || "",
+      mensagem: row[10] || "",
+      limite: parseInt(row[11]) || 0,
+    }));
+
+    cacheConvidados = data;
+    lastCacheTime = now;
+    return data;
+  } catch (error) {
+    console.error("[GoogleSheets] Erro ao buscar todos os convidados:", error);
+    // Se falhar e tivermos cache (mesmo expirado), retornamos ele para manter o site vivo
+    if (cacheConvidados) {
+      console.warn("[GoogleSheets] Retornando cache expirado devido a falha na API.");
+      return cacheConvidados;
+    }
+    throw error;
+  }
 }
 
 export async function buscarConvidados(nome: string) {
