@@ -544,7 +544,7 @@ export default function Confirmacao() {
                               setOutroValor("");
                               setPixGerado(null);
                             }}
-                            className="w-full border border-[#462F29] text-[#462F29] py-3 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#462F29] hover:text-white transition-all duration-[220ms]"
+                            className="w-full bg-[#462F29] text-white py-3 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#3d2924] transition-all duration-200 shadow-md active:scale-[0.98] active:brightness-95"
                           >
                             Presentear via PIX
                           </button>
