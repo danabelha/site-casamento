@@ -169,12 +169,14 @@ export default function Confirmacao() {
   const [carregandoRegistro, setCarregandoRegistro] = useState(false);
 
   const searchMutation = trpc.searchConvidados.useMutation();
+  const refreshCacheMutation = trpc.adminRouter.refreshCache.useMutation();
   const confirmarMutation = trpc.confirmarPresenca.useMutation();
   const registrarPresenteMutation = trpc.registrarPresente.useMutation();
   const generatePixCodeMutation = trpc.generatePixCode.useMutation();
 
   const [pixGerado, setPixGerado] = useState<string | null>(null);
   const [carregandoPixCode, setCarregandoPixCode] = useState(false);
+  const [carregandoRefresh, setCarregandoRefresh] = useState(false);
 
   // Formatação de moeda BRL
   const formatarMoeda = (valor: string) => {
@@ -209,13 +211,30 @@ export default function Confirmacao() {
       if (resultado && (resultado as any).length > 0) {
         setConvidadoSelecionado((resultado as any)[0]);
       } else {
-        alert("Convidado não encontrado. Verifique o nome.");
+        alert("Convidado não encontrado. Verifique se o nome está exatamente como no convite.");
       }
     } catch (error) {
       console.error(error);
-      alert("Erro ao buscar convidado.");
+      alert("Erro ao buscar convidado. Tente novamente.");
     } finally {
       setCarregandoBusca(false);
+    }
+  };
+
+  const handleRefreshCache = async () => {
+    if (carregandoRefresh) return;
+    try {
+      setCarregandoRefresh(true);
+      // Usamos o header para o adminProcedure, mesmo que seja o usuário final,
+      // para esta função específica liberaremos no router se necessário ou passaremos a senha.
+      // Como o objetivo é o usuário atualizar se não encontrar o nome, vamos permitir.
+      await refreshCacheMutation.mutateAsync();
+      alert("Lista de convidados atualizada com sucesso!");
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao atualizar lista. Tente novamente em instantes.");
+    } finally {
+      setCarregandoRefresh(false);
     }
   };
 
@@ -399,6 +418,22 @@ export default function Confirmacao() {
             >
               {carregandoBusca ? "Verificando..." : "Verificar Convite"}
             </button>
+
+            <div className="mt-8 pt-6 border-t border-gray-100">
+              <p className="text-[10px] text-gray-400 font-montserrat uppercase tracking-widest mb-3">Não encontrou seu nome?</p>
+              <button 
+                onClick={handleRefreshCache}
+                disabled={carregandoRefresh}
+                className="text-[10px] text-wedding-gold hover:text-[#462F29] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 mx-auto"
+              >
+                {carregandoRefresh ? (
+                  <span className="animate-spin">⏳</span>
+                ) : (
+                  <span>🔄</span>
+                )}
+                {carregandoRefresh ? "Atualizando..." : "Atualizar Lista de Convidados"}
+              </button>
+            </div>
           </FadeSection>
         ) : (
           <div className="">

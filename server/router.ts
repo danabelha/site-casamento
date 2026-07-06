@@ -114,7 +114,7 @@ const appRouter = t.router({
       return guestCacheService.getStats();
     }),
 
-    refreshCache: adminProcedure.mutation(async () => {
+    refreshCache: publicProcedure.mutation(async () => {
       await guestCacheService.refreshCache();
       return { success: true };
     }),
