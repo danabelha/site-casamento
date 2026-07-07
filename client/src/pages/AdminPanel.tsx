@@ -32,6 +32,7 @@ export default function AdminPanel() {
   const [filtroResposta, setFiltroResposta] = useState<string>("todos");
   const [expandidoId, setExpandidoId] = useState<string | null>(null);
   const [exibirMensagens, setExibirMensagens] = useState(false);
+  const [filtroAtivo, setFiltroAtivo] = useState<string>("todos");
   
   const [formConvidado, setFormConvidado] = useState({ 
     nome: "", 
@@ -125,6 +126,7 @@ export default function AdminPanel() {
 
   const handleExport = (type: 'csv' | 'xlsx' | 'pdf' | 'print', filterOnly = false) => {
     const list = filterOnly ? convidadosFiltrados : (getAllConvidados.data as Convidado[]) || [];
+    const filterName = filterOnly ? filtroAtivo : 'todos';
     
     if (type === 'csv') {
       const csvContent = "data:text/csv;charset=utf-8," 
@@ -134,7 +136,7 @@ export default function AdminPanel() {
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `convidados_${filterOnly ? filtroResposta : 'todos'}_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute("download", `convidados_${filterName}_${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -206,19 +208,30 @@ export default function AdminPanel() {
   const convidadosFiltrados = useMemo(() => {
     let list = (getAllConvidados.data as Convidado[]) || [];
     
-    if (filtroResposta !== "todos") {
-      if (filtroResposta === "Crianças") {
-        list = list.filter(c => (c.criancas || 0) > 0);
-      } else if (filtroResposta === "Menores de 8") {
-        list = list.filter(c => (c.menores8 || 0) > 0);
-      } else if (filtroResposta === "Mensagens") {
-        list = list.filter(c => c.mensagem && c.mensagem.trim() !== "");
-      } else if (filtroResposta === "Presentes") {
-        list = list.filter(c => c.status === "Confirmado" && c.mensagem?.toLowerCase().includes("pix")); // Simplificação baseada no status/mensagem
-      } else if (filtroResposta === "Acompanhantes") {
-        list = list.filter(c => (c.acompanhantes || 0) > 0);
-      } else {
-        list = list.filter(c => c.status === filtroResposta);
+    if (filtroAtivo !== "todos") {
+      switch (filtroAtivo) {
+        case "Confirmado":
+        case "Pendente":
+        case "Talvez":
+        case "Não Irá":
+          list = list.filter(c => c.status === filtroAtivo);
+          break;
+        case "Acompanhantes":
+          list = list.filter(c => (c.acompanhantes || 0) > 0);
+          break;
+        case "Crianças":
+          list = list.filter(c => (c.criancas || 0) > 0);
+          break;
+        case "Menores de 8":
+          list = list.filter(c => (c.menores8 || 0) > 0);
+          break;
+        case "Mensagens":
+          list = list.filter(c => c.mensagem && c.mensagem.trim() !== "");
+          break;
+        case "Presentes":
+          // Como não temos a lista de intenções aqui, filtramos por quem mencionou presente ou está confirmado
+          list = list.filter(c => c.mensagem?.toLowerCase().includes("presente") || c.mensagem?.toLowerCase().includes("pix"));
+          break;
       }
     }
     
@@ -231,7 +244,7 @@ export default function AdminPanel() {
       );
     }
     return list;
-  }, [getAllConvidados.data, filtroResposta, busca]);
+  }, [getAllConvidados.data, filtroAtivo, busca]);
 
   const stats = useMemo(() => {
     const list = (getAllConvidados.data as Convidado[]) || [];
@@ -374,11 +387,13 @@ export default function AdminPanel() {
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-10">
         
-        {/* 2. Resumo de Hoje */}
+        {/* 1. Saudação (Já no Header) */}
+
+        {/* 2. Resumo do Dia */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Resumo de Hoje</h2>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Resumo do Dia</h2>
           </div>
           <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm">
             <p className="text-[12px] text-gray-500 italic">Hoje não houve novas movimentações.</p>
@@ -392,12 +407,12 @@ export default function AdminPanel() {
               <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
               <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Painel Operacional</h2>
             </div>
-            {filtroResposta !== "todos" && (
+            {filtroAtivo !== "todos" && (
               <button 
-                onClick={() => { setFiltroResposta("todos"); setExibirMensagens(false); }}
+                onClick={() => { setFiltroAtivo("todos"); setExibirMensagens(false); }}
                 className="text-[10px] uppercase tracking-widest font-bold text-wedding-gold hover:underline"
               >
-                Limpar Filtro / Ver Todos
+                Ver Todos
               </button>
             )}
           </div>
@@ -417,21 +432,21 @@ export default function AdminPanel() {
               <button
                 key={ind.id}
                 onClick={() => {
-                  setFiltroResposta(ind.id);
+                  setFiltroAtivo(ind.id);
                   setExibirMensagens(ind.id === "Mensagens");
                 }}
                 className={`flex-shrink-0 snap-start w-32 md:w-40 p-5 border rounded-sm transition-all duration-300 text-left
-                  ${filtroResposta === ind.id 
+                  ${filtroAtivo === ind.id 
                     ? 'bg-[#462F29] border-[#462F29] shadow-xl -translate-y-1' 
                     : 'bg-white border-[#E8CECE] hover:border-wedding-gold shadow-sm'}`}
               >
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-xl">{ind.icon}</span>
-                  <span className={`text-[16px] font-bold ${filtroResposta === ind.id ? 'text-white' : 'text-[#462F29]'}`}>
+                  <span className={`text-[16px] font-bold ${filtroAtivo === ind.id ? 'text-white' : 'text-[#462F29]'}`}>
                     {ind.value}
                   </span>
                 </div>
-                <p className={`text-[9px] uppercase tracking-widest font-bold ${filtroResposta === ind.id ? 'text-white/60' : 'text-gray-400'}`}>
+                <p className={`text-[9px] uppercase tracking-widest font-bold ${filtroAtivo === ind.id ? 'text-white/60' : 'text-gray-400'}`}>
                   {ind.label}
                 </p>
               </button>
@@ -439,7 +454,7 @@ export default function AdminPanel() {
           </div>
         </section>
 
-        {/* 4. Necessita Atenção (Alertas Inteligentes) */}
+        {/* 4. Necessita Atenção */}
         {!getAllConvidados.isLoading && (
           <section className="space-y-4">
             <div className="flex items-center gap-3 mb-2">
@@ -463,7 +478,7 @@ export default function AdminPanel() {
               {getCacheStats.data && getCacheStats.data.cacheAgeSeconds > 300 && (
                 <div className="bg-orange-50 p-4 border border-orange-200 rounded-sm flex items-center gap-3">
                   <span className="text-xl">⏳</span>
-                  <p className="text-[12px] text-orange-700">Cache desatualizado. Considere sincronizar.</p>
+                  <p className="text-[12px] text-orange-700">Cache desatualizado há mais de 5 minutos.</p>
                 </div>
               )}
               {stats.pendentes <= 30 && stats.mensagens === 0 && (getCacheStats.data && getCacheStats.data.cacheAgeSeconds <= 300) && (
@@ -476,7 +491,7 @@ export default function AdminPanel() {
           </section>
         )}
 
-        {/* 5. Últimas Atualizações (Timeline) */}
+        {/* 5. Últimas Atualizações */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
@@ -526,7 +541,7 @@ export default function AdminPanel() {
           )}
         </section>
 
-        {/* 7. Painel de Mensagens (Condicional ou Recentes) */}
+        {/* 7. Painel de Mensagens */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-pink-400 rounded-full"></div>
@@ -579,7 +594,7 @@ export default function AdminPanel() {
           {!exibirMensagens && stats.mensagens > 3 && (
             <div className="text-center mt-6">
               <button 
-                onClick={() => { setFiltroResposta("Mensagens"); setExibirMensagens(true); }}
+                onClick={() => { setFiltroAtivo("Mensagens"); setExibirMensagens(true); }}
                 className="text-[10px] uppercase tracking-widest font-bold text-wedding-gold hover:underline"
               >
                 Ver todas as mensagens ({stats.mensagens})
@@ -588,13 +603,13 @@ export default function AdminPanel() {
           )}
         </section>
 
-        {/* 8. Lista de Convidados (Resultado Filtrado) */}
+        {/* 8. Lista de Convidados / Resultado Filtrado */}
         <section className="space-y-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
               <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
               <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">
-                {filtroResposta === "todos" ? "Lista de Convidados" : `Filtrado: ${filtroResposta}`}
+                {filtroAtivo === "todos" ? "Lista de Convidados" : `Filtrado: ${filtroAtivo}`}
               </h2>
             </div>
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
