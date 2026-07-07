@@ -29,7 +29,6 @@ export default function AdminPanel() {
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [exibirForm, setExibirForm] = useState(false);
   const [busca, setBusca] = useState("");
-  const [filtroResposta, setFiltroResposta] = useState<string>("todos");
   const [expandidoId, setExpandidoId] = useState<string | null>(null);
   const [exibirMensagens, setExibirMensagens] = useState(false);
   const [filtroAtivo, setFiltroAtivo] = useState<string>("todos");
@@ -284,16 +283,7 @@ export default function AdminPanel() {
     </div>
   );
 
-  const SkeletonStat = () => (
-    <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm skeleton">
-      <div className="flex justify-between items-center mb-2">
-        <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-        <div className="w-16 h-6 bg-gray-200 rounded"></div>
-      </div>
-      <div className="h-2 w-20 bg-gray-100 rounded mb-1"></div>
-      <div className="h-2 w-12 bg-gray-100 rounded"></div>
-    </div>
-  );
+
 
   const getSaudacao = () => {
     const hora = new Date().getHours();
@@ -366,7 +356,7 @@ export default function AdminPanel() {
           </button>
           
           <button 
-            onClick={handleExport}
+            onClick={() => handleExport('csv')}
             className="p-2.5 bg-[#FDFAF6] border border-[#E8CECE] rounded-full hover:bg-white hover:shadow-md transition-all active:scale-90 relative group"
             title="Exportar CSV"
           >
