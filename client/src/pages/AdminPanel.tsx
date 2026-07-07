@@ -252,6 +252,7 @@ export default function AdminPanel() {
       acompanhantes: confirmados.reduce((acc, c) => acc + (c.acompanhantes || 0), 0),
       pendentes: list.filter(c => c.status === "Pendente").length,
       naoIrao: list.filter(c => c.status === "Não Irá").length,
+      talvez: list.filter(c => c.status === "Talvez").length,
       taxaConfirmacao: list.length ? Math.round((confirmados.length / list.length) * 100) : 0,
       valorPresentes: totalPresentes,
       mensagens,
@@ -405,7 +406,7 @@ export default function AdminPanel() {
             {[
               { id: "Confirmado", label: "Confirmados", icon: "👥", value: stats.confirmados },
               { id: "Pendente", label: "Pendentes", icon: "⏳", value: stats.pendentes },
-              { id: "Talvez", label: "Talvez", icon: "🤔", value: stats.naoIrao },
+              { id: "Talvez", label: "Talvez", icon: "🤔", value: stats.talvez },
               { id: "Não Irá", label: "Não irão", icon: "❌", value: stats.naoIrao },
               { id: "Acompanhantes", label: "Acompanhantes", icon: "👨‍👩‍👧", value: stats.acompanhantes },
               { id: "Crianças", label: "Crianças", icon: "👶", value: stats.criancas },
