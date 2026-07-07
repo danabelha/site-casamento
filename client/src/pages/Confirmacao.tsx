@@ -363,12 +363,10 @@ export default function Confirmacao() {
   };
 
   const PremiumTitle = ({ title }: { title: string }) => (
-    <div className="flex flex-col items-center space-y-4 mb-8">
-      <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
+    <div className="flex flex-col items-center mb-8">
       <h4 className="font-montserrat text-[14px] font-semibold uppercase tracking-[0.2em] text-wedding-gold text-center">
         {title}
       </h4>
-      <div className="w-12 h-[1px] bg-wedding-gold/30"></div>
     </div>
   );
 
@@ -490,9 +488,9 @@ export default function Confirmacao() {
                     </div>
                   </div>
                     <div className="w-full md:w-1/2 text-center md:text-left space-y-2 md:space-y-3 px-8 py-8 bg-[#462F29] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] relative z-10 rounded-[1px]">
-                      <h3 className="font-cormorant text-[24px] md:text-[34px] text-wedding-gold uppercase tracking-[0.15em] leading-tight">
-                        {item.titulo}
-                      </h3>
+	                      <h3 className="font-cormorant text-[20px] md:text-[28px] text-wedding-gold uppercase tracking-[0.15em] leading-tight">
+	                        {item.titulo}
+	                      </h3>
                       <p className="font-montserrat text-[12px] md:text-[14px] text-white/80 leading-relaxed font-light tracking-wide">
                         {item.texto}
                       </p>
@@ -601,7 +599,6 @@ export default function Confirmacao() {
                     Esperamos você para celebrar conosco.
                   </p>
                   <h2 className="font-cormorant font-light text-white text-[28px] md:text-[42px] leading-tight mb-4">Confirmação de Presença</h2>
-                  <div className="w-10 h-[1px] bg-wedding-gold mx-auto" />
                 </div>
                 
                 {sucesso ? (
@@ -680,7 +677,7 @@ export default function Confirmacao() {
 
                     {/* Seção de Acompanhantes (Apenas se Confirmado) */}
                     {resposta === "Confirmado" && convidadoSelecionado.limite > 0 && (
-                      <div className="space-y-8 pt-10 border-t border-white/10 animate-in fade-in slide-in-from-top-4">
+                      <div className="space-y-8 pt-10 animate-in fade-in slide-in-from-top-4">
                         <PremiumTitle title="SEUS ACOMPANHANTES" />
                         
                         {/* Lista de Acompanhantes */}
@@ -760,7 +757,7 @@ export default function Confirmacao() {
 
                     {/* Mensagem e Botão Final */}
                     {resposta && (
-                      <div className="space-y-8 pt-10 border-t border-white/10 animate-in fade-in duration-500">
+                      <div className="space-y-8 pt-10 animate-in fade-in duration-500">
                         {(resposta === "Confirmado" || resposta === "Não Irá") && (
                         <div className="space-y-6">
                           <PremiumTitle title="MENSAGEM PARA OS NOIVOS" />
@@ -832,8 +829,6 @@ export default function Confirmacao() {
                   ✕
                 </button>
               </div>
-
-              <div className="h-[1px] bg-[#462F29]/5 w-full mb-6"></div>
 
               {!pixGerado ? (
                 <div className="space-y-6 animate-in fade-in duration-250">
@@ -917,7 +912,7 @@ export default function Confirmacao() {
                       </p>
                     </div>
 
-                    <div className="pt-4 border-t border-[#462F29]/5">
+                    <div className="pt-4">
                       <p className="text-[9px] font-montserrat text-[#462F29]/40 mb-2 uppercase tracking-[0.2em] font-bold">Código PIX</p>
                       <div className="bg-white p-4 rounded-xl border border-[#462F29]/5 shadow-inner relative group cursor-pointer active:scale-[0.99] transition-transform" onClick={() => handleCopiarPixCode(modalPresenteAberto)}>
                         <p className="text-[11px] font-mono text-[#462F29]/60 break-all text-center leading-relaxed pr-8">{pixGerado}</p>
