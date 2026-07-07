@@ -329,9 +329,9 @@ export default function AdminPanel() {
       {/* 1. Barra de Ações Superior (Fixa) */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#E8CECE] px-4 md:px-8 py-4 flex justify-between items-center">
         <div className="flex flex-col items-start">
-          <h1 className="font-halimun text-2xl text-[#462F29]">{getSaudacao()}</h1>
-          <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">
-            Faltam {diasParaCasamento} dias para o grande dia.
+          <h1 className="font-halimun text-2xl md:text-3xl text-[#462F29]">{getSaudacao()}</h1>
+          <p className="text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-wedding-gold font-bold mt-1">
+            Faltam {diasParaCasamento} dias para o grande dia 💍
           </p>
         </div>
 

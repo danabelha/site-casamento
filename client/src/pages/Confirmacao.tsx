@@ -329,12 +329,16 @@ export default function Confirmacao() {
       return {
         titulo: "CONFIRMAÇÃO RECEBIDA",
         mensagem: (
-          <>
-            <p className="font-cormorant text-2xl text-wedding-gold mb-4">Que alegria ter você conosco!</p>
-            <p className="text-white/80 font-light leading-relaxed">
+          <div className="bg-[#462F29] p-8 md:p-12 rounded-sm shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/5">
+            <p className="font-cormorant text-3xl md:text-4xl text-wedding-gold mb-6 tracking-wide">Que alegria ter você conosco!</p>
+            <p className="text-white/90 font-light text-lg leading-relaxed mb-8 max-w-xl mx-auto">
               Sua presença foi registrada com sucesso e estamos ansiosos para celebrar este dia tão especial ao seu lado.
             </p>
-          </>
+            <div className="pt-8 border-t border-white/10">
+              <p className="text-wedding-gold/60 text-[10px] uppercase tracking-[0.3em] font-bold mb-4">Próximos Passos</p>
+              <p className="text-white/70 text-sm font-light">Confira o Manual do Convidado abaixo para detalhes sobre o traje e localização.</p>
+            </div>
+          </div>
         )
       };
     }
@@ -365,10 +369,11 @@ export default function Confirmacao() {
   };
 
   const PremiumTitle = ({ title }: { title: string }) => (
-    <div className="flex flex-col items-center mb-8">
-      <h4 className="font-montserrat text-[14px] font-semibold uppercase tracking-[0.2em] text-wedding-gold text-center">
+    <div className="flex flex-col items-center mb-10">
+      <h4 className="font-montserrat text-[13px] font-bold uppercase tracking-[0.25em] text-wedding-gold text-center opacity-90">
         {title}
       </h4>
+      <div className="w-8 h-[1px] bg-wedding-gold/30 mt-4"></div>
     </div>
   );
 
