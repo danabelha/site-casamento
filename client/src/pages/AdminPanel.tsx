@@ -29,7 +29,8 @@ export default function AdminPanel() {
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [exibirForm, setExibirForm] = useState(false);
   const [busca, setBusca] = useState("");
-  const [filtroResposta, setFiltroResposta] = useState<"todos" | "Confirmado" | "Não Irá" | "Talvez" | "Pendente">("todos");
+  const [filtroResposta, setFiltroResposta] = useState<string>("todos");
+  const [expandidoId, setExpandidoId] = useState<string | null>(null);
   
   const [formConvidado, setFormConvidado] = useState({ 
     nome: "", 
@@ -196,7 +197,19 @@ export default function AdminPanel() {
   // --- DATA PROCESSING ---
   const convidadosFiltrados = useMemo(() => {
     let list = (getAllConvidados.data as Convidado[]) || [];
-    if (filtroResposta !== "todos") list = list.filter(c => c.status === filtroResposta);
+    
+    if (filtroResposta !== "todos") {
+      if (filtroResposta === "Com Crianças") {
+        list = list.filter(c => (c.criancas || 0) > 0);
+      } else if (filtroResposta === "Com Menores de 8") {
+        list = list.filter(c => (c.menores8 || 0) > 0);
+      } else if (filtroResposta === "Com Mensagem") {
+        list = list.filter(c => c.mensagem && c.mensagem.trim() !== "");
+      } else {
+        list = list.filter(c => c.status === filtroResposta);
+      }
+    }
+    
     if (busca) {
       const b = busca.toLowerCase();
       list = list.filter(c => 
@@ -214,10 +227,15 @@ export default function AdminPanel() {
     const totalPresentes = (getRankingPresentes.data as any[])?.reduce((acc, p) => acc + p.valorTotal, 0) || 0;
     const mensagens = list.filter(c => c.mensagem && c.mensagem.trim() !== "").length;
     
+    const totalCriancas = confirmados.reduce((acc, c) => acc + (c.criancas || 0), 0);
+    const menores8 = confirmados.reduce((acc, c) => acc + (c.menores8 || 0), 0);
+    
     return {
       totalLista: list.length,
       confirmados: confirmados.reduce((acc, c) => acc + 1 + (c.acompanhantes || 0), 0),
-      criancas: confirmados.reduce((acc, c) => acc + (c.criancas || 0), 0),
+      criancas: totalCriancas,
+      menores8,
+      maiores8: totalCriancas - menores8,
       acompanhantes: confirmados.reduce((acc, c) => acc + (c.acompanhantes || 0), 0),
       pendentes: list.filter(c => c.status === "Pendente").length,
       naoIrao: list.filter(c => c.status === "Não Irá").length,
@@ -355,6 +373,22 @@ export default function AdminPanel() {
               ))
             )}
           </div>
+
+          {/* Resumo de Crianças */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-[#FDFAF6] border border-[#E8CECE] p-4 rounded-sm flex items-center justify-between">
+              <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Crianças Menores de 8</span>
+              <span className="text-[16px] font-bold text-blue-500">{stats.menores8}</span>
+            </div>
+            <div className="bg-[#FDFAF6] border border-[#E8CECE] p-4 rounded-sm flex items-center justify-between">
+              <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Crianças 8 anos ou mais</span>
+              <span className="text-[16px] font-bold text-blue-800">{stats.maiores8}</span>
+            </div>
+            <div className="bg-[#FDFAF6] border border-[#E8CECE] p-4 rounded-sm flex items-center justify-between">
+              <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Total Geral Crianças</span>
+              <span className="text-[16px] font-bold text-[#462F29]">{stats.criancas}</span>
+            </div>
+          </div>
         </section>
 
         {/* 2. Necessita Atenção (Alertas Inteligentes) */}
@@ -389,7 +423,7 @@ export default function AdminPanel() {
         )}
 
         {/* 3. Busca & Filtros */}
-        <div className="bg-white p-4 border border-[#E8CECE] rounded-sm shadow-sm flex flex-col md:flex-row gap-4 items-center">
+        <div className="bg-white p-4 border border-[#E8CECE] rounded-sm shadow-sm space-y-4">
           <div className="relative flex-grow w-full">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300">🔍</span>
             <input 
@@ -400,11 +434,11 @@ export default function AdminPanel() {
               className="w-full pl-12 pr-4 py-3 bg-[#FDFAF6] border-none outline-none text-[13px] placeholder:text-gray-300 focus:ring-1 focus:ring-wedding-gold/20 transition-all rounded-sm"
             />
           </div>
-          <div className="flex gap-2 overflow-x-auto w-full md:w-auto no-scrollbar">
-            {["todos", "Confirmado", "Não Irá", "Talvez", "Pendente"].map((f) => (
+          <div className="flex gap-2 overflow-x-auto w-full no-scrollbar">
+            {["todos", "Confirmado", "Não Irá", "Talvez", "Pendente", "Com Crianças", "Com Menores de 8", "Com Mensagem"].map((f) => (
               <button 
                 key={f} 
-                onClick={() => setFiltroResposta(f as any)}
+                onClick={() => setFiltroResposta(f)}
                 className={`px-4 py-2.5 rounded-full text-[9px] uppercase tracking-widest font-bold whitespace-nowrap transition-all
                   ${filtroResposta === f ? 'bg-[#462F29] text-white shadow-lg' : 'bg-[#FDFAF6] text-gray-400 border border-[#E8CECE] hover:border-wedding-gold'}`}
               >
@@ -414,83 +448,178 @@ export default function AdminPanel() {
           </div>
         </div>
 
-        {/* 4. Lista de Convidados */}
-        <div className="bg-white border border-[#E8CECE] rounded-sm shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[#FDFAF6] border-b border-[#E8CECE]">
-                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Convidado</th>
-                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold">Status</th>
-                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold hidden md:table-cell text-center">Acomp.</th>
-                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold hidden lg:table-cell">Mensagem</th>
-                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold text-right">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#FDFAF6]">
-                {getAllConvidados.isLoading ? (
-                  Array(5).fill(0).map((_, i) => (
-                    <tr key={i} className="skeleton">
-                      <td className="px-6 py-6"><div className="h-4 w-32 bg-gray-200 rounded"></div></td>
-                      <td className="px-6 py-6"><div className="h-4 w-20 bg-gray-200 rounded"></div></td>
-                      <td className="px-6 py-6"><div className="h-4 w-8 bg-gray-200 rounded mx-auto"></div></td>
-                      <td className="px-6 py-6 hidden lg:table-cell"><div className="h-4 w-48 bg-gray-200 rounded"></div></td>
-                      <td className="px-6 py-6"><div className="h-4 w-16 bg-gray-200 rounded ml-auto"></div></td>
-                    </tr>
-                  ))
-                ) : convidadosFiltrados.length > 0 ? convidadosFiltrados.map((c) => (
-                  <tr key={c.id} className="hover:bg-[#FDFAF6]/50 transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="font-bold text-[#462F29] text-[13px]">{c.nome}</div>
-                      <div className="text-[10px] text-gray-400 flex flex-wrap gap-x-2">
-                        <span>{c.telefone || 'Sem tel'}</span>
-                        <span className="text-gray-200">•</span>
-                        <span>Limite: {c.limite}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-[8px] uppercase tracking-widest font-bold
-                        ${c.status === 'Confirmado' ? 'bg-green-50 text-green-600' : 
-                          c.status === 'Não Irá' ? 'bg-red-50 text-red-500' : 
-                          c.status === 'Talvez' ? 'bg-orange-50 text-orange-500' : 
-                          'bg-gray-50 text-gray-400'}`}>
-                        {c.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center hidden md:table-cell">
-                      <span className="text-[12px] font-bold text-[#462F29]">{c.acompanhantes || 0}</span>
-                      {c.criancas ? <span className="text-[10px] text-wedding-gold ml-1">+{c.criancas}👶</span> : null}
-                    </td>
-                    <td className="px-6 py-4 hidden lg:table-cell">
-                      <p className="text-[11px] text-gray-500 italic max-w-xs truncate" title={c.mensagem}>
-                        {c.mensagem || '--'}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => iniciarEdicao(c)} className="text-[10px] uppercase font-bold text-wedding-gold hover:underline">Editar</button>
-                        <button onClick={() => removerConvidado(c.id)} className="text-[10px] uppercase font-bold text-red-300 hover:text-red-500 transition-colors">Excluir</button>
-                      </div>
-                      {/* Mobile Actions (sempre visível) */}
-                      <div className="flex justify-end gap-3 md:hidden">
-                        <button onClick={() => iniciarEdicao(c)} className="text-lg">📝</button>
-                      </div>
-                    </td>
-                  </tr>
-                )) : (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-20 text-center">
-                      <div className="space-y-3">
-                        <span className="text-4xl block">🍃</span>
-                        <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhum convidado encontrado</p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+        {/* 4. Lista de Convidados (Cards Expansíveis) */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Lista de Convidados</h2>
           </div>
-        </div>
+          
+          <div className="grid grid-cols-1 gap-4">
+            {getAllConvidados.isLoading ? Array(5).fill(0).map((_, i) => <SkeletonCard key={i} />) : 
+             convidadosFiltrados.length > 0 ? convidadosFiltrados.map((c) => (
+              <div key={c.id} className="bg-white border border-[#E8CECE] rounded-sm shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+                <div 
+                  className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-gray-50/50"
+                  onClick={() => setExpandidoId(expandidoId === c.id ? null : c.id)}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold
+                      ${c.status === 'Confirmado' ? 'bg-green-100 text-green-700' : 
+                        c.status === 'Não Irá' ? 'bg-red-100 text-red-700' : 
+                        c.status === 'Talvez' ? 'bg-yellow-100 text-yellow-700' : 
+                        'bg-gray-100 text-gray-700'}`}>
+                      {c.nome.charAt(0)}
+                    </div>
+                    <div>
+                      <h4 className="text-[13px] font-bold text-[#462F29] uppercase tracking-wide">{c.nome}</h4>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        <span className={`text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full border
+                          ${c.status === 'Confirmado' ? 'bg-green-50 text-green-600 border-green-100' : 
+                            c.status === 'Não Irá' ? 'bg-red-50 text-red-400 border-red-100' : 
+                            c.status === 'Talvez' ? 'bg-yellow-50 text-yellow-600 border-yellow-100' : 
+                            'bg-gray-50 text-gray-400 border-gray-100'}`}>
+                          {c.status}
+                        </span>
+                        {(c.acompanhantes || 0) > 0 && (
+                          <span className="text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 border border-purple-100">
+                            {c.acompanhantes} Adultos
+                          </span>
+                        )}
+                        {(c.criancas || 0) > 0 && (
+                          <span className="text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                            {c.criancas} Crianças
+                          </span>
+                        )}
+                        {c.mensagem && (
+                          <span className="text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-pink-50 text-pink-600 border border-pink-100">
+                            💌 Mensagem
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between md:justify-end gap-4">
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); iniciarEdicao(c); }}
+                        className="p-2 text-gray-400 hover:text-wedding-gold transition-colors"
+                        title="Editar"
+                      >
+                        📝
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); removerConvidado(c.id); }}
+                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                        title="Excluir"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                    <div className={`transition-transform duration-300 ${expandidoId === c.id ? 'rotate-180' : ''}`}>
+                      🔽
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Detalhes Expandidos */}
+                {expandidoId === c.id && (
+                  <div className="px-5 pb-6 pt-2 border-t border-gray-50 bg-[#FDFAF6]/30 animate-in slide-in-from-top-2 duration-300">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-4">
+                        <div>
+                          <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-2">Acompanhantes Adultos</h5>
+                          <div className="space-y-1">
+                            {c.acompanhanteDetalhes ? c.acompanhanteDetalhes.split('\n').filter(line => !line.includes('(')).map((nome, idx) => (
+                              <p key={idx} className="text-[12px] text-[#462F29] font-medium">• {nome}</p>
+                            )) : <p className="text-[11px] text-gray-400 italic">Nenhum acompanhante adulto informado.</p>}
+                          </div>
+                        </div>
+                        <div>
+                          <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-2">Crianças</h5>
+                          <div className="space-y-1">
+                            {c.acompanhanteDetalhes ? c.acompanhanteDetalhes.split('\n').filter(line => line.includes('(')).map((detalhe, idx) => {
+                              const idadeMatch = detalhe.match(/\((\d+)\s+anos\)/);
+                              const idade = idadeMatch ? parseInt(idadeMatch[1]) : 0;
+                              return (
+                                <p key={idx} className="text-[12px] text-[#462F29] font-medium">
+                                  • {detalhe} {idade < 8 && <span className="text-[9px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded-full ml-2 uppercase font-bold tracking-tighter">Menor de 8</span>}
+                                </p>
+                              );
+                            }) : <p className="text-[11px] text-gray-400 italic">Nenhuma criança informada.</p>}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-2">Mensagem do Convidado</h5>
+                          <div className="bg-white p-4 border border-[#E8CECE]/50 rounded-sm italic">
+                            <p className="text-[12px] text-[#462F29]/80 leading-relaxed">
+                              {c.mensagem ? `"${c.mensagem}"` : "Nenhuma mensagem enviada."}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-6 pt-2">
+                          <div>
+                            <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Telefone</h5>
+                            <p className="text-[12px] text-[#462F29]">{c.telefone || '--'}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">E-mail</h5>
+                            <p className="text-[12px] text-[#462F29]">{c.email || '--'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )) : (
+              <div className="bg-white p-20 text-center border border-[#E8CECE] rounded-sm">
+                <span className="text-4xl block mb-4">🍃</span>
+                <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhum convidado encontrado</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* 5. Central de Mensagens */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-pink-400 rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Mensagens dos Convidados</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {getAllConvidados.isLoading ? Array(3).fill(0).map((_, i) => <SkeletonCard key={i} />) : 
+             convidadosFiltrados.filter(c => c.mensagem && c.mensagem.trim() !== "").length > 0 ? 
+             convidadosFiltrados.filter(c => c.mensagem && c.mensagem.trim() !== "").map((c) => (
+              <div key={`msg-${c.id}`} className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all relative">
+                <div className="absolute top-4 right-4 text-pink-100 text-4xl font-serif">"</div>
+                <div className="space-y-4">
+                  <p className="text-[13px] text-[#462F29]/80 leading-relaxed italic pr-4">
+                    {c.mensagem}
+                  </p>
+                  <div className="pt-4 border-t border-gray-50 flex justify-between items-end">
+                    <div>
+                      <p className="text-[11px] font-bold text-[#462F29] uppercase tracking-wider">{c.nome}</p>
+                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">{c.status}</p>
+                    </div>
+                    {c.dataConfirmacao && (
+                      <p className="text-[8px] text-gray-300 uppercase tracking-tighter">{c.dataConfirmacao.split(',')[0]}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )) : (
+              <div className="col-span-full bg-white p-12 text-center border border-[#E8CECE] rounded-sm">
+                <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhuma mensagem recebida ainda</p>
+              </div>
+            )}
+          </div>
+        </section>
 
         {/* 5. Estatísticas & Ranking */}
         <section className="space-y-6">
