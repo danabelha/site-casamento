@@ -485,7 +485,9 @@ export default function AdminPanel() {
                         {idx === 2 && '🥉 '}
                         {p.presenteNome}
                       </p>
-                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">{p.quantidade} Cotas</p>
+                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">
+                        {p.quantidade} Cotas • {stats.valorPresentes > 0 ? Math.round((p.valorTotal / stats.valorPresentes) * 100) : 0}%
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="text-[13px] font-bold text-wedding-gold">
