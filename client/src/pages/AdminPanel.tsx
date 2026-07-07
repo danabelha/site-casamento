@@ -1,5 +1,5 @@
 /**
- * Admin Panel Premium - Release Candidate 1
+ * Admin Panel Premium - Release Candidate 5.3
  * Design Philosophy: Editorial, Clean, and High-Performance
  */
 
@@ -224,7 +224,8 @@ export default function AdminPanel() {
   const stats = useMemo(() => {
     const list = (getAllConvidados.data as Convidado[]) || [];
     const confirmados = list.filter(c => c.status === "Confirmado");
-    const totalPresentes = (getRankingPresentes.data as any[])?.reduce((acc, p) => acc + p.valorTotal, 0) || 0;
+    const ranking = (getRankingPresentes.data as any[]) || [];
+    const totalPresentes = ranking.reduce((acc, p) => acc + p.valorTotal, 0);
     const mensagens = list.filter(c => c.mensagem && c.mensagem.trim() !== "").length;
     
     const totalCriancas = confirmados.reduce((acc, c) => acc + (c.criancas || 0), 0);
@@ -241,7 +242,8 @@ export default function AdminPanel() {
       naoIrao: list.filter(c => c.status === "Não Irá").length,
       taxaConfirmacao: list.length ? Math.round((confirmados.length / list.length) * 100) : 0,
       valorPresentes: totalPresentes,
-      mensagens
+      mensagens,
+      ranking
     };
   }, [getAllConvidados.data, getRankingPresentes.data]);
 
@@ -266,6 +268,15 @@ export default function AdminPanel() {
       <div className="h-2 w-12 bg-gray-100 rounded"></div>
     </div>
   );
+
+  const getSaudacao = () => {
+    const hora = new Date().getHours();
+    if (hora >= 5 && hora < 12) return "Bom dia, Daniel! 👋";
+    if (hora >= 12 && hora < 18) return "Boa tarde, Daniel! 👋";
+    return "Boa noite, Daniel! 👋";
+  };
+
+  const diasParaCasamento = Math.max(0, Math.ceil((new Date('2026-12-05').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)));
 
   // --- RENDER HELPERS ---
   if (!autenticado) {
@@ -302,9 +313,9 @@ export default function AdminPanel() {
       {/* 1. Barra de Ações Superior (Fixa) */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#E8CECE] px-4 md:px-8 py-4 flex justify-between items-center">
         <div className="flex flex-col items-start">
-          <h1 className="font-halimun text-2xl text-[#462F29]">Olá, Daniel! 👋</h1>
+          <h1 className="font-halimun text-2xl text-[#462F29]">{getSaudacao()}</h1>
           <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">
-            Faltam {Math.max(0, Math.ceil((new Date('2026-12-05').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} dias para o casamento.
+            Faltam {diasParaCasamento} dias para o grande dia.
           </p>
         </div>
 
@@ -350,18 +361,18 @@ export default function AdminPanel() {
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-10">
         
-        {/* 1. Resumo de Hoje */}
+        {/* 2. Resumo de Hoje */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
             <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Resumo de Hoje</h2>
           </div>
           <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm">
-            <p className="text-[12px] text-gray-500 italic">O resumo de hoje será implementado em breve.</p>
+            <p className="text-[12px] text-gray-500 italic">Hoje não houve novas movimentações.</p>
           </div>
         </section>
 
-        {/* 2. Indicadores Inteligentes */}
+        {/* 3. Indicadores Inteligentes */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
@@ -373,10 +384,10 @@ export default function AdminPanel() {
                 <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
                   <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Presente Mais Escolhido</p>
                   <h4 className="text-[16px] font-bold text-[#462F29] truncate">
-                    {getRankingPresentes.data && (getRankingPresentes.data as any[]).length > 0 ? (getRankingPresentes.data as any[])[0].presenteNome : 'Nenhum'}
+                    {stats.ranking.length > 0 ? stats.ranking[0].presenteNome : 'Nenhum'}
                   </h4>
                   <p className="text-[8px] text-gray-300 uppercase tracking-tighter">
-                    {(getRankingPresentes.data && (getRankingPresentes.data as any[]).length > 0) ? `${(getRankingPresentes.data as any[])[0].quantidade} Cotas` : ''}
+                    {stats.ranking.length > 0 ? `${stats.ranking[0].quantidade} Cotas` : ''}
                   </p>
                 </div>
                 <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
@@ -407,8 +418,8 @@ export default function AdminPanel() {
           </div>
         </section>
 
-        {/* 3. Necessita Atenção (Alertas Inteligentes) */}
-        {!getAllConvidados.isLoading && (stats.pendentes > 0 || stats.mensagens > 0) && (
+        {/* 4. Necessita Atenção (Alertas Inteligentes) */}
+        {!getAllConvidados.isLoading && (
           <section className="space-y-4">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-1 h-6 bg-orange-400 rounded-full"></div>
@@ -416,29 +427,35 @@ export default function AdminPanel() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {stats.pendentes > 0 && (
-                <div className="bg-orange-50 border border-orange-100 p-4 rounded-sm flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
-                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-xl">⏳</div>
-                  <div>
-                    <h4 className="text-[12px] font-bold text-orange-800 uppercase tracking-wider">Convites Pendentes</h4>
-                    <p className="text-[11px] text-orange-700/70">Ainda temos {stats.pendentes} convidados que não responderam ao convite.</p>
-                  </div>
+              {stats.pendentes > 30 && (
+                <div className="bg-red-50 p-4 border border-red-200 rounded-sm flex items-center gap-3">
+                  <span className="text-xl">⚠️</span>
+                  <p className="text-[12px] text-red-700">Mais de 30 convidados pendentes de confirmação.</p>
                 </div>
               )}
               {stats.mensagens > 0 && (
-                <div className="bg-blue-50 border border-blue-100 p-4 rounded-sm flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">💌</div>
-                  <div>
-                    <h4 className="text-[12px] font-bold text-blue-800 uppercase tracking-wider">Novas Mensagens</h4>
-                    <p className="text-[11px] text-blue-700/70">Recebemos {stats.mensagens} mensagens carinhosas dos seus convidados.</p>
-                  </div>
+                <div className="bg-yellow-50 p-4 border border-yellow-200 rounded-sm flex items-center gap-3">
+                  <span className="text-xl">✉️</span>
+                  <p className="text-[12px] text-yellow-700">Novas mensagens não lidas.</p>
+                </div>
+              )}
+              {getCacheStats.data && getCacheStats.data.cacheAgeSeconds > 300 && (
+                <div className="bg-orange-50 p-4 border border-orange-200 rounded-sm flex items-center gap-3">
+                  <span className="text-xl">⏳</span>
+                  <p className="text-[12px] text-orange-700">Cache desatualizado. Considere sincronizar.</p>
+                </div>
+              )}
+              {stats.pendentes <= 30 && stats.mensagens === 0 && (getCacheStats.data && getCacheStats.data.cacheAgeSeconds <= 300) && (
+                <div className="bg-green-50 p-4 border border-green-200 rounded-sm flex items-center gap-3">
+                  <span className="text-xl">✅</span>
+                  <p className="text-[12px] text-green-700">Tudo sob controle! Nenhuma pendência urgente.</p>
                 </div>
               )}
             </div>
           </section>
         )}
 
-        {/* 4. Últimas Atualizações (Placeholder) */}
+        {/* 5. Últimas Atualizações (Timeline) */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
@@ -449,7 +466,44 @@ export default function AdminPanel() {
           </div>
         </section>
 
-        {/* 5. Mensagens Recentes */}
+        {/* 6. Ranking dos Presentes */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Ranking dos Presentes</h2>
+          </div>
+          
+          {stats.ranking.length > 0 ? (
+            <div className="bg-white border border-[#E8CECE] rounded-sm shadow-sm p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {stats.ranking.map((p, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-4 bg-[#FDFAF6] border border-[#E8CECE]/50 rounded-sm">
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-bold text-[#462F29] uppercase truncate max-w-[180px]">
+                        {idx === 0 && '🥇 '}
+                        {idx === 1 && '🥈 '}
+                        {idx === 2 && '🥉 '}
+                        {p.presenteNome}
+                      </p>
+                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">{p.quantidade} Cotas</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[13px] font-bold text-wedding-gold">
+                        {p.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white p-12 text-center border border-[#E8CECE] rounded-sm">
+              <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhum presente registrado ainda</p>
+            </div>
+          )}
+        </section>
+
+        {/* 7. Mensagens Recentes */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-pink-400 rounded-full"></div>
@@ -494,74 +548,36 @@ export default function AdminPanel() {
           )}
         </section>
 
-        {/* 6. Ranking dos Presentes */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Ranking dos Presentes</h2>
-          </div>
-          
-          {getRankingPresentes.data && (getRankingPresentes.data as any[]).length > 0 ? (
-            <div className="bg-white border border-[#E8CECE] rounded-sm shadow-sm p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {(getRankingPresentes.data as any[]).map((p, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-4 bg-[#FDFAF6] border border-[#E8CECE]/50 rounded-sm">
-                    <div className="space-y-1">
-                      <p className="text-[11px] font-bold text-[#462F29] uppercase truncate max-w-[180px]">
-                        {idx === 0 && '🥇 '}
-                        {idx === 1 && '🥈 '}
-                        {idx === 2 && '🥉 '}
-                        {p.presenteNome}
-                      </p>
-                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">{p.quantidade} Cotas</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[13px] font-bold text-wedding-gold">
-                        {p.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white p-12 text-center border border-[#E8CECE] rounded-sm">
-              <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhum presente registrado ainda</p>
-            </div>
-          )}
-        </section>
-
-        {/* 7. Busca & Filtros (Lista) */}
-        <div className="bg-white p-4 border border-[#E8CECE] rounded-sm shadow-sm space-y-4">
-          <div className="relative flex-grow w-full">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300">🔍</span>
-            <input 
-              type="text" 
-              placeholder="Buscar na lista de convidados..." 
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-[#FDFAF6] border-none outline-none text-[13px] placeholder:text-gray-300 focus:ring-1 focus:ring-wedding-gold/20 transition-all rounded-sm"
-            />
-          </div>
-          <div className="flex gap-2 overflow-x-auto w-full no-scrollbar">
-            {["todos", "Confirmado", "Não Irá", "Talvez", "Pendente", "Com Crianças", "Com Menores de 8", "Com Mensagem"].map((f) => (
-              <button 
-                key={f} 
-                onClick={() => setFiltroResposta(f)}
-                className={`px-4 py-2.5 rounded-full text-[9px] uppercase tracking-widest font-bold whitespace-nowrap transition-all
-                  ${filtroResposta === f ? 'bg-[#462F29] text-white shadow-lg' : 'bg-[#FDFAF6] text-gray-400 border border-[#E8CECE] hover:border-wedding-gold'}`}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* 8. Lista de Convidados (Cards Expansíveis) */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
             <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Lista de Convidados</h2>
+          </div>
+
+          <div className="bg-white p-4 border border-[#E8CECE] rounded-sm shadow-sm space-y-4 mb-6">
+            <div className="relative flex-grow w-full">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300">🔍</span>
+              <input 
+                type="text" 
+                placeholder="Buscar na lista de convidados..." 
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-[#FDFAF6] border-none outline-none text-[13px] placeholder:text-gray-300 focus:ring-1 focus:ring-wedding-gold/20 transition-all rounded-sm"
+              />
+            </div>
+            <div className="flex gap-2 overflow-x-auto w-full no-scrollbar">
+              {["todos", "Confirmado", "Não Irá", "Talvez", "Pendente", "Com Crianças", "Com Menores de 8", "Com Mensagem"].map((f) => (
+                <button 
+                  key={f} 
+                  onClick={() => setFiltroResposta(f)}
+                  className={`px-4 py-2.5 rounded-full text-[9px] uppercase tracking-widest font-bold whitespace-nowrap transition-all
+                    ${filtroResposta === f ? 'bg-[#462F29] text-white shadow-lg' : 'bg-[#FDFAF6] text-gray-400 border border-[#E8CECE] hover:border-wedding-gold'}`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
           </div>
           
           <div className="grid grid-cols-1 gap-4">
