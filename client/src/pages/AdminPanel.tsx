@@ -212,15 +212,18 @@ export default function AdminPanel() {
     const list = (getAllConvidados.data as Convidado[]) || [];
     const confirmados = list.filter(c => c.status === "Confirmado");
     const totalPresentes = (getRankingPresentes.data as any[])?.reduce((acc, p) => acc + p.valorTotal, 0) || 0;
+    const mensagens = list.filter(c => c.mensagem && c.mensagem.trim() !== "").length;
     
     return {
       totalLista: list.length,
       confirmados: confirmados.reduce((acc, c) => acc + 1 + (c.acompanhantes || 0), 0),
       criancas: confirmados.reduce((acc, c) => acc + (c.criancas || 0), 0),
+      acompanhantes: confirmados.reduce((acc, c) => acc + (c.acompanhantes || 0), 0),
       pendentes: list.filter(c => c.status === "Pendente").length,
       naoIrao: list.filter(c => c.status === "Não Irá").length,
       taxaConfirmacao: list.length ? Math.round((confirmados.length / list.length) * 100) : 0,
-      valorPresentes: totalPresentes
+      valorPresentes: totalPresentes,
+      mensagens
     };
   }, [getAllConvidados.data, getRankingPresentes.data]);
 
@@ -322,62 +325,68 @@ export default function AdminPanel() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-10">
         
-        {/* 2. Cache Info & Stats Dashboard */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Cache Info Card */}
-          {getCacheStats.isLoading ? <SkeletonCard /> : (
-            <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm space-y-4">
-              <div className="flex justify-between items-start">
-                <h3 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Status do Cache</h3>
-                <span className="text-[10px] font-mono text-wedding-gold">v1.2.0</span>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-[11px] text-gray-500">Convidados</span>
-                  <span className="text-[11px] font-bold text-[#462F29]">{getCacheStats.data?.count || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[11px] text-gray-500">Última Sinc.</span>
-                  <span className="text-[11px] font-bold text-[#462F29]">
-                    {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleTimeString('pt-BR') : '--:--'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[11px] text-gray-500">Idade</span>
-                  <span className="text-[11px] font-bold text-[#462F29]">{getCacheStats.data?.cacheAgeSeconds || 0}s</span>
-                </div>
-              </div>
-              {carregando && (
-                <div className="pt-2 border-t border-[#FDFAF6]">
-                  <p className="text-[9px] text-wedding-gold animate-pulse uppercase tracking-widest font-bold text-center">Sincronizando com Google Sheets...</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Stats Grid */}
-          <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
-            {getAllConvidados.isLoading ? Array(4).fill(0).map((_, i) => <SkeletonStat key={i} />) : (
+        {/* 1. Dashboard Executivo (Resumo do Casamento) */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Resumo do Casamento</h2>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {getAllConvidados.isLoading ? Array(6).fill(0).map((_, i) => <SkeletonStat key={i} />) : (
               [
-                { label: "Confirmados", val: stats.confirmados, sub: "Pessoas", icon: "✨", color: "text-green-600" },
-                { label: "Pendentes", val: stats.pendentes, sub: "Convites", icon: "⏳", color: "text-gray-400" },
-                { label: "Taxa Conf.", val: `${stats.taxaConfirmacao}%`, sub: "Engajamento", icon: "📈", color: "text-wedding-gold" },
-                { label: "Presentes", val: stats.valorPresentes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }), sub: "Estimado", icon: "🎁", color: "text-[#462F29]" },
+                { label: "Confirmados", val: stats.confirmados, sub: "Total Pessoas", icon: "👥", color: "text-green-600" },
+                { label: "Aguardando", val: stats.pendentes, sub: "Convites", icon: "⏳", color: "text-gray-400" },
+                { label: "Não Irão", val: stats.naoIrao, sub: "Convites", icon: "❌", color: "text-red-400" },
+                { label: "Crianças", val: stats.criancas, sub: "Confirmadas", icon: "👶", color: "text-blue-400" },
+                { label: "Acompanhantes", val: stats.acompanhantes, sub: "Confirmados", icon: "👨‍👩‍👧", color: "text-purple-400" },
+                { label: "Mensagens", val: stats.mensagens, sub: "Recebidas", icon: "💌", color: "text-pink-400" },
               ].map((s, i) => (
-                <div key={i} className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-center mb-2">
+                <div key={i} className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                  <div className="flex justify-between items-start mb-3">
                     <span className="text-xl">{s.icon}</span>
-                    <span className={`text-[18px] font-bold ${s.color}`}>{s.val}</span>
+                    <span className={`text-[20px] font-bold ${s.color}`}>{s.val}</span>
                   </div>
-                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">{s.label}</p>
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">{s.label}</p>
                   <p className="text-[8px] text-gray-300 uppercase tracking-tighter">{s.sub}</p>
                 </div>
               ))
             )}
           </div>
-        </div>
+        </section>
+
+        {/* 2. Necessita Atenção (Alertas Inteligentes) */}
+        {!getAllConvidados.isLoading && (stats.pendentes > 0 || stats.mensagens > 0) && (
+          <section className="space-y-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-1 h-6 bg-orange-400 rounded-full"></div>
+              <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Necessita Atenção</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {stats.pendentes > 0 && (
+                <div className="bg-orange-50 border border-orange-100 p-4 rounded-sm flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
+                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-xl">⏳</div>
+                  <div>
+                    <h4 className="text-[12px] font-bold text-orange-800 uppercase tracking-wider">Convites Pendentes</h4>
+                    <p className="text-[11px] text-orange-700/70">Ainda temos {stats.pendentes} convidados que não responderam ao convite.</p>
+                  </div>
+                </div>
+              )}
+              {stats.mensagens > 0 && (
+                <div className="bg-blue-50 border border-blue-100 p-4 rounded-sm flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">💌</div>
+                  <div>
+                    <h4 className="text-[12px] font-bold text-blue-800 uppercase tracking-wider">Novas Mensagens</h4>
+                    <p className="text-[11px] text-blue-700/70">Recebemos {stats.mensagens} mensagens carinhosas dos seus convidados.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* 3. Busca & Filtros */}
         <div className="bg-white p-4 border border-[#E8CECE] rounded-sm shadow-sm flex flex-col md:flex-row gap-4 items-center">
@@ -483,27 +492,110 @@ export default function AdminPanel() {
           </div>
         </div>
 
-        {/* 5. Ranking de Presentes (Visual Refinado) */}
-        {getRankingPresentes.data && (getRankingPresentes.data as any[]).length > 0 && (
-          <div className="bg-white border border-[#E8CECE] rounded-sm shadow-sm p-6">
-            <h3 className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-6">Ranking de Cotas de Presentes</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(getRankingPresentes.data as any[]).map((p, idx) => (
-                <div key={idx} className="flex items-center justify-between p-4 bg-[#FDFAF6] border border-[#E8CECE]/50 rounded-sm">
-                  <div className="space-y-1">
-                    <p className="text-[11px] font-bold text-[#462F29] uppercase truncate max-w-[180px]">{p.presenteNome}</p>
-                    <p className="text-[9px] text-gray-400 uppercase tracking-widest">{p.quantidade} Contribuições</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[13px] font-bold text-wedding-gold">
-                      {p.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                    </p>
-                  </div>
-                </div>
-              ))}
+        {/* 5. Estatísticas & Ranking */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Estatísticas & Ranking</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm flex flex-col items-center justify-center text-center space-y-2">
+              <span className="text-3xl">📈</span>
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Taxa de Confirmação</p>
+              <h4 className="text-3xl font-bold text-wedding-gold">{stats.taxaConfirmacao}%</h4>
+              <p className="text-[9px] text-gray-300 uppercase tracking-tighter">Engajamento da Lista</p>
+            </div>
+            <div className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm flex flex-col items-center justify-center text-center space-y-2">
+              <span className="text-3xl">🎁</span>
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Total em Presentes</p>
+              <h4 className="text-3xl font-bold text-[#462F29]">{stats.valorPresentes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}</h4>
+              <p className="text-[9px] text-gray-300 uppercase tracking-tighter">Valor Estimado</p>
+            </div>
+            <div className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm flex flex-col items-center justify-center text-center space-y-2">
+              <span className="text-3xl">💍</span>
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Dias para o Grande Dia</p>
+              <h4 className="text-3xl font-bold text-red-400">
+                {Math.max(0, Math.ceil((new Date('2026-12-05').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))}
+              </h4>
+              <p className="text-[9px] text-gray-300 uppercase tracking-tighter">Contagem Regressiva</p>
             </div>
           </div>
-        )}
+
+          {getRankingPresentes.data && (getRankingPresentes.data as any[]).length > 0 && (
+            <div className="bg-white border border-[#E8CECE] rounded-sm shadow-sm p-6">
+              <h3 className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-6">Ranking de Cotas de Presentes</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {(getRankingPresentes.data as any[]).map((p, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-4 bg-[#FDFAF6] border border-[#E8CECE]/50 rounded-sm">
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-bold text-[#462F29] uppercase truncate max-w-[180px]">{p.presenteNome}</p>
+                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">{p.quantidade} Contribuições</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[13px] font-bold text-wedding-gold">
+                        {p.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* 6. Informações Técnicas (Sistema) */}
+        <section className="space-y-6 pt-10 border-t border-[#E8CECE]/50">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-gray-300 rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-gray-400">Informações Técnicas</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {getCacheStats.isLoading ? <SkeletonCard /> : (
+              <div className="bg-white/50 p-5 border border-[#E8CECE] rounded-sm space-y-4">
+                <div className="flex justify-between items-start">
+                  <h3 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Status do Cache</h3>
+                  <span className="text-[10px] font-mono text-wedding-gold/50">v1.2.1</span>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-[11px] text-gray-400">Convidados Carregados</span>
+                    <span className="text-[11px] font-bold text-gray-500">{getCacheStats.data?.count || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[11px] text-gray-400">Última Sinc.</span>
+                    <span className="text-[11px] font-bold text-gray-500">
+                      {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleTimeString('pt-BR') : '--:--'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[11px] text-gray-400">Idade do Cache</span>
+                    <span className="text-[11px] font-bold text-gray-500">{getCacheStats.data?.cacheAgeSeconds || 0}s</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[11px] text-gray-400">Tempo de Sinc.</span>
+                    <span className="text-[11px] font-bold text-gray-500">{getCacheStats.data?.lastSyncDurationMs || 0}ms</span>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-center gap-2">
+                  <div className={`w-1.5 h-1.5 rounded-full ${getCacheStats.data?.isSyncing ? 'bg-yellow-400 animate-pulse' : 'bg-green-500/50'}`}></div>
+                  <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">
+                    {getCacheStats.data?.isSyncing ? 'Sincronizando...' : 'Sistema Estável'}
+                  </span>
+                </div>
+              </div>
+            )}
+            
+            <div className="md:col-span-3 bg-white/30 p-6 border border-dashed border-[#E8CECE] rounded-sm flex flex-col items-center justify-center text-center">
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium mb-1">Dica de Performance</p>
+              <p className="text-[11px] text-gray-400/70 max-w-md">
+                O sistema utiliza um cache inteligente para garantir que o site carregue instantaneamente para seus convidados. 
+                Sincronizações manuais são necessárias apenas após grandes alterações na planilha.
+              </p>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* 6. Modal de Formulário (Premium) */}
