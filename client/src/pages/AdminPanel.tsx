@@ -31,6 +31,7 @@ export default function AdminPanel() {
   const [busca, setBusca] = useState("");
   const [filtroResposta, setFiltroResposta] = useState<string>("todos");
   const [expandidoId, setExpandidoId] = useState<string | null>(null);
+  const [exibirMensagens, setExibirMensagens] = useState(false);
   
   const [formConvidado, setFormConvidado] = useState({ 
     nome: "", 
@@ -122,19 +123,26 @@ export default function AdminPanel() {
     }
   };
 
-  const handleExport = () => {
-    const data = getAllConvidados.data || [];
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + "Nome,Status,Limite,Acompanhantes,Crianças,Mensagem\n"
-      + data.map((c: any) => `"${c.nome}","${c.status}",${c.limite},${c.acompanhantes},${c.criancas},"${c.mensagem?.replace(/"/g, '""') || ''}"`).join("\n");
+  const handleExport = (type: 'csv' | 'xlsx' | 'pdf' | 'print', filterOnly = false) => {
+    const list = filterOnly ? convidadosFiltrados : (getAllConvidados.data as Convidado[]) || [];
     
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `convidados_casamento_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (type === 'csv') {
+      const csvContent = "data:text/csv;charset=utf-8," 
+        + "Nome,Status,Limite,Acompanhantes,Crianças,Mensagem\n"
+        + list.map((c: any) => `"${c.nome}","${c.status}",${c.limite},${c.acompanhantes},${c.criancas},"${c.mensagem?.replace(/"/g, '""') || ''}"`).join("\n");
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `convidados_${filterOnly ? filtroResposta : 'todos'}_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (type === 'print') {
+      window.print();
+    } else {
+      alert(`Exportação ${type.toUpperCase()} disponível em breve.`);
+    }
   };
 
   const salvarConvidado = async () => {
@@ -199,12 +207,16 @@ export default function AdminPanel() {
     let list = (getAllConvidados.data as Convidado[]) || [];
     
     if (filtroResposta !== "todos") {
-      if (filtroResposta === "Com Crianças") {
+      if (filtroResposta === "Crianças") {
         list = list.filter(c => (c.criancas || 0) > 0);
-      } else if (filtroResposta === "Com Menores de 8") {
+      } else if (filtroResposta === "Menores de 8") {
         list = list.filter(c => (c.menores8 || 0) > 0);
-      } else if (filtroResposta === "Com Mensagem") {
+      } else if (filtroResposta === "Mensagens") {
         list = list.filter(c => c.mensagem && c.mensagem.trim() !== "");
+      } else if (filtroResposta === "Presentes") {
+        list = list.filter(c => c.status === "Confirmado" && c.mensagem?.toLowerCase().includes("pix")); // Simplificação baseada no status/mensagem
+      } else if (filtroResposta === "Acompanhantes") {
+        list = list.filter(c => (c.acompanhantes || 0) > 0);
       } else {
         list = list.filter(c => c.status === filtroResposta);
       }
@@ -372,49 +384,57 @@ export default function AdminPanel() {
           </div>
         </section>
 
-        {/* 3. Indicadores Inteligentes */}
+        {/* 3. Carrossel de Indicadores Acionáveis */}
         <section className="space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Indicadores Inteligentes</h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {getAllConvidados.isLoading ? Array(4).fill(0).map((_, i) => <SkeletonStat key={i} />) : (
-              <>
-                <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Presente Mais Escolhido</p>
-                  <h4 className="text-[16px] font-bold text-[#462F29] truncate">
-                    {stats.ranking.length > 0 ? stats.ranking[0].presenteNome : 'Nenhum'}
-                  </h4>
-                  <p className="text-[8px] text-gray-300 uppercase tracking-tighter">
-                    {stats.ranking.length > 0 ? `${stats.ranking[0].quantidade} Cotas` : ''}
-                  </p>
-                </div>
-                <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Última Confirmação</p>
-                  <h4 className="text-[16px] font-bold text-[#462F29] truncate">
-                    {getAllConvidados.data && (getAllConvidados.data as Convidado[]).filter(c => c.dataConfirmacao).sort((a, b) => new Date(b.dataConfirmacao!).getTime() - new Date(a.dataConfirmacao!).getTime())[0]?.nome || 'Nenhuma'}
-                  </h4>
-                  <p className="text-[8px] text-gray-300 uppercase tracking-tighter">
-                    {getAllConvidados.data && (getAllConvidados.data as Convidado[]).filter(c => c.dataConfirmacao).sort((a, b) => new Date(b.dataConfirmacao!).getTime() - new Date(a.dataConfirmacao!).getTime())[0]?.dataConfirmacao?.split(',')[0] || ''}
-                  </p>
-                </div>
-                <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Última Sincronização</p>
-                  <h4 className="text-[16px] font-bold text-[#462F29]">
-                    {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleTimeString('pt-BR') : '--:--'}
-                  </h4>
-                  <p className="text-[8px] text-gray-300 uppercase tracking-tighter">
-                    {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleDateString('pt-BR') : 'N/A'}
-                  </p>
-                </div>
-                <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Crianças Menores de 8</p>
-                  <h4 className="text-[16px] font-bold text-blue-500">{stats.menores8}</h4>
-                  <p className="text-[8px] text-gray-300 uppercase tracking-tighter">Total Confirmadas</p>
-                </div>
-              </>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
+              <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Painel Operacional</h2>
+            </div>
+            {filtroResposta !== "todos" && (
+              <button 
+                onClick={() => { setFiltroResposta("todos"); setExibirMensagens(false); }}
+                className="text-[10px] uppercase tracking-widest font-bold text-wedding-gold hover:underline"
+              >
+                Limpar Filtro / Ver Todos
+              </button>
             )}
+          </div>
+          
+          <div className="flex overflow-x-auto pb-4 gap-4 no-scrollbar snap-x">
+            {[
+              { id: "Confirmado", label: "Confirmados", icon: "👥", value: stats.confirmados },
+              { id: "Pendente", label: "Pendentes", icon: "⏳", value: stats.pendentes },
+              { id: "Talvez", label: "Talvez", icon: "🤔", value: stats.naoIrao },
+              { id: "Não Irá", label: "Não irão", icon: "❌", value: stats.naoIrao },
+              { id: "Acompanhantes", label: "Acompanhantes", icon: "👨‍👩‍👧", value: stats.acompanhantes },
+              { id: "Crianças", label: "Crianças", icon: "👶", value: stats.criancas },
+              { id: "Menores de 8", label: "Menores de 8", icon: "🍼", value: stats.menores8 },
+              { id: "Mensagens", label: "Mensagens", icon: "💌", value: stats.mensagens },
+              { id: "Presentes", label: "Presentes", icon: "🎁", value: stats.ranking.length }
+            ].map((ind) => (
+              <button
+                key={ind.id}
+                onClick={() => {
+                  setFiltroResposta(ind.id);
+                  setExibirMensagens(ind.id === "Mensagens");
+                }}
+                className={`flex-shrink-0 snap-start w-32 md:w-40 p-5 border rounded-sm transition-all duration-300 text-left
+                  ${filtroResposta === ind.id 
+                    ? 'bg-[#462F29] border-[#462F29] shadow-xl -translate-y-1' 
+                    : 'bg-white border-[#E8CECE] hover:border-wedding-gold shadow-sm'}`}
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-xl">{ind.icon}</span>
+                  <span className={`text-[16px] font-bold ${filtroResposta === ind.id ? 'text-white' : 'text-[#462F29]'}`}>
+                    {ind.value}
+                  </span>
+                </div>
+                <p className={`text-[9px] uppercase tracking-widest font-bold ${filtroResposta === ind.id ? 'text-white/60' : 'text-gray-400'}`}>
+                  {ind.label}
+                </p>
+              </button>
+            ))}
           </div>
         </section>
 
@@ -505,56 +525,80 @@ export default function AdminPanel() {
           )}
         </section>
 
-        {/* 7. Mensagens Recentes */}
+        {/* 7. Painel de Mensagens (Condicional ou Recentes) */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-pink-400 rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Mensagens Recentes</h2>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">
+              {exibirMensagens ? "Todas as Mensagens" : "Mensagens Recentes"}
+            </h2>
           </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {getAllConvidados.isLoading ? Array(3).fill(0).map((_, i) => <SkeletonCard key={i} />) : 
-             convidadosFiltrados.filter(c => c.mensagem && c.mensagem.trim() !== "").slice(0, 3).map((c) => (
-              <div key={`msg-${c.id}`} className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all relative">
-                <div className="absolute top-4 right-4 text-pink-100 text-4xl font-serif">"</div>
-                <div className="space-y-4">
-                  <p className="text-[13px] text-[#462F29]/80 leading-relaxed italic pr-4">
-                    {c.mensagem}
-                  </p>
-                  <div className="pt-4 border-t border-gray-50 flex justify-between items-end">
-                    <div>
-                      <p className="text-[11px] font-bold text-[#462F29] uppercase tracking-wider">{c.nome}</p>
-                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">{c.status}</p>
+            {getAllConvidados.isLoading ? Array(3).fill(0).map((_, i) => <SkeletonCard key={i} />) : (
+              <>
+                {((exibirMensagens ? convidadosFiltrados : (getAllConvidados.data as Convidado[] || []))
+                  .filter(c => c.mensagem && c.mensagem.trim() !== "")
+                  .slice(0, exibirMensagens ? undefined : 3)
+                  .map((c) => (
+                    <div key={`msg-${c.id}`} className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all relative">
+                      <div className="absolute top-4 right-4 text-pink-100 text-4xl font-serif">"</div>
+                      <div className="space-y-4">
+                        <p className="text-[13px] text-[#462F29]/80 leading-relaxed italic pr-4">
+                          {c.mensagem}
+                        </p>
+                        <div className="pt-4 border-t border-gray-50 flex justify-between items-end">
+                          <div>
+                            <p className="text-[11px] font-bold text-[#462F29] uppercase tracking-wider">{c.nome}</p>
+                            <span className={`text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full border
+                              ${c.status === 'Confirmado' ? 'bg-green-50 text-green-600 border-green-100' : 
+                                c.status === 'Não Irá' ? 'bg-red-50 text-red-400 border-red-100' : 
+                                c.status === 'Talvez' ? 'bg-yellow-50 text-yellow-600 border-yellow-100' : 
+                                'bg-gray-50 text-gray-400 border-gray-100'}`}>
+                              {c.status}
+                            </span>
+                          </div>
+                          {c.dataConfirmacao && (
+                            <p className="text-[8px] text-gray-300 uppercase tracking-tighter">{c.dataConfirmacao.split(',')[0]}</p>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    {c.dataConfirmacao && (
-                      <p className="text-[8px] text-gray-300 uppercase tracking-tighter">{c.dataConfirmacao.split(',')[0]}</p>
-                    )}
+                  ))
+                )}
+                {((exibirMensagens ? convidadosFiltrados : (getAllConvidados.data as Convidado[] || []))
+                  .filter(c => c.mensagem && c.mensagem.trim() !== "").length === 0) && (
+                  <div className="col-span-full bg-white p-12 text-center border border-[#E8CECE] rounded-sm">
+                    <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhuma mensagem recebida até o momento.</p>
                   </div>
-                </div>
-              </div>
-            ))}
-            {convidadosFiltrados.filter(c => c.mensagem && c.mensagem.trim() !== "").length === 0 && (
-              <div className="col-span-full bg-white p-12 text-center border border-[#E8CECE] rounded-sm">
-                <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhuma mensagem recebida ainda</p>
-              </div>
+                )}
+              </>
             )}
           </div>
-          {convidadosFiltrados.filter(c => c.mensagem && c.mensagem.trim() !== "").length > 3 && (
+          {!exibirMensagens && stats.mensagens > 3 && (
             <div className="text-center mt-6">
               <button 
-                onClick={() => setFiltroResposta("Com Mensagem")}
+                onClick={() => { setFiltroResposta("Mensagens"); setExibirMensagens(true); }}
                 className="text-[10px] uppercase tracking-widest font-bold text-wedding-gold hover:underline"
               >
-                Ver todas as mensagens
+                Ver todas as mensagens ({stats.mensagens})
               </button>
             </div>
           )}
         </section>
 
-        {/* 8. Lista de Convidados (Cards Expansíveis) */}
+        {/* 8. Lista de Convidados (Resultado Filtrado) */}
         <section className="space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Lista de Convidados</h2>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
+              <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">
+                {filtroResposta === "todos" ? "Lista de Convidados" : `Filtrado: ${filtroResposta}`}
+              </h2>
+            </div>
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+              {convidadosFiltrados.length} Registros encontrados
+            </p>
           </div>
 
           <div className="bg-white p-4 border border-[#E8CECE] rounded-sm shadow-sm space-y-4 mb-6">
@@ -562,23 +606,11 @@ export default function AdminPanel() {
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300">🔍</span>
               <input 
                 type="text" 
-                placeholder="Buscar na lista de convidados..." 
+                placeholder="Buscar por nome, e-mail ou telefone..." 
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-[#FDFAF6] border-none outline-none text-[13px] placeholder:text-gray-300 focus:ring-1 focus:ring-wedding-gold/20 transition-all rounded-sm"
               />
-            </div>
-            <div className="flex gap-2 overflow-x-auto w-full no-scrollbar">
-              {["todos", "Confirmado", "Não Irá", "Talvez", "Pendente", "Com Crianças", "Com Menores de 8", "Com Mensagem"].map((f) => (
-                <button 
-                  key={f} 
-                  onClick={() => setFiltroResposta(f)}
-                  className={`px-4 py-2.5 rounded-full text-[9px] uppercase tracking-widest font-bold whitespace-nowrap transition-all
-                    ${filtroResposta === f ? 'bg-[#462F29] text-white shadow-lg' : 'bg-[#FDFAF6] text-gray-400 border border-[#E8CECE] hover:border-wedding-gold'}`}
-                >
-                  {f}
-                </button>
-              ))}
             </div>
           </div>
           
@@ -712,11 +744,59 @@ export default function AdminPanel() {
           </div>
         </section>
 
-        {/* 9. Informações Técnicas (Sistema) */}
+        {/* 9. Exportações */}
+        <section className="space-y-6 pt-10 border-t border-[#E8CECE]/50">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Exportar Informações</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <button 
+              onClick={() => handleExport('csv', true)}
+              className="flex items-center justify-between p-5 bg-white border border-[#E8CECE] rounded-sm hover:border-green-600 transition-all group"
+            >
+              <div className="text-left">
+                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Exportar CSV</p>
+                <p className="text-[12px] font-bold text-[#462F29]">Filtro Atual</p>
+              </div>
+              <span className="text-xl group-hover:scale-110 transition-transform">📊</span>
+            </button>
+            <button 
+              onClick={() => handleExport('csv', false)}
+              className="flex items-center justify-between p-5 bg-white border border-[#E8CECE] rounded-sm hover:border-green-600 transition-all group"
+            >
+              <div className="text-left">
+                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Exportar CSV</p>
+                <p className="text-[12px] font-bold text-[#462F29]">Todos os Dados</p>
+              </div>
+              <span className="text-xl group-hover:scale-110 transition-transform">📂</span>
+            </button>
+            <button 
+              onClick={() => handleExport('print')}
+              className="flex items-center justify-between p-5 bg-white border border-[#E8CECE] rounded-sm hover:border-blue-600 transition-all group"
+            >
+              <div className="text-left">
+                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Relatório Rápido</p>
+                <p className="text-[12px] font-bold text-[#462F29]">Imprimir Lista</p>
+              </div>
+              <span className="text-xl group-hover:scale-110 transition-transform">🖨️</span>
+            </button>
+            <div className="flex items-center justify-between p-5 bg-gray-50/50 border border-[#E8CECE] rounded-sm opacity-50 cursor-not-allowed">
+              <div className="text-left">
+                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Gerar PDF</p>
+                <p className="text-[12px] font-bold text-[#462F29]">Em breve</p>
+              </div>
+              <span className="text-xl">📄</span>
+            </div>
+          </div>
+        </section>
+
+        {/* 10. Informações Técnicas (Sistema) */}
         <section className="space-y-6 pt-10 border-t border-[#E8CECE]/50">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-gray-300 rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-gray-400">Informações Técnicas</h2>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-gray-400">Sistema</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
