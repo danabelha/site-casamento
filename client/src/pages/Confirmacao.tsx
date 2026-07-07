@@ -92,23 +92,18 @@ const MAPS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURI
 function SectionDivider({ title, isVerification = false }: { title: string; isVerification?: boolean } ) {
   return (
     <div className="text-center mb-8 md:mb-12 px-4 animate-in fade-in duration-700">
-      <h2 className={`font-cormorant font-light text-[#462F29] leading-tight mb-4 tracking-wide whitespace-nowrap
+      <h2 className={`font-cormorant font-light text-[#462F29] leading-tight tracking-wide whitespace-nowrap
         ${isVerification ? 'text-[22px] sm:text-[28px] md:text-[42px]' : 'text-[28px] md:text-[42px]'}`}>
         {title}
       </h2>
-      <div className="w-10 h-[1px] bg-wedding-gold mx-auto opacity-60" />
     </div>
   );
 }
 
 function SectionSeparator() {
   return (
-    <div className="w-full flex justify-center py-8 md:py-12 opacity-[0.28]">
-      <div className="flex items-center gap-3">
-        <div className="w-12 md:w-20 h-[0.5px] bg-wedding-gold"></div>
-        <div className="w-1.5 h-1.5 border border-wedding-gold rotate-45"></div>
-        <div className="w-12 md:w-20 h-[0.5px] bg-wedding-gold"></div>
-      </div>
+    <div className="w-full flex justify-center py-8 md:py-12">
+      {/* Separador minimalista invisível para manter o ritmo visual */}
     </div>
   );
 }
@@ -513,8 +508,8 @@ export default function Confirmacao() {
             <section className="px-4 sm:px-6 mb-10 md:mb-14 overflow-x-hidden">
               <SectionDivider title="Presentes" />
               <div className="max-w-6xl mx-auto -mt-6">
-                <p className="text-center font-montserrat text-[9px] md:text-[10px] text-wedding-gold/20 uppercase tracking-[0.25em] mb-6 md:hidden animate-in fade-in duration-1000">
-                  Deslize para descobrir mais presentes <span className="inline-block animate-bounce-x ml-1">→</span>
+                <p className="text-center font-montserrat text-[9px] md:text-[10px] text-wedding-gold/40 uppercase tracking-[0.25em] mb-6 md:hidden animate-in fade-in duration-1000 font-medium">
+                  Deslize para descobrir mais presentes <span className="inline-block animate-bounce-x ml-1 text-wedding-gold/60 scale-110">→</span>
                 </p>
                 <div className="flex overflow-x-auto pb-12 gap-5 md:grid md:grid-cols-3 md:overflow-visible scrollbar-hide px-6 md:px-0 snap-x snap-mandatory scroll-smooth">
                   {PRESENTES.map((p, i) => (
@@ -611,8 +606,8 @@ export default function Confirmacao() {
                 
                 {sucesso ? (
                   <div className="space-y-12">
-                    <div className="text-center space-y-8 py-16 px-8 border border-wedding-gold/20 bg-white/5 rounded-sm animate-in fade-in duration-600 max-w-2xl mx-auto">
-                      <PremiumTitle title={getSucessoMensagem().titulo} />
+	                      <div className="text-center space-y-8 py-16 px-8 border border-wedding-gold/20 bg-[#462F29] rounded-sm animate-in fade-in duration-600 max-w-2xl mx-auto shadow-2xl">
+	                        <PremiumTitle title={getSucessoMensagem().titulo} />
                       
                       <div className="animate-in fade-in slide-in-from-bottom-2 duration-700 delay-200 text-white">
                         {getSucessoMensagem().mensagem}
@@ -746,17 +741,15 @@ export default function Confirmacao() {
                               className="group flex flex-col items-center p-6 border border-wedding-gold/30 rounded-md transition-all duration-300 hover:bg-wedding-gold hover:-translate-y-1 hover:shadow-lg"
                             >
                               <span className="text-2xl mb-2 group-hover:scale-110 transition-transform">👤</span>
-                              <span className="font-montserrat text-[12px] font-semibold uppercase tracking-widest text-wedding-gold group-hover:text-white">Adicionar Adulto</span>
-                              <span className="text-[10px] text-white/40 mt-1 group-hover:text-white/70">Acompanhante adulto</span>
-                            </button>
-                            <button 
-                              onClick={() => setCriancas([...criancas, { nome: "", idade: "" }])}
-                              className="group flex flex-col items-center p-6 border border-wedding-gold/30 rounded-md transition-all duration-300 hover:bg-wedding-gold hover:-translate-y-1 hover:shadow-lg"
-                            >
-                              <span className="text-2xl mb-2 group-hover:scale-110 transition-transform">👶</span>
-                              <span className="font-montserrat text-[12px] font-semibold uppercase tracking-widest text-wedding-gold group-hover:text-white">Adicionar Criança</span>
-                              <span className="text-[10px] text-white/40 mt-1 group-hover:text-white/70">Menor de idade</span>
-                            </button>
+	                              <span className="font-montserrat text-[12px] font-semibold uppercase tracking-widest text-wedding-gold group-hover:text-white">Adicionar Adulto</span>
+	                            </button>
+	                            <button 
+	                              onClick={() => setCriancas([...criancas, { nome: "", idade: "" }])}
+	                              className="group flex flex-col items-center p-6 border border-wedding-gold/30 rounded-md transition-all duration-300 hover:bg-wedding-gold hover:-translate-y-1 hover:shadow-lg"
+	                            >
+	                              <span className="text-2xl mb-2 group-hover:scale-110 transition-transform">👶</span>
+	                              <span className="font-montserrat text-[12px] font-semibold uppercase tracking-widest text-wedding-gold group-hover:text-white">Adicionar Criança</span>
+	                            </button>
                           </div>
                         )}
                         {limiteAtingido && (
@@ -771,9 +764,9 @@ export default function Confirmacao() {
                         {(resposta === "Confirmado" || resposta === "Não Irá") && (
                         <div className="space-y-6">
                           <PremiumTitle title="MENSAGEM PARA OS NOIVOS" />
-                          <p className="text-[12px] text-white/60 font-light italic text-center -mt-6">
-                            Compartilhe uma lembrança, um conselho ou uma mensagem carinhosa para os noivos.
-                          </p>
+	                          <p className="text-[12px] text-white/60 font-light italic text-center -mt-6">
+	                            Compartilhe uma lembrança, um conselho ou uma mensagem carinhosa para os noivos. ❤️
+	                          </p>
                           
                           <textarea
                             placeholder="Escreva aqui sua mensagem..."
