@@ -385,7 +385,7 @@ export default function AdminPanel() {
                     {getAllConvidados.data && (getAllConvidados.data as Convidado[]).filter(c => c.dataConfirmacao).sort((a, b) => new Date(b.dataConfirmacao!).getTime() - new Date(a.dataConfirmacao!).getTime())[0]?.nome || 'Nenhuma'}
                   </h4>
                   <p className="text-[8px] text-gray-300 uppercase tracking-tighter">
-                    {getAllConvidados.data && (getAllConvidados.data as Convidado[]).filter(c => c.dataConfirmacao).sort((a, b) => new Date(b.dataConfirmacao!).getTime() - new Date(a.dataConfirmacao!).getTime())[0]?.dataConfirmacao.split(',')[0] || ''}
+                    {getAllConvidados.data && (getAllConvidados.data as Convidado[]).filter(c => c.dataConfirmacao).sort((a, b) => new Date(b.dataConfirmacao!).getTime() - new Date(a.dataConfirmacao!).getTime())[0]?.dataConfirmacao?.split(',')[0] || ''}
                   </p>
                 </div>
                 <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
