@@ -301,21 +301,23 @@ export default function AdminPanel() {
     <div className="min-h-[100dvh] bg-[#FDFAF6] font-montserrat pb-20 md:pb-10">
       {/* 1. Barra de Ações Superior (Fixa) */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#E8CECE] px-4 md:px-8 py-4 flex justify-between items-center">
-          <div className="flex flex-col items-start">
-            <h1 className="font-halimun text-2xl text-[#462F29]">Olá, Daniel! 👋</h1>
-            <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">
-              Faltam {Math.max(0, Math.ceil((new Date('2026-12-05').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} dias para o casamento.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 md:gap-4">
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${getCacheStats.data?.isSyncing ? 'bg-yellow-400 animate-pulse' : 'bg-green-500'}`}></div>
-              <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">
-                {getCacheStats.data?.isSyncing ? 'Sincronizando...' : 'Sistema Online'}
-              </span>
-            </div>
+        <div className="flex flex-col items-start">
+          <h1 className="font-halimun text-2xl text-[#462F29]">Olá, Daniel! 👋</h1>
+          <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">
+            Faltam {Math.max(0, Math.ceil((new Date('2026-12-05').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} dias para o casamento.
+          </p>
+        </div>
 
         <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${getCacheStats.data?.isSyncing ? 'bg-yellow-400 animate-pulse' : 'bg-green-500'}`}></div>
+            <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">
+              {getCacheStats.data?.isSyncing ? 'Sincronizando...' : 'Sistema Online'}
+            </span>
+          </div>
+
+          <div className="h-6 w-[1px] bg-[#E8CECE] hidden md:block mx-2"></div>
+
           <button 
             onClick={handleRefreshCache}
             disabled={carregando}
@@ -405,39 +407,36 @@ export default function AdminPanel() {
           </div>
         </section>
 
-        {/* 3. Necessita Atenção */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-1 h-6 bg-red-400 rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Necessita Atenção</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {stats.pendentes > 30 && (
-              <div className="bg-red-50 p-4 border border-red-200 rounded-sm flex items-center gap-3">
-                <span className="text-xl">⚠️</span>
-                <p className="text-[12px] text-red-700">Mais de 30 convidados pendentes de confirmação.</p>
-              </div>
-            )}
-            {stats.mensagens > 0 && (
-              <div className="bg-yellow-50 p-4 border border-yellow-200 rounded-sm flex items-center gap-3">
-                <span className="text-xl">✉️</span>
-                <p className="text-[12px] text-yellow-700">Novas mensagens não lidas.</p>
-              </div>
-            )}
-            {getCacheStats.data && getCacheStats.data.cacheAgeSeconds > 300 && (
-              <div className="bg-orange-50 p-4 border border-orange-200 rounded-sm flex items-center gap-3">
-                <span className="text-xl">⏳</span>
-                <p className="text-[12px] text-orange-700">Cache desatualizado. Considere sincronizar.</p>
-              </div>
-            )}
-            {stats.pendentes <= 30 && stats.mensagens === 0 && (getCacheStats.data && getCacheStats.data.cacheAgeSeconds <= 300) && (
-              <div className="bg-green-50 p-4 border border-green-200 rounded-sm flex items-center gap-3">
-                <span className="text-xl">✅</span>
-                <p className="text-[12px] text-green-700">Tudo sob controle! Nenhuma pendência urgente.</p>
-              </div>
-            )}
-          </div>
-        </section>
+        {/* 3. Necessita Atenção (Alertas Inteligentes) */}
+        {!getAllConvidados.isLoading && (stats.pendentes > 0 || stats.mensagens > 0) && (
+          <section className="space-y-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-1 h-6 bg-orange-400 rounded-full"></div>
+              <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Necessita Atenção</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {stats.pendentes > 0 && (
+                <div className="bg-orange-50 border border-orange-100 p-4 rounded-sm flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
+                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-xl">⏳</div>
+                  <div>
+                    <h4 className="text-[12px] font-bold text-orange-800 uppercase tracking-wider">Convites Pendentes</h4>
+                    <p className="text-[11px] text-orange-700/70">Ainda temos {stats.pendentes} convidados que não responderam ao convite.</p>
+                  </div>
+                </div>
+              )}
+              {stats.mensagens > 0 && (
+                <div className="bg-blue-50 border border-blue-100 p-4 rounded-sm flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">💌</div>
+                  <div>
+                    <h4 className="text-[12px] font-bold text-blue-800 uppercase tracking-wider">Novas Mensagens</h4>
+                    <p className="text-[11px] text-blue-700/70">Recebemos {stats.mensagens} mensagens carinhosas dos seus convidados.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* 4. Últimas Atualizações (Placeholder) */}
         <section className="space-y-6">
@@ -532,250 +531,13 @@ export default function AdminPanel() {
           )}
         </section>
 
-        {/* 7. Lista de Convidados (Cards Expansíveis) */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Lista de Convidados</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 gap-4">
-            {getAllConvidados.isLoading ? Array(5).fill(0).map((_, i) => <SkeletonCard key={i} />) : 
-             convidadosFiltrados.length > 0 ? convidadosFiltrados.map((c) => (
-              <div key={c.id} className="bg-white border border-[#E8CECE] rounded-sm shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
-                <div 
-                  className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-gray-50/50"
-                  onClick={() => setExpandidoId(expandidoId === c.id ? null : c.id)}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold
-                      ${c.status === 'Confirmado' ? 'bg-green-100 text-green-700' : 
-                        c.status === 'Não Irá' ? 'bg-red-100 text-red-700' : 
-                        c.status === 'Talvez' ? 'bg-yellow-100 text-yellow-700' : 
-                        'bg-gray-100 text-gray-700'}`}>
-                      {c.nome.charAt(0)}
-                    </div>
-                    <div>
-                      <h4 className="text-[13px] font-bold text-[#462F29] uppercase tracking-wide">{c.nome}</h4>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        <span className={`text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full border
-                          ${c.status === 'Confirmado' ? 'bg-green-50 text-green-600 border-green-100' : 
-                            c.status === 'Não Irá' ? 'bg-red-50 text-red-400 border-red-100' : 
-                            c.status === 'Talvez' ? 'bg-yellow-50 text-yellow-600 border-yellow-100' : 
-                            'bg-gray-50 text-gray-400 border-gray-100'}`}>
-                          {c.status}
-                        </span>
-                        {(c.acompanhantes || 0) > 0 && (
-                          <span className="text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 border border-purple-100">
-                            {c.acompanhantes} Adultos
-                          </span>
-                        )}
-                        {(c.criancas || 0) > 0 && (
-                          <span className="text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
-                            {c.criancas} Crianças
-                          </span>
-                        )}
-                        {c.mensagem && (
-                          <span className="text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-pink-50 text-pink-600 border border-pink-100">
-                            💌 Mensagem
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between md:justify-end gap-4">
-                    <div className="flex gap-3">
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); iniciarEdicao(c); }}
-                        className="p-2 text-gray-400 hover:text-wedding-gold transition-colors"
-                        title="Editar"
-                      >
-                        📝
-                      </button>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); removerConvidado(c.id); }}
-                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                        title="Excluir"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                    <div className={`transition-transform duration-300 ${expandidoId === c.id ? 'rotate-180' : ''}`}>
-                      🔽
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Detalhes Expandidos */}
-                {expandidoId === c.id && (
-                  <div className="px-5 pb-6 pt-2 border-t border-gray-50 bg-[#FDFAF6]/30 animate-in slide-in-from-top-2 duration-300">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-4">
-                        <div>
-                          <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-2">Acompanhantes Adultos</h5>
-                          <div className="space-y-1">
-                            {c.acompanhanteDetalhes ? c.acompanhanteDetalhes.split('\n').filter(line => !line.includes('(')).map((nome, idx) => (
-                              <p key={idx} className="text-[12px] text-[#462F29] font-medium">• {nome}</p>
-                            )) : <p className="text-[11px] text-gray-400 italic">Nenhum acompanhante adulto informado.</p>}
-                          </div>
-                        </div>
-                        <div>
-                          <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-2">Crianças</h5>
-                          <div className="space-y-1">
-                            {c.acompanhanteDetalhes ? c.acompanhanteDetalhes.split('\n').filter(line => line.includes('(')).map((detalhe, idx) => {
-                              const idadeMatch = detalhe.match(/\((\d+)\s+anos\)/);
-                              const idade = idadeMatch ? parseInt(idadeMatch[1]) : 0;
-                              return (
-                                <p key={idx} className="text-[12px] text-[#462F29] font-medium">
-                                  • {detalhe} {idade < 8 && <span className="text-[9px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded-full ml-2 uppercase font-bold tracking-tighter">Menor de 8</span>}
-                                </p>
-                              );
-                            }) : <p className="text-[11px] text-gray-400 italic">Nenhuma criança informada.</p>}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-2">Mensagem do Convidado</h5>
-                          <div className="bg-white p-4 border border-[#E8CECE]/50 rounded-sm italic">
-                            <p className="text-[12px] text-[#462F29]/80 leading-relaxed">
-                              {c.mensagem ? `"${c.mensagem}"` : "Nenhuma mensagem enviada."}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex gap-6 pt-2">
-                          <div>
-                            <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Telefone</h5>
-                            <p className="text-[12px] text-[#462F29]">{c.telefone || '--'}</p>
-                          </div>
-                          <div>
-                            <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">E-mail</h5>
-                            <p className="text-[12px] text-[#462F29]">{c.email || '--'}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )) : (
-              <div className="bg-white p-20 text-center border border-[#E8CECE] rounded-sm">
-                <span className="text-4xl block mb-4">🍃</span>
-                <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhum convidado encontrado</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* 8. Informações Técnicas (Sistema) */}
-        <section className="space-y-6 pt-10 border-t border-[#E8CECE]/50">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-1 h-6 bg-gray-300 rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-gray-400">Informações Técnicas</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {getCacheStats.isLoading ? <SkeletonCard /> : (
-              <div className="bg-white/50 p-5 border border-[#E8CECE] rounded-sm space-y-4">
-                <div className="flex justify-between items-start">
-                  <h3 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Status do Cache</h3>
-                  <span className="text-[10px] font-mono text-wedding-gold/50">v1.2.1</span>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-[11px] text-gray-400">Convidados Carregados</span>
-                    <span className="text-[11px] font-bold text-gray-500">{getCacheStats.data?.count || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[11px] text-gray-400">Última Sinc.</span>
-                    <span className="text-[11px] font-bold text-gray-500">
-                      {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleTimeString('pt-BR') : '--:--'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[11px] text-gray-400">Idade do Cache</span>
-                    <span className="text-[11px] font-bold text-gray-500">{getCacheStats.data?.cacheAgeSeconds || 0}s</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[11px] text-gray-400">Tempo de Sinc.</span>
-                    <span className="text-[11px] font-bold text-gray-500">{getCacheStats.data?.lastSyncDurationMs || 0}ms</span>
-                  </div>
-                </div>
-                <div className="pt-2 border-t border-gray-100 flex items-center justify-center gap-2">
-                  <div className={`w-1.5 h-1.5 rounded-full ${getCacheStats.data?.isSyncing ? 'bg-yellow-400 animate-pulse' : 'bg-green-500/50'}`}></div>
-                  <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">
-                    {getCacheStats.data?.isSyncing ? 'Sincronizando...' : 'Sistema Estável'}
-                  </span>
-                </div>
-              </div>
-            )}
-            
-            <div className="md:col-span-3 bg-white/30 p-6 border border-dashed border-[#E8CECE] rounded-sm flex flex-col items-center justify-center text-center">
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium mb-1">Dica de Performance</p>
-              <p className="text-[11px] text-gray-400/70 max-w-md">
-                O sistema utiliza um cache inteligente para garantir que o site carregue instantaneamente para seus convidados. 
-                Sincronizações manuais são necessárias apenas após grandes alterações na planilha.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* 9. Modal de Formulário (Premium) */}
-        {exibirForm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
-            <div className="absolute inset-0 bg-[#462F29]/40 backdrop-blur-sm" onClick={limparForm}></div>
-            <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-sm overflow-hidden animate-in zoom-in-95 duration-300">
-              <div className="bg-[#462F29] px-8 py-6 flex justify-between items-center">
-                <h2 className="font-cormorant text-2xl text-white uppercase tracking-widest">
-                  {editandoId ? 'Editar Convidado' : 'Novo Convidado'}
-                </h2>
-                <button onClick={limparForm} className="text-white/60 hover:text-white text-2xl">×</button>
-              </div>
-              
-              <div className="p-8 space-y-6">
-                <div className="grid grid-cols-1 gap-6">
-                  <div className="space-y-1">
-
-        {/* 2. Necessita Atenção (Alertas Inteligentes) */}
-        {!getAllConvidados.isLoading && (stats.pendentes > 0 || stats.mensagens > 0) && (
-          <section className="space-y-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-1 h-6 bg-orange-400 rounded-full"></div>
-              <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Necessita Atenção</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {stats.pendentes > 0 && (
-                <div className="bg-orange-50 border border-orange-100 p-4 rounded-sm flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
-                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-xl">⏳</div>
-                  <div>
-                    <h4 className="text-[12px] font-bold text-orange-800 uppercase tracking-wider">Convites Pendentes</h4>
-                    <p className="text-[11px] text-orange-700/70">Ainda temos {stats.pendentes} convidados que não responderam ao convite.</p>
-                  </div>
-                </div>
-              )}
-              {stats.mensagens > 0 && (
-                <div className="bg-blue-50 border border-blue-100 p-4 rounded-sm flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">💌</div>
-                  <div>
-                    <h4 className="text-[12px] font-bold text-blue-800 uppercase tracking-wider">Novas Mensagens</h4>
-                    <p className="text-[11px] text-blue-700/70">Recebemos {stats.mensagens} mensagens carinhosas dos seus convidados.</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
-
-        {/* 3. Busca & Filtros */}
+        {/* 7. Busca & Filtros (Lista) */}
         <div className="bg-white p-4 border border-[#E8CECE] rounded-sm shadow-sm space-y-4">
           <div className="relative flex-grow w-full">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300">🔍</span>
             <input 
               type="text" 
-              placeholder="Buscar por nome, e-mail ou telefone..." 
+              placeholder="Buscar na lista de convidados..." 
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-[#FDFAF6] border-none outline-none text-[13px] placeholder:text-gray-300 focus:ring-1 focus:ring-wedding-gold/20 transition-all rounded-sm"
@@ -795,7 +557,7 @@ export default function AdminPanel() {
           </div>
         </div>
 
-        {/* 4. Lista de Convidados (Cards Expansíveis) */}
+        {/* 8. Lista de Convidados (Cards Expansíveis) */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
@@ -932,95 +694,7 @@ export default function AdminPanel() {
           </div>
         </section>
 
-        {/* 5. Central de Mensagens */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-1 h-6 bg-pink-400 rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Mensagens dos Convidados</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {getAllConvidados.isLoading ? Array(3).fill(0).map((_, i) => <SkeletonCard key={i} />) : 
-             convidadosFiltrados.filter(c => c.mensagem && c.mensagem.trim() !== "").length > 0 ? 
-             convidadosFiltrados.filter(c => c.mensagem && c.mensagem.trim() !== "").map((c) => (
-              <div key={`msg-${c.id}`} className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all relative">
-                <div className="absolute top-4 right-4 text-pink-100 text-4xl font-serif">"</div>
-                <div className="space-y-4">
-                  <p className="text-[13px] text-[#462F29]/80 leading-relaxed italic pr-4">
-                    {c.mensagem}
-                  </p>
-                  <div className="pt-4 border-t border-gray-50 flex justify-between items-end">
-                    <div>
-                      <p className="text-[11px] font-bold text-[#462F29] uppercase tracking-wider">{c.nome}</p>
-                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">{c.status}</p>
-                    </div>
-                    {c.dataConfirmacao && (
-                      <p className="text-[8px] text-gray-300 uppercase tracking-tighter">{c.dataConfirmacao.split(',')[0]}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )) : (
-              <div className="col-span-full bg-white p-12 text-center border border-[#E8CECE] rounded-sm">
-                <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhuma mensagem recebida ainda</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* 5. Estatísticas & Ranking */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Estatísticas & Ranking</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm flex flex-col items-center justify-center text-center space-y-2">
-              <span className="text-3xl">📈</span>
-              <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Taxa de Confirmação</p>
-              <h4 className="text-3xl font-bold text-wedding-gold">{stats.taxaConfirmacao}%</h4>
-              <p className="text-[9px] text-gray-300 uppercase tracking-tighter">Engajamento da Lista</p>
-            </div>
-            <div className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm flex flex-col items-center justify-center text-center space-y-2">
-              <span className="text-3xl">🎁</span>
-              <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Total em Presentes</p>
-              <h4 className="text-3xl font-bold text-[#462F29]">{stats.valorPresentes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}</h4>
-              <p className="text-[9px] text-gray-300 uppercase tracking-tighter">Valor Estimado</p>
-            </div>
-            <div className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm flex flex-col items-center justify-center text-center space-y-2">
-              <span className="text-3xl">💍</span>
-              <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Dias para o Grande Dia</p>
-              <h4 className="text-3xl font-bold text-red-400">
-                {Math.max(0, Math.ceil((new Date('2026-12-05').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))}
-              </h4>
-              <p className="text-[9px] text-gray-300 uppercase tracking-tighter">Contagem Regressiva</p>
-            </div>
-          </div>
-
-          {getRankingPresentes.data && (getRankingPresentes.data as any[]).length > 0 && (
-            <div className="bg-white border border-[#E8CECE] rounded-sm shadow-sm p-6">
-              <h3 className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-6">Ranking de Cotas de Presentes</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {(getRankingPresentes.data as any[]).map((p, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-4 bg-[#FDFAF6] border border-[#E8CECE]/50 rounded-sm">
-                    <div className="space-y-1">
-                      <p className="text-[11px] font-bold text-[#462F29] uppercase truncate max-w-[180px]">{p.presenteNome}</p>
-                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">{p.quantidade} Contribuições</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[13px] font-bold text-wedding-gold">
-                        {p.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
-
-        {/* 6. Informações Técnicas (Sistema) */}
+        {/* 9. Informações Técnicas (Sistema) */}
         <section className="space-y-6 pt-10 border-t border-[#E8CECE]/50">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-gray-300 rounded-full"></div>
@@ -1074,7 +748,7 @@ export default function AdminPanel() {
         </section>
       </main>
 
-      {/* 6. Modal de Formulário (Premium) */}
+      {/* 10. Modal de Formulário (Premium) */}
       {exibirForm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-[#462F29]/40 backdrop-blur-sm" onClick={limparForm}></div>
