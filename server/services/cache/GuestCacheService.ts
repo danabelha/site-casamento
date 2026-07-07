@@ -68,11 +68,29 @@ class GuestCacheService {
     const lista = await this.getConvidados();
     
     const start = Date.now();
-    const resultado = lista.filter(c => c.nomeNormalizado === termo);
+    
+    // Busca inteligente:
+    // 1. Busca por correspondência exata (Prioridade Máxima)
+    let resultado = lista.filter(c => c.nomeNormalizado === termo);
+    
+    // 2. Se não encontrar exato, busca por partes do nome (Contém)
+    if (resultado.length === 0 && termo.length >= 3) {
+      resultado = lista.filter(c => c.nomeNormalizado.includes(termo));
+    }
+    
+    // 3. Se ainda não encontrar, busca por primeiro nome ou sobrenome (Palavras isoladas)
+    if (resultado.length === 0 && termo.length >= 3) {
+      const palavrasTermo = termo.split(" ");
+      resultado = lista.filter(c => {
+        const palavrasNome = c.nomeNormalizado.split(" ");
+        return palavrasTermo.every(p => palavrasNome.some(pn => pn.startsWith(p) || pn.endsWith(p)));
+      });
+    }
+
     const duration = Date.now() - start;
     
-    if (duration > 20) {
-      console.warn(`[GuestCacheService] Busca lenta detectada: ${duration}ms para o termo "${nome}"`);
+    if (duration > 50) {
+      console.warn(`[GuestCacheService] Busca complexa detectada: ${duration}ms para o termo "${nome}"`);
     }
     
     return resultado;

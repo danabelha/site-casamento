@@ -213,9 +213,11 @@ export default function Confirmacao() {
       }
 
       if (resultado && (resultado as any).length > 0) {
-        setConvidadoSelecionado((resultado as any)[0]);
+        // Se houver mais de um resultado, priorizamos o exato (ignorando case), senão pegamos o primeiro
+        const exato = (resultado as any[]).find(c => c.nome.toLowerCase() === nomeBusca.toLowerCase().trim());
+        setConvidadoSelecionado(exato || (resultado as any)[0]);
       } else {
-        setErroBusca("Tivemos dificuldade para localizar seu convite. Confira se o nome foi digitado corretamente. Caso o problema continue, entre em contato com os noivos para que possamos ajudá-lo.");
+        setErroBusca(`Não encontramos o convite para "${nomeBusca}". Tente digitar apenas o primeiro nome e sobrenome, ou verifique a grafia conforme o convite.`);
       }
     } catch (error) {
       console.error(error);
