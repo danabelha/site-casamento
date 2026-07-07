@@ -301,16 +301,19 @@ export default function AdminPanel() {
     <div className="min-h-[100dvh] bg-[#FDFAF6] font-montserrat pb-20 md:pb-10">
       {/* 1. Barra de Ações Superior (Fixa) */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#E8CECE] px-4 md:px-8 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <h1 className="font-halimun text-2xl text-[#462F29] hidden md:block">Admin</h1>
-          <div className="h-6 w-[1px] bg-[#E8CECE] hidden md:block mx-2"></div>
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${getCacheStats.data?.isSyncing ? 'bg-yellow-400 animate-pulse' : 'bg-green-500'}`}></div>
-            <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">
-              {getCacheStats.data?.isSyncing ? 'Sincronizando...' : 'Sistema Online'}
-            </span>
+          <div className="flex flex-col items-start">
+            <h1 className="font-halimun text-2xl text-[#462F29]">Olá, Daniel! 👋</h1>
+            <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">
+              Faltam {Math.max(0, Math.ceil((new Date('2026-12-05').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} dias para o casamento.
+            </p>
           </div>
-        </div>
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${getCacheStats.data?.isSyncing ? 'bg-yellow-400 animate-pulse' : 'bg-green-500'}`}></div>
+              <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">
+                {getCacheStats.data?.isSyncing ? 'Sincronizando...' : 'Sistema Online'}
+              </span>
+            </div>
 
         <div className="flex items-center gap-2 md:gap-4">
           <button 
@@ -345,51 +348,395 @@ export default function AdminPanel() {
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-10">
         
-        {/* 1. Dashboard Executivo (Resumo do Casamento) */}
+        {/* 1. Resumo de Hoje */}
         <section className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
-            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Resumo do Casamento</h2>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Resumo de Hoje</h2>
           </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {getAllConvidados.isLoading ? Array(6).fill(0).map((_, i) => <SkeletonStat key={i} />) : (
-              [
-                { label: "Confirmados", val: stats.confirmados, sub: "Total Pessoas", icon: "👥", color: "text-green-600" },
-                { label: "Aguardando", val: stats.pendentes, sub: "Convites", icon: "⏳", color: "text-gray-400" },
-                { label: "Não Irão", val: stats.naoIrao, sub: "Convites", icon: "❌", color: "text-red-400" },
-                { label: "Crianças", val: stats.criancas, sub: "Confirmadas", icon: "👶", color: "text-blue-400" },
-                { label: "Acompanhantes", val: stats.acompanhantes, sub: "Confirmados", icon: "👨‍👩‍👧", color: "text-purple-400" },
-                { label: "Mensagens", val: stats.mensagens, sub: "Recebidas", icon: "💌", color: "text-pink-400" },
-              ].map((s, i) => (
-                <div key={i} className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                  <div className="flex justify-between items-start mb-3">
-                    <span className="text-xl">{s.icon}</span>
-                    <span className={`text-[20px] font-bold ${s.color}`}>{s.val}</span>
-                  </div>
-                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">{s.label}</p>
-                  <p className="text-[8px] text-gray-300 uppercase tracking-tighter">{s.sub}</p>
+          <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm">
+            <p className="text-[12px] text-gray-500 italic">O resumo de hoje será implementado em breve.</p>
+          </div>
+        </section>
+
+        {/* 2. Indicadores Inteligentes */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Indicadores Inteligentes</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {getAllConvidados.isLoading ? Array(4).fill(0).map((_, i) => <SkeletonStat key={i} />) : (
+              <>
+                <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Presente Mais Escolhido</p>
+                  <h4 className="text-[16px] font-bold text-[#462F29] truncate">
+                    {getRankingPresentes.data && (getRankingPresentes.data as any[]).length > 0 ? (getRankingPresentes.data as any[])[0].presenteNome : 'Nenhum'}
+                  </h4>
+                  <p className="text-[8px] text-gray-300 uppercase tracking-tighter">
+                    {(getRankingPresentes.data && (getRankingPresentes.data as any[]).length > 0) ? `${(getRankingPresentes.data as any[])[0].quantidade} Cotas` : ''}
+                  </p>
                 </div>
-              ))
+                <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Última Confirmação</p>
+                  <h4 className="text-[16px] font-bold text-[#462F29] truncate">
+                    {getAllConvidados.data && (getAllConvidados.data as Convidado[]).filter(c => c.dataConfirmacao).sort((a, b) => new Date(b.dataConfirmacao!).getTime() - new Date(a.dataConfirmacao!).getTime())[0]?.nome || 'Nenhuma'}
+                  </h4>
+                  <p className="text-[8px] text-gray-300 uppercase tracking-tighter">
+                    {getAllConvidados.data && (getAllConvidados.data as Convidado[]).filter(c => c.dataConfirmacao).sort((a, b) => new Date(b.dataConfirmacao!).getTime() - new Date(a.dataConfirmacao!).getTime())[0]?.dataConfirmacao.split(',')[0] || ''}
+                  </p>
+                </div>
+                <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Última Sincronização</p>
+                  <h4 className="text-[16px] font-bold text-[#462F29]">
+                    {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleTimeString('pt-BR') : '--:--'}
+                  </h4>
+                  <p className="text-[8px] text-gray-300 uppercase tracking-tighter">
+                    {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleDateString('pt-BR') : 'N/A'}
+                  </p>
+                </div>
+                <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Crianças Menores de 8</p>
+                  <h4 className="text-[16px] font-bold text-blue-500">{stats.menores8}</h4>
+                  <p className="text-[8px] text-gray-300 uppercase tracking-tighter">Total Confirmadas</p>
+                </div>
+              </>
             )}
           </div>
+        </section>
 
-          {/* Resumo de Crianças */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-[#FDFAF6] border border-[#E8CECE] p-4 rounded-sm flex items-center justify-between">
-              <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Crianças Menores de 8</span>
-              <span className="text-[16px] font-bold text-blue-500">{stats.menores8}</span>
+        {/* 3. Necessita Atenção */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-red-400 rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Necessita Atenção</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {stats.pendentes > 30 && (
+              <div className="bg-red-50 p-4 border border-red-200 rounded-sm flex items-center gap-3">
+                <span className="text-xl">⚠️</span>
+                <p className="text-[12px] text-red-700">Mais de 30 convidados pendentes de confirmação.</p>
+              </div>
+            )}
+            {stats.mensagens > 0 && (
+              <div className="bg-yellow-50 p-4 border border-yellow-200 rounded-sm flex items-center gap-3">
+                <span className="text-xl">✉️</span>
+                <p className="text-[12px] text-yellow-700">Novas mensagens não lidas.</p>
+              </div>
+            )}
+            {getCacheStats.data && getCacheStats.data.cacheAgeSeconds > 300 && (
+              <div className="bg-orange-50 p-4 border border-orange-200 rounded-sm flex items-center gap-3">
+                <span className="text-xl">⏳</span>
+                <p className="text-[12px] text-orange-700">Cache desatualizado. Considere sincronizar.</p>
+              </div>
+            )}
+            {stats.pendentes <= 30 && stats.mensagens === 0 && (getCacheStats.data && getCacheStats.data.cacheAgeSeconds <= 300) && (
+              <div className="bg-green-50 p-4 border border-green-200 rounded-sm flex items-center gap-3">
+                <span className="text-xl">✅</span>
+                <p className="text-[12px] text-green-700">Tudo sob controle! Nenhuma pendência urgente.</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* 4. Últimas Atualizações (Placeholder) */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Últimas Atualizações</h2>
+          </div>
+          <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm">
+            <p className="text-[12px] text-gray-500 italic">Histórico de atualizações em breve.</p>
+          </div>
+        </section>
+
+        {/* 5. Mensagens Recentes */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-pink-400 rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Mensagens Recentes</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {getAllConvidados.isLoading ? Array(3).fill(0).map((_, i) => <SkeletonCard key={i} />) : 
+             convidadosFiltrados.filter(c => c.mensagem && c.mensagem.trim() !== "").slice(0, 3).map((c) => (
+              <div key={`msg-${c.id}`} className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm hover:shadow-md transition-all relative">
+                <div className="absolute top-4 right-4 text-pink-100 text-4xl font-serif">"</div>
+                <div className="space-y-4">
+                  <p className="text-[13px] text-[#462F29]/80 leading-relaxed italic pr-4">
+                    {c.mensagem}
+                  </p>
+                  <div className="pt-4 border-t border-gray-50 flex justify-between items-end">
+                    <div>
+                      <p className="text-[11px] font-bold text-[#462F29] uppercase tracking-wider">{c.nome}</p>
+                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">{c.status}</p>
+                    </div>
+                    {c.dataConfirmacao && (
+                      <p className="text-[8px] text-gray-300 uppercase tracking-tighter">{c.dataConfirmacao.split(',')[0]}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {convidadosFiltrados.filter(c => c.mensagem && c.mensagem.trim() !== "").length === 0 && (
+              <div className="col-span-full bg-white p-12 text-center border border-[#E8CECE] rounded-sm">
+                <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhuma mensagem recebida ainda</p>
+              </div>
+            )}
+          </div>
+          {convidadosFiltrados.filter(c => c.mensagem && c.mensagem.trim() !== "").length > 3 && (
+            <div className="text-center mt-6">
+              <button 
+                onClick={() => setFiltroResposta("Com Mensagem")}
+                className="text-[10px] uppercase tracking-widest font-bold text-wedding-gold hover:underline"
+              >
+                Ver todas as mensagens
+              </button>
             </div>
-            <div className="bg-[#FDFAF6] border border-[#E8CECE] p-4 rounded-sm flex items-center justify-between">
-              <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Crianças 8 anos ou mais</span>
-              <span className="text-[16px] font-bold text-blue-800">{stats.maiores8}</span>
+          )}
+        </section>
+
+        {/* 6. Ranking dos Presentes */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Ranking dos Presentes</h2>
+          </div>
+          
+          {getRankingPresentes.data && (getRankingPresentes.data as any[]).length > 0 ? (
+            <div className="bg-white border border-[#E8CECE] rounded-sm shadow-sm p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {(getRankingPresentes.data as any[]).map((p, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-4 bg-[#FDFAF6] border border-[#E8CECE]/50 rounded-sm">
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-bold text-[#462F29] uppercase truncate max-w-[180px]">
+                        {idx === 0 && '🥇 '}
+                        {idx === 1 && '🥈 '}
+                        {idx === 2 && '🥉 '}
+                        {p.presenteNome}
+                      </p>
+                      <p className="text-[9px] text-gray-400 uppercase tracking-widest">{p.quantidade} Cotas</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[13px] font-bold text-wedding-gold">
+                        {p.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="bg-[#FDFAF6] border border-[#E8CECE] p-4 rounded-sm flex items-center justify-between">
-              <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Total Geral Crianças</span>
-              <span className="text-[16px] font-bold text-[#462F29]">{stats.criancas}</span>
+          ) : (
+            <div className="bg-white p-12 text-center border border-[#E8CECE] rounded-sm">
+              <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhum presente registrado ainda</p>
+            </div>
+          )}
+        </section>
+
+        {/* 7. Lista de Convidados (Cards Expansíveis) */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-[#462F29] rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Lista de Convidados</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-4">
+            {getAllConvidados.isLoading ? Array(5).fill(0).map((_, i) => <SkeletonCard key={i} />) : 
+             convidadosFiltrados.length > 0 ? convidadosFiltrados.map((c) => (
+              <div key={c.id} className="bg-white border border-[#E8CECE] rounded-sm shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+                <div 
+                  className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-gray-50/50"
+                  onClick={() => setExpandidoId(expandidoId === c.id ? null : c.id)}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold
+                      ${c.status === 'Confirmado' ? 'bg-green-100 text-green-700' : 
+                        c.status === 'Não Irá' ? 'bg-red-100 text-red-700' : 
+                        c.status === 'Talvez' ? 'bg-yellow-100 text-yellow-700' : 
+                        'bg-gray-100 text-gray-700'}`}>
+                      {c.nome.charAt(0)}
+                    </div>
+                    <div>
+                      <h4 className="text-[13px] font-bold text-[#462F29] uppercase tracking-wide">{c.nome}</h4>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        <span className={`text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full border
+                          ${c.status === 'Confirmado' ? 'bg-green-50 text-green-600 border-green-100' : 
+                            c.status === 'Não Irá' ? 'bg-red-50 text-red-400 border-red-100' : 
+                            c.status === 'Talvez' ? 'bg-yellow-50 text-yellow-600 border-yellow-100' : 
+                            'bg-gray-50 text-gray-400 border-gray-100'}`}>
+                          {c.status}
+                        </span>
+                        {(c.acompanhantes || 0) > 0 && (
+                          <span className="text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 border border-purple-100">
+                            {c.acompanhantes} Adultos
+                          </span>
+                        )}
+                        {(c.criancas || 0) > 0 && (
+                          <span className="text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                            {c.criancas} Crianças
+                          </span>
+                        )}
+                        {c.mensagem && (
+                          <span className="text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-pink-50 text-pink-600 border border-pink-100">
+                            💌 Mensagem
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between md:justify-end gap-4">
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); iniciarEdicao(c); }}
+                        className="p-2 text-gray-400 hover:text-wedding-gold transition-colors"
+                        title="Editar"
+                      >
+                        📝
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); removerConvidado(c.id); }}
+                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                        title="Excluir"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                    <div className={`transition-transform duration-300 ${expandidoId === c.id ? 'rotate-180' : ''}`}>
+                      🔽
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Detalhes Expandidos */}
+                {expandidoId === c.id && (
+                  <div className="px-5 pb-6 pt-2 border-t border-gray-50 bg-[#FDFAF6]/30 animate-in slide-in-from-top-2 duration-300">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-4">
+                        <div>
+                          <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-2">Acompanhantes Adultos</h5>
+                          <div className="space-y-1">
+                            {c.acompanhanteDetalhes ? c.acompanhanteDetalhes.split('\n').filter(line => !line.includes('(')).map((nome, idx) => (
+                              <p key={idx} className="text-[12px] text-[#462F29] font-medium">• {nome}</p>
+                            )) : <p className="text-[11px] text-gray-400 italic">Nenhum acompanhante adulto informado.</p>}
+                          </div>
+                        </div>
+                        <div>
+                          <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-2">Crianças</h5>
+                          <div className="space-y-1">
+                            {c.acompanhanteDetalhes ? c.acompanhanteDetalhes.split('\n').filter(line => line.includes('(')).map((detalhe, idx) => {
+                              const idadeMatch = detalhe.match(/\((\d+)\s+anos\)/);
+                              const idade = idadeMatch ? parseInt(idadeMatch[1]) : 0;
+                              return (
+                                <p key={idx} className="text-[12px] text-[#462F29] font-medium">
+                                  • {detalhe} {idade < 8 && <span className="text-[9px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded-full ml-2 uppercase font-bold tracking-tighter">Menor de 8</span>}
+                                </p>
+                              );
+                            }) : <p className="text-[11px] text-gray-400 italic">Nenhuma criança informada.</p>}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-2">Mensagem do Convidado</h5>
+                          <div className="bg-white p-4 border border-[#E8CECE]/50 rounded-sm italic">
+                            <p className="text-[12px] text-[#462F29]/80 leading-relaxed">
+                              {c.mensagem ? `"${c.mensagem}"` : "Nenhuma mensagem enviada."}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-6 pt-2">
+                          <div>
+                            <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Telefone</h5>
+                            <p className="text-[12px] text-[#462F29]">{c.telefone || '--'}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">E-mail</h5>
+                            <p className="text-[12px] text-[#462F29]">{c.email || '--'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )) : (
+              <div className="bg-white p-20 text-center border border-[#E8CECE] rounded-sm">
+                <span className="text-4xl block mb-4">🍃</span>
+                <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhum convidado encontrado</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* 8. Informações Técnicas (Sistema) */}
+        <section className="space-y-6 pt-10 border-t border-[#E8CECE]/50">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 bg-gray-300 rounded-full"></div>
+            <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-gray-400">Informações Técnicas</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {getCacheStats.isLoading ? <SkeletonCard /> : (
+              <div className="bg-white/50 p-5 border border-[#E8CECE] rounded-sm space-y-4">
+                <div className="flex justify-between items-start">
+                  <h3 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Status do Cache</h3>
+                  <span className="text-[10px] font-mono text-wedding-gold/50">v1.2.1</span>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-[11px] text-gray-400">Convidados Carregados</span>
+                    <span className="text-[11px] font-bold text-gray-500">{getCacheStats.data?.count || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[11px] text-gray-400">Última Sinc.</span>
+                    <span className="text-[11px] font-bold text-gray-500">
+                      {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleTimeString('pt-BR') : '--:--'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[11px] text-gray-400">Idade do Cache</span>
+                    <span className="text-[11px] font-bold text-gray-500">{getCacheStats.data?.cacheAgeSeconds || 0}s</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[11px] text-gray-400">Tempo de Sinc.</span>
+                    <span className="text-[11px] font-bold text-gray-500">{getCacheStats.data?.lastSyncDurationMs || 0}ms</span>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-center gap-2">
+                  <div className={`w-1.5 h-1.5 rounded-full ${getCacheStats.data?.isSyncing ? 'bg-yellow-400 animate-pulse' : 'bg-green-500/50'}`}></div>
+                  <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">
+                    {getCacheStats.data?.isSyncing ? 'Sincronizando...' : 'Sistema Estável'}
+                  </span>
+                </div>
+              </div>
+            )}
+            
+            <div className="md:col-span-3 bg-white/30 p-6 border border-dashed border-[#E8CECE] rounded-sm flex flex-col items-center justify-center text-center">
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium mb-1">Dica de Performance</p>
+              <p className="text-[11px] text-gray-400/70 max-w-md">
+                O sistema utiliza um cache inteligente para garantir que o site carregue instantaneamente para seus convidados. 
+                Sincronizações manuais são necessárias apenas após grandes alterações na planilha.
+              </p>
             </div>
           </div>
         </section>
+
+        {/* 9. Modal de Formulário (Premium) */}
+        {exibirForm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
+            <div className="absolute inset-0 bg-[#462F29]/40 backdrop-blur-sm" onClick={limparForm}></div>
+            <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-sm overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="bg-[#462F29] px-8 py-6 flex justify-between items-center">
+                <h2 className="font-cormorant text-2xl text-white uppercase tracking-widest">
+                  {editandoId ? 'Editar Convidado' : 'Novo Convidado'}
+                </h2>
+                <button onClick={limparForm} className="text-white/60 hover:text-white text-2xl">×</button>
+              </div>
+              
+              <div className="p-8 space-y-6">
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="space-y-1">
 
         {/* 2. Necessita Atenção (Alertas Inteligentes) */}
         {!getAllConvidados.isLoading && (stats.pendentes > 0 || stats.mensagens > 0) && (
