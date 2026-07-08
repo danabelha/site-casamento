@@ -8,8 +8,9 @@ class GuestCacheService {
   private cache: CachedGuest[] | null = null;
   private lastUpdate: number = 0;
   private syncDuration: number = 0;
-  private readonly TTL = 5 * 60 * 1000; // 5 minutos em milissegundos
+  private readonly TTL = 30 * 60 * 1000; // 30 minutos em milissegundos
   private isSyncing = false;
+  private autoSyncInterval: NodeJS.Timeout | null = null;
 
   private normalizar(texto: string): string {
     return texto
@@ -21,14 +22,18 @@ class GuestCacheService {
   }
 
   public async getConvidados(): Promise<CachedGuest[]> {
-    const now = Date.now();
-    
-    // Se o cache expirar ou não existir, atualiza
-    if (!this.cache || (now - this.lastUpdate > this.TTL)) {
-      await this.refreshCache();
-    }
-
+    // Retorna o cache atual imediatamente. 
+    // A atualização agora é gerida de forma automática/manual sem bloquear a leitura.
     return this.cache || [];
+  }
+
+  public startAutoSync(): void {
+    if (this.autoSyncInterval) return;
+    
+    console.log("[GuestCacheService] Iniciando agendamento de sincronização automática (30 em 30 min)...");
+    this.autoSyncInterval = setInterval(() => {
+      this.refreshCache().catch(err => console.error("[GuestCacheService] Erro no auto-sync:", err));
+    }, this.TTL);
   }
 
   public async refreshCache(): Promise<void> {

@@ -29,7 +29,8 @@ app.listen(PORT, "0.0.0.0", async () => {
   try {
     const { guestCacheService } = await import("./services/cache/GuestCacheService.js");
     await guestCacheService.refreshCache();
-    console.log("[Server] Cache de convidados inicializado com sucesso.");
+    guestCacheService.startAutoSync();
+    console.log("[Server] Cache de convidados inicializado e agendado com sucesso.");
   } catch (error) {
     console.error("[Server] Falha ao inicializar cache na subida:", error);
   }

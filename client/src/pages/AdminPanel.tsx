@@ -841,13 +841,7 @@ export default function AdminPanel() {
               </div>
             )}
             
-            <div className="md:col-span-3 bg-white/30 p-6 border border-dashed border-[#E8CECE] rounded-sm flex flex-col items-center justify-center text-center">
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium mb-1">Dica de Performance</p>
-              <p className="text-[11px] text-gray-400/70 max-w-md">
-                O sistema utiliza um cache inteligente para garantir que o site carregue instantaneamente para seus convidados. 
-                Sincronizações manuais são necessárias apenas após grandes alterações na planilha.
-              </p>
-            </div>
+
           </div>
         </section>
       </main>

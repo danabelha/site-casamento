@@ -439,7 +439,7 @@ export default function Confirmacao() {
             <button 
               onClick={handleSearch}
               disabled={carregandoBusca}
-              className={`w-full bg-[#462F29] text-white py-4 md:py-5 tracking-[0.3em] uppercase text-[11px] md:text-[12px] font-bold transition-all hover:bg-[#2d1e1a] shadow-lg active:scale-[0.98] ${carregandoBusca ? 'opacity-50' : 'opacity-100'} flex items-center justify-center gap-3`}
+              className={`w-full bg-[#462F29] text-white py-4 md:py-5 tracking-[0.25em] uppercase text-[11px] md:text-[12px] font-bold transition-all hover:bg-[#2d1e1a] shadow-lg active:scale-[0.98] ${carregandoBusca ? 'opacity-50' : 'opacity-100'} flex items-center justify-center gap-3 rounded-sm`}
             >
               {carregandoBusca ? (
                 <>
