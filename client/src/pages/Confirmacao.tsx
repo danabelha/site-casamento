@@ -202,12 +202,24 @@ export default function Confirmacao() {
     if (!nomeBusca.trim() || carregandoBusca) return;
     const startTime = Date.now();
     setErroBusca(null);
+    
+    // Timeout de segurança: se a busca demorar mais de 5 segundos, interromper
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error("TIMEOUT")), 5000)
+    );
+    
     try {
       setCarregandoBusca(true);
-      const resultado = await searchMutation.mutateAsync({ nome: nomeBusca });
+      
+      // Executar busca com timeout
+      const resultado = await Promise.race([
+        searchMutation.mutateAsync({ nome: nomeBusca }),
+        timeoutPromise
+      ]);
       
       const duration = Date.now() - startTime;
-      const minDuration = 600;
+      // Feedback visual mínimo: 300ms (reduzido de 600ms para melhor UX)
+      const minDuration = 300;
       if (duration < minDuration) {
         await new Promise(resolve => setTimeout(resolve, minDuration - duration));
       }
@@ -219,9 +231,13 @@ export default function Confirmacao() {
       } else {
         setErroBusca(`Não encontramos o convite para "${nomeBusca}". Tente digitar apenas o primeiro nome e sobrenome, ou verifique a grafia conforme o convite.`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setErroBusca("Ocorreu um erro ao buscar seu convite. Por favor, tente novamente em instantes.");
+      if (error?.message === "TIMEOUT") {
+        setErroBusca("Estamos com dificuldade para localizar seu convite no momento. Tente novamente em alguns instantes.");
+      } else {
+        setErroBusca("Ocorreu um erro ao buscar seu convite. Por favor, tente novamente em instantes.");
+      }
     } finally {
       setCarregandoBusca(false);
     }
