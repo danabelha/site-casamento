@@ -788,13 +788,7 @@ export default function AdminPanel() {
               </div>
               <span className="text-xl group-hover:scale-110 transition-transform">🖨️</span>
             </button>
-            <div className="flex items-center justify-between p-5 bg-gray-50/50 border border-[#E8CECE] rounded-sm opacity-50 cursor-not-allowed">
-              <div className="text-left">
-                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Gerar PDF</p>
-                <p className="text-[12px] font-bold text-[#462F29]">Em breve</p>
-              </div>
-              <span className="text-xl">📄</span>
-            </div>
+
           </div>
         </section>
 
