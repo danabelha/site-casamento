@@ -8,7 +8,7 @@ class GuestCacheService {
   private cache: CachedGuest[] | null = null;
   private lastUpdate: number = 0;
   private syncDuration: number = 0;
-  private readonly TTL = 30 * 60 * 1000; // 30 minutos em milissegundos
+  private readonly TTL = 5 * 60 * 1000; // 5 minutos em milissegundos (sincronizado com alerta do frontend)
   private isSyncing = false;
   private autoSyncInterval: NodeJS.Timeout | null = null;
 
