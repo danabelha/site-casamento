@@ -2,7 +2,7 @@
 
 Este documento detalha os aspectos de negócio e técnicos do site de casamento, servindo como guia para usuários e desenvolvedores.
 
----
+--
 
 ## 1. Documentação de Negócio
 
