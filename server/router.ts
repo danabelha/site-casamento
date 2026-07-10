@@ -41,6 +41,17 @@ const adminProcedure = publicProcedure.use(isAdmin);
 // Para resolver o erro TS2883, definimos o router e exportamos o tipo separadamente.
 // O segredo aqui é não deixar o TS tentar gerar um arquivo .d.ts complexo.
 const appRouter = t.router({
+  health: publicProcedure
+    .query(async () => {
+      const cacheStats = guestCacheService.getStats();
+      return {
+        status: "ok",
+        timestamp: new Date().toISOString(),
+        cacheReady: cacheStats.count > 0,
+        cacheCount: cacheStats.count,
+      };
+    }),
+
   searchConvidados: publicProcedure
     .input(z.object({ nome: z.string() }))
     .mutation(async ({ input }) => {
