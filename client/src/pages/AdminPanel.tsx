@@ -272,6 +272,23 @@ export default function AdminPanel() {
     };
   }, [getAllConvidados.data, getRankingPresentes.data]);
 
+  const confirmacoesHoje = useMemo(() => {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    return ((getAllConvidados.data as Convidado[]) || []).filter(c => c.dataConfirmacao?.includes(hoje)).length;
+  }, [getAllConvidados.data]);
+
+  const ultimasAtualizacoes = useMemo(() => {
+    const list = (getAllConvidados.data as Convidado[]) || [];
+    return list
+      .filter(c => c.dataConfirmacao)
+      .sort((a, b) => {
+        const dateA = a.dataConfirmacao ? new Date(a.dataConfirmacao.split(',').reverse().join('-')).getTime() : 0;
+        const dateB = b.dataConfirmacao ? new Date(b.dataConfirmacao.split(',').reverse().join('-')).getTime() : 0;
+        return dateB - dateA;
+      })
+      .slice(0, 5);
+  }, [getAllConvidados.data]);
+
   const SkeletonCard = () => (
     <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm space-y-4 skeleton">
       <div className="h-3 w-20 bg-gray-200 rounded"></div>
@@ -297,7 +314,7 @@ export default function AdminPanel() {
   // --- RENDER HELPERS ---
   if (!autenticado) {
     return (
-      <div className="min-h-[100dvh] flex items-center justify-center bg-[#FDFAF6] px-6">
+      <div className="h-[100dvh] w-full overflow-hidden fixed inset-0 flex items-center justify-center bg-[#FDFAF6] px-6 z-[9999]">
         <div className="w-full max-w-md text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
           <h1 className="font-halimun text-4xl text-[#462F29]">Admin</h1>
           <div className="bg-white p-8 border border-[#E8CECE] shadow-xl rounded-sm space-y-6">
@@ -309,7 +326,7 @@ export default function AdminPanel() {
                 value={senhaDigitada} 
                 onChange={(e) => setSenhaDigitada(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && autenticar()}
-                className="w-full border-b border-[#E8CECE] py-3 text-center outline-none focus:border-wedding-gold transition-colors"
+                className="w-full border-b border-[#E8CECE] py-3 text-center outline-none focus:border-wedding-gold transition-colors bg-transparent"
               />
             </div>
             <button 
@@ -389,12 +406,7 @@ export default function AdminPanel() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="space-y-1">
                 <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Confirmações Hoje</p>
-                <p className="text-2xl font-bold text-[#462F29]">
-                  {useMemo(() => {
-                    const hoje = new Date().toLocaleDateString('pt-BR');
-                    return ((getAllConvidados.data as Convidado[]) || []).filter(c => c.dataConfirmacao?.includes(hoje)).length;
-                  }, [getAllConvidados.data])}
-                </p>
+                <p className="text-2xl font-bold text-[#462F29]">{confirmacoesHoje}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Último Sincronismo</p>
@@ -513,36 +525,25 @@ export default function AdminPanel() {
           </div>
           <div className="bg-white border border-[#E8CECE] rounded-sm shadow-sm overflow-hidden">
             <div className="divide-y divide-gray-50">
-              {useMemo(() => {
-                const list = (getAllConvidados.data as Convidado[]) || [];
-                return list
-                  .filter(c => c.dataConfirmacao)
-                  .sort((a, b) => {
-                    const dateA = a.dataConfirmacao ? new Date(a.dataConfirmacao.split(',').reverse().join('-')).getTime() : 0;
-                    const dateB = b.dataConfirmacao ? new Date(b.dataConfirmacao.split(',').reverse().join('-')).getTime() : 0;
-                    return dateB - dateA;
-                  })
-                  .slice(0, 5)
-                  .map((c, idx) => (
-                    <div key={idx} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
-                          ${c.status === 'Confirmado' ? 'bg-green-50 text-green-600' : 
-                            c.status === 'Não Irá' ? 'bg-red-50 text-red-600' : 'bg-yellow-50 text-yellow-600'}`}>
-                          {c.nome.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="text-[12px] font-bold text-[#462F29]">{c.nome}</p>
-                          <p className="text-[10px] text-gray-400 uppercase tracking-widest">
-                            Alterou status para <span className="font-bold">{c.status}</span>
-                          </p>
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-gray-300 font-medium">{c.dataConfirmacao?.split(',')[0]}</p>
+              {ultimasAtualizacoes.map((c, idx) => (
+                <div key={idx} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
+                      ${c.status === 'Confirmado' ? 'bg-green-50 text-green-600' : 
+                        c.status === 'Não Irá' ? 'bg-red-50 text-red-600' : 'bg-yellow-50 text-yellow-600'}`}>
+                      {c.nome.charAt(0)}
                     </div>
-                  ));
-              }, [getAllConvidados.data])}
-              {((getAllConvidados.data as Convidado[]) || []).filter(c => c.dataConfirmacao).length === 0 && (
+                    <div>
+                      <p className="text-[12px] font-bold text-[#462F29]">{c.nome}</p>
+                      <p className="text-[10px] text-gray-400 uppercase tracking-widest">
+                        Alterou status para <span className="font-bold">{c.status}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-gray-300 font-medium">{c.dataConfirmacao?.split(',')[0]}</p>
+                </div>
+              ))}
+              {ultimasAtualizacoes.length === 0 && (
                 <div className="p-8 text-center">
                   <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhuma atualização recente</p>
                 </div>
