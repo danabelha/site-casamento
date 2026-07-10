@@ -287,9 +287,9 @@ export default function AdminPanel() {
 
   const getSaudacao = () => {
     const hora = new Date().getHours();
-    if (hora >= 5 && hora < 12) return "Bom dia, Daniel! 👋";
-    if (hora >= 12 && hora < 18) return "Boa tarde, Daniel! 👋";
-    return "Boa noite, Daniel! 👋";
+    if (hora >= 5 && hora < 12) return "Bom dia, Daniel!";
+    if (hora >= 12 && hora < 18) return "Boa tarde, Daniel!";
+    return "Boa noite, Daniel!";
   };
 
   const diasParaCasamento = Math.max(0, Math.ceil((new Date('2026-12-05').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)));
@@ -385,8 +385,32 @@ export default function AdminPanel() {
             <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
             <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Resumo do Dia</h2>
           </div>
-          <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm">
-            <p className="text-[12px] text-gray-500 italic">Hoje não houve novas movimentações.</p>
+          <div className="bg-white p-6 border border-[#E8CECE] rounded-sm shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="space-y-1">
+                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Confirmações Hoje</p>
+                <p className="text-2xl font-bold text-[#462F29]">
+                  {useMemo(() => {
+                    const hoje = new Date().toLocaleDateString('pt-BR');
+                    return ((getAllConvidados.data as Convidado[]) || []).filter(c => c.dataConfirmacao?.includes(hoje)).length;
+                  }, [getAllConvidados.data])}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Último Sincronismo</p>
+                <p className="text-sm font-bold text-[#462F29]">
+                  {getCacheStats.data?.lastUpdate ? new Date(getCacheStats.data.lastUpdate).toLocaleTimeString('pt-BR') : '--:--'}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Taxa de Resposta</p>
+                <p className="text-2xl font-bold text-wedding-gold">{stats.taxaConfirmacao}%</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Total Arrecadado</p>
+                <p className="text-sm font-bold text-green-600">{stats.valorPresentes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -487,8 +511,43 @@ export default function AdminPanel() {
             <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
             <h2 className="font-montserrat text-[14px] font-bold uppercase tracking-[0.2em] text-[#462F29]">Últimas Atualizações</h2>
           </div>
-          <div className="bg-white p-5 border border-[#E8CECE] rounded-sm shadow-sm">
-            <p className="text-[12px] text-gray-500 italic">Histórico de atualizações em breve.</p>
+          <div className="bg-white border border-[#E8CECE] rounded-sm shadow-sm overflow-hidden">
+            <div className="divide-y divide-gray-50">
+              {useMemo(() => {
+                const list = (getAllConvidados.data as Convidado[]) || [];
+                return list
+                  .filter(c => c.dataConfirmacao)
+                  .sort((a, b) => {
+                    const dateA = a.dataConfirmacao ? new Date(a.dataConfirmacao.split(',').reverse().join('-')).getTime() : 0;
+                    const dateB = b.dataConfirmacao ? new Date(b.dataConfirmacao.split(',').reverse().join('-')).getTime() : 0;
+                    return dateB - dateA;
+                  })
+                  .slice(0, 5)
+                  .map((c, idx) => (
+                    <div key={idx} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
+                          ${c.status === 'Confirmado' ? 'bg-green-50 text-green-600' : 
+                            c.status === 'Não Irá' ? 'bg-red-50 text-red-600' : 'bg-yellow-50 text-yellow-600'}`}>
+                          {c.nome.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-[12px] font-bold text-[#462F29]">{c.nome}</p>
+                          <p className="text-[10px] text-gray-400 uppercase tracking-widest">
+                            Alterou status para <span className="font-bold">{c.status}</span>
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-gray-300 font-medium">{c.dataConfirmacao?.split(',')[0]}</p>
+                    </div>
+                  ));
+              }, [getAllConvidados.data])}
+              {((getAllConvidados.data as Convidado[]) || []).filter(c => c.dataConfirmacao).length === 0 && (
+                <div className="p-8 text-center">
+                  <p className="text-[11px] uppercase tracking-widest text-gray-300 font-bold">Nenhuma atualização recente</p>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 

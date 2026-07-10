@@ -102,8 +102,8 @@ function SectionDivider({ title, isVerification = false }: { title: string; isVe
 
 function SectionSeparator() {
   return (
-    <div className="w-full flex justify-center py-8 md:py-12">
-      {/* Separador minimalista invisível para manter o ritmo visual */}
+    <div className="w-full flex justify-center py-6 md:py-8">
+      {/* Separador minimalista invisível para manter o ritmo visual - Reduzido em RC-5.11 */}
     </div>
   );
 }
@@ -591,7 +591,7 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 4. Localização */}
-            <div className="bg-[#FDFAF6] py-11 md:py-15">
+            <div className="bg-[#FDFAF6] py-8 md:py-10">
               <FadeSection className="max-w-4xl mx-auto px-6 text-center">
                 <SectionDivider title="Localização" />
                 <div className="space-y-6">
@@ -631,7 +631,7 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 5. Confirmação de Presença */}
-            <div id="rsvp-section" className="bg-[#462F29] py-11 md:py-20">
+            <div id="rsvp-section" className="bg-[#462F29] py-10 md:py-16">
               <FadeSection className="max-w-[700px] mx-auto px-6 text-center">
                 <div className="text-center mb-8">
                   <p className="font-montserrat text-[10px] md:text-[12px] text-white/40 uppercase tracking-[0.25em] mb-4">
