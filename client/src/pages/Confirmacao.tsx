@@ -189,6 +189,19 @@ export default function Confirmacao() {
     return parseFloat(limpo) / 100;
   };
 
+  // RC-5.9: Silent server pre-warming on page load
+  useEffect(() => {
+    const warmupServer = async () => {
+      try {
+        await trpc.health.query();
+      } catch (error) {
+        // Silent failure - this is just a pre-warming attempt
+        console.debug("Server pre-warming initiated");
+      }
+    };
+    warmupServer();
+  }, []);
+
   useEffect(() => {
     if (convidadoSelecionado) {
       window.scrollTo({
@@ -203,19 +216,32 @@ export default function Confirmacao() {
     const startTime = Date.now();
     setErroBusca(null);
     
-    // Timeout de segurança: se a busca demorar mais de 5 segundos, interromper
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error("TIMEOUT")), 5000)
-    );
+    // RC-5.9: Extended timeout (15s) with automatic retry for cold start mitigation
+    const makeSearchAttempt = async () => {
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("TIMEOUT")), 15000)
+      );
+      return Promise.race([
+        searchMutation.mutateAsync({ nome: nomeBusca }),
+        timeoutPromise
+      ]);
+    };
     
     try {
       setCarregandoBusca(true);
       
-      // Executar busca com timeout
-      const resultado = await Promise.race([
-        searchMutation.mutateAsync({ nome: nomeBusca }),
-        timeoutPromise
-      ]);
+      // RC-5.9: Attempt search with automatic retry on timeout
+      let resultado;
+      try {
+        resultado = await makeSearchAttempt();
+      } catch (firstAttemptError: any) {
+        if (firstAttemptError?.message === "TIMEOUT") {
+          console.log("First attempt timed out, retrying...");
+          resultado = await makeSearchAttempt();
+        } else {
+          throw firstAttemptError;
+        }
+      }
       
       const duration = Date.now() - startTime;
       // Feedback visual mínimo: 300ms (reduzido de 600ms para melhor UX)
@@ -460,7 +486,7 @@ export default function Confirmacao() {
               {carregandoBusca ? (
                 <>
                   <span className="animate-spin-slow text-lg">⏳</span>
-                  <span>Verificando...</span>
+                  <span>Preparando seu convite...</span>
                 </>
               ) : "Verificar Convite"}
             </button>
