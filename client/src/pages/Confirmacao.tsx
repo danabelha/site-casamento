@@ -368,13 +368,9 @@ export default function Confirmacao() {
         mensagem: (
           <div className="bg-[#462F29] p-8 md:p-12 rounded-sm shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/5">
             <p className="font-cormorant text-3xl md:text-4xl text-wedding-gold mb-6 tracking-wide">Que alegria ter você conosco!</p>
-            <p className="text-white/90 font-light text-lg leading-relaxed mb-8 max-w-xl mx-auto">
+            <p className="text-white/90 font-light text-lg leading-relaxed max-w-xl mx-auto">
               Sua presença foi registrada com sucesso e estamos ansiosos para celebrar este dia tão especial ao seu lado.
             </p>
-            <div className="pt-8 border-t border-white/10">
-              <p className="text-wedding-gold/60 text-[10px] uppercase tracking-[0.3em] font-bold mb-4">Próximos Passos</p>
-              <p className="text-white/70 text-sm font-light">Confira o Manual do Convidado abaixo para detalhes sobre o traje e localização.</p>
-            </div>
           </div>
         )
       };
@@ -406,11 +402,10 @@ export default function Confirmacao() {
   };
 
   const PremiumTitle = ({ title }: { title: string }) => (
-    <div className="flex flex-col items-center mb-10">
+    <div className="flex flex-col items-center mb-8">
       <h4 className="font-montserrat text-[13px] font-bold uppercase tracking-[0.25em] text-wedding-gold text-center opacity-90">
         {title}
       </h4>
-      <div className="w-8 h-[1px] bg-wedding-gold/30 mt-4"></div>
     </div>
   );
 
@@ -550,8 +545,8 @@ export default function Confirmacao() {
             <section className="px-4 sm:px-6 mb-10 md:mb-14 overflow-x-hidden">
               <SectionDivider title="Presentes" />
               <div className="max-w-6xl mx-auto -mt-6">
-                <p className="text-center font-montserrat text-[9px] md:text-[10px] text-wedding-gold/40 uppercase tracking-[0.25em] mb-6 md:hidden animate-in fade-in duration-1000 font-medium">
-                  Deslize para descobrir mais presentes <span className="inline-block animate-bounce-x ml-1 text-wedding-gold/60 scale-110">→</span>
+                <p className="text-center font-montserrat text-[9px] md:text-[10px] text-wedding-gold/60 uppercase tracking-[0.25em] mb-6 md:hidden animate-in fade-in duration-1000 font-bold">
+                  Deslize para descobrir mais presentes <span className="inline-block animate-bounce-x ml-1 text-wedding-gold/80 scale-125">→</span>
                 </p>
                 <div className="flex overflow-x-auto pb-12 gap-5 md:grid md:grid-cols-3 md:overflow-visible scrollbar-hide px-6 md:px-0 snap-x snap-mandatory scroll-smooth">
                   {PRESENTES.map((p, i) => (
@@ -652,12 +647,6 @@ export default function Confirmacao() {
                       
                       <div className="animate-in fade-in slide-in-from-bottom-2 duration-700 delay-200 text-white">
                         {getSucessoMensagem().mensagem}
-                      </div>
-
-                      <div className="pt-8">
-                        <div className="w-12 h-12 bg-wedding-gold/10 rounded-full flex items-center justify-center mx-auto">
-                          <span className="text-xl">✨</span>
-                        </div>
                       </div>
                     </div>
                     
