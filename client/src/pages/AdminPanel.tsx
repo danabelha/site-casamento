@@ -427,7 +427,7 @@ export default function AdminPanel() {
         </section>
 
         {/* 3. Carrossel de Indicadores Acionáveis */}
-        <section className="space-y-6">
+        <section id="indicadores-operacionais" className="space-y-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
               <div className="w-1 h-6 bg-wedding-gold rounded-full"></div>
@@ -496,9 +496,16 @@ export default function AdminPanel() {
                 </div>
               )}
               {stats.mensagens > 0 && (
-                <div className="bg-yellow-50 p-4 border border-yellow-200 rounded-sm flex items-center gap-3">
+                <div 
+                  className="bg-yellow-50 p-4 border border-yellow-200 rounded-sm flex items-center gap-3 cursor-pointer hover:bg-yellow-100 transition-colors"
+                  onClick={() => {
+                    setFiltroAtivo("Mensagens");
+                    setExibirMensagens(true);
+                    document.getElementById('indicadores-operacionais')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
                   <span className="text-xl">✉️</span>
-                  <p className="text-[12px] text-yellow-700">Novas mensagens não lidas.</p>
+                  <p className="text-[12px] text-yellow-700">Mensagens recebidas dos convidados.</p>
                 </div>
               )}
               {getCacheStats.data && getCacheStats.data.cacheAgeSeconds > 300 && (
