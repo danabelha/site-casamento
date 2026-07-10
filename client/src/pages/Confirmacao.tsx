@@ -190,17 +190,12 @@ export default function Confirmacao() {
   };
 
   // RC-5.9: Silent server pre-warming on page load
-  useEffect(() => {
-    const warmupServer = async () => {
-      try {
-        await trpc.health.query();
-      } catch (error) {
-        // Silent failure - this is just a pre-warming attempt
-        console.debug("Server pre-warming initiated");
-      }
-    };
-    warmupServer();
-  }, []);
+  // We use useQuery with a small staleTime to trigger the call once on mount
+  trpc.health.useQuery(undefined, {
+    staleTime: Infinity,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
 
   useEffect(() => {
     if (convidadoSelecionado) {
