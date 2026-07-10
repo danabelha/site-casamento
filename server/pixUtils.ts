@@ -1,3 +1,5 @@
+const { crc16 } = require('crc');
+
 interface PixData {
   pixKey: string;
   receiverName: string;
@@ -16,53 +18,27 @@ export function generatePixBrCode({ pixKey, receiverName, receiverCity, value, t
   const pointOfInitiationMethod = '12'; // 11 = estático, 12 = dinâmico. Para copia e cola, geralmente dinâmico.
   const merchantAccountInformation = `26${String(pixKey.length + 25).padStart(2, '0')}0014BR.GOV.BCB.PIX01${pixKey}`;
   const merchantCategoryCode = '0000'; // Default para PIX, pode ser 5399 para outros
-  const transactionCurrency = '986'; // BRL
-  const transactionAmount = `54${String(value.toFixed(2).length).padStart(2, '0')}${value.toFixed(2)}`;
-  const countryCode = 'BR';
-  const merchantName = `59${String(receiverName.length).padStart(2, '0')}${receiverName}`;
-  const merchantCity = `60${String(receiverCity.length).padStart(2, '0')}${receiverCity}`;
-  const additionalDataFieldTemplate = `62${String((transactionId || generateTransactionId()).length + 5).padStart(2, '0')}05${transactionId || generateTransactionId()}`;
-  const crc16Indicator = '6304';
+  const transactionAmount = String(value).padStart(13, '0');
+  const countryCode = '5891'; // Brasil
+  const merchantName = receiverName.substring(0, 25).padEnd(25, ' ');
+  const merchantCity = receiverCity.substring(0, 15).padEnd(15, ' ');
+  const txId = (transactionId || generateTransactionId()).substring(0, 25).padEnd(25, ' ');
 
-  let pixString = '';
-  pixString += payloadFormatIndicator;
-  pixString += pointOfInitiationMethod;
-  pixString += merchantAccountInformation;
-  pixString += merchantCategoryCode;
-  pixString += transactionCurrency;
-  pixString += transactionAmount;
-  pixString += countryCode;
-  pixString += merchantName;
-  pixString += merchantCity;
-  pixString += additionalDataFieldTemplate;
+  // Construir o payload
+  let payload = '';
+  payload += `00${payloadFormatIndicator}`; // Payload Format Indicator
+  payload += `01${pointOfInitiationMethod}`; // Point of Initiation Method
+  payload += `26${String(merchantAccountInformation.length).padStart(2, '0')}${merchantAccountInformation}`; // Merchant Account Information
+  payload += `52${merchantCategoryCode}`; // Merchant Category Code
+  payload += `53${transactionAmount}`; // Transaction Amount
+  payload += `5802${countryCode}`; // Country Code
+  payload += `59${String(merchantName.length).padStart(2, '0')}${merchantName}`; // Merchant Name
+  payload += `60${String(merchantCity.length).padStart(2, '0')}${merchantCity}`; // Merchant City
+  payload += `62${String(txId.length).padStart(2, '0')}${txId}`; // Additional Data Field Template
 
-  // O cálculo do CRC16 é crucial para a validade do BR Code.
-  // Uma implementação robusta de CRC16 é complexa e deve ser testada exaustivamente.
-  // Para este projeto, vamos usar uma função simplificada que pode precisar de ajustes
-  // ou substituição por uma biblioteca dedicada em um ambiente de produção.
-  const crc16 = calculateCrc16(pixString + crc16Indicator);
-  pixString += `${crc16Indicator}${crc16}`;
+  // Calcular CRC16
+  const crcValue = crc16(payload).toString(16).toUpperCase().padStart(4, '0');
+  const brCode = `${payload}6304${crcValue}`;
 
-  return pixString;
-}
-
-// Função auxiliar para calcular CRC16 (implementação simplificada)
-// ATENÇÃO: Esta implementação é um exemplo e pode não ser 100% compatível com todas as
-// especificações do Banco Central do Brasil para CRC16. Para produção, considere
-// usar uma biblioteca validada ou uma implementação mais robusta.
-function calculateCrc16(payload: string): string {
-  let crc = 0xFFFF;
-  const polynomial = 0x1021;
-
-  for (let i = 0; i < payload.length; i++) {
-    crc ^= (payload.charCodeAt(i) << 8);
-    for (let j = 0; j < 8; j++) {
-      if ((crc & 0x8000) !== 0) {
-        crc = (crc << 1) ^ polynomial;
-      } else {
-        crc <<= 1;
-      }
-    }
-  }
-  return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+  return brCode;
 }
