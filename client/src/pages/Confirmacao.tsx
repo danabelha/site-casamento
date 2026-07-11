@@ -189,14 +189,6 @@ export default function Confirmacao() {
     return parseFloat(limpo) / 100;
   };
 
-  // RC-5.9: Silent server pre-warming on page load
-  // We use useQuery with a small staleTime to trigger the call once on mount
-  trpc.health.useQuery(undefined, {
-    staleTime: Infinity,
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
-
   useEffect(() => {
     if (convidadoSelecionado) {
       window.scrollTo({

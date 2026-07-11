@@ -7,8 +7,17 @@ import Home from "./pages/Home"
 import { Route } from "wouter"
 import Confirmacao from "./pages/Confirmacao";
 import AdminPanel from "./pages/AdminPanel";
+import { trpc } from "./lib/trpc";
 
 function App() {
+  // RC-5.10.2: Silent server pre-warming at the root level
+  // This ensures the Render server starts waking up as soon as the visitor opens the site (Home)
+  trpc.health.useQuery(undefined, {
+    staleTime: Infinity,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
   return (
     <>
       <Route path="/" component={Home} />
