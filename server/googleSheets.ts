@@ -179,14 +179,21 @@ export async function adicionarConvidado(data: {
     if (ids.length > 0) novoId = Math.max(...ids) + 1;
   }
   
+  // RC-5.10.6: Mapeamento explícito para evitar deslocamento de colunas
+  // Ordem na planilha: 0:id, 1:nome, 2:email, 3:telefone, 4:status, 5:acompanhantes, 6:criancas, 7:menores8, 8:dataConfirmacao, 9:acompanhanteDetalhes, 10:mensagem, 11:limite
   const novaLinha = [
-    novoId.toString(),
-    data.nome,
-    data.email || "",
-    data.telefone || "",
-    "Pendente",
-    0, 0, 0, "", "", "",
-    data.limite || 0
+    novoId.toString(),        // A: id
+    data.nome,                // B: nome
+    data.email || "",         // C: email
+    data.telefone || "",      // D: telefone
+    "Pendente",               // E: status
+    "0",                      // F: acompanhantes
+    "0",                      // G: criancas
+    "0",                      // H: menores8
+    "",                       // I: dataConfirmacao
+    "",                       // J: acompanhanteDetalhes
+    "",                       // K: mensagem
+    (data.limite || 0).toString() // L: limite
   ];
 
   await sheets.spreadsheets.values.append({
