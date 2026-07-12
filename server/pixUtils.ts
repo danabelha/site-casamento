@@ -1,4 +1,7 @@
-const { crc16 } = require('crc');
+/**
+ * Hotfix RC-5.10.7 - Geração de BR Code PIX compatível
+ * Segue especificações do BACEN (EMV QRCPS)
+ */
 
 interface PixData {
   pixKey: string;
@@ -8,37 +11,80 @@ interface PixData {
   transactionId?: string;
 }
 
-// Função para gerar um ID de transação simples
-function generateTransactionId(): string {
-  return Math.random().toString(36).substring(2, 15).toUpperCase();
+/**
+ * Implementação do CRC16-CCITT (0xFFFF) exigido pelo padrão Pix/BR Code
+ */
+function calculateCRC16(payload: string): string {
+  let crc = 0xFFFF;
+  const polynomial = 0x1021;
+
+  for (let i = 0; i < payload.length; i++) {
+    let b = payload.charCodeAt(i);
+    for (let j = 0; j < 8; j++) {
+      let bit = ((b >> (7 - j)) & 1) === 1;
+      let c15 = ((crc >> 15) & 1) === 1;
+      crc <<= 1;
+      if (c15 !== bit) crc ^= polynomial;
+    }
+  }
+
+  return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+}
+
+/**
+ * Helper para gerar campos no formato TLV (Tag-Length-Value)
+ */
+function formatTLV(tag: string, value: string): string {
+  const length = value.length.toString().padStart(2, '0');
+  return `${tag}${length}${value}`;
+}
+
+/**
+ * Sanitiza strings para o padrão aceito pelo Pix (sem acentos, maiúsculas)
+ */
+function sanitize(text: string, maxLength: number): string {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Remove acentos
+    .replace(/[^A-Z0-9\s]/gi, "")   // Remove caracteres especiais
+    .toUpperCase()
+    .substring(0, maxLength)
+    .trim();
 }
 
 export function generatePixBrCode({ pixKey, receiverName, receiverCity, value, transactionId }: PixData): string {
-  const payloadFormatIndicator = '0001';
-  const pointOfInitiationMethod = '12'; // 11 = estático, 12 = dinâmico. Para copia e cola, geralmente dinâmico.
-  const merchantAccountInformation = `26${String(pixKey.length + 25).padStart(2, '0')}0014BR.GOV.BCB.PIX01${pixKey}`;
-  const merchantCategoryCode = '0000'; // Default para PIX, pode ser 5399 para outros
-  const transactionAmount = String(value).padStart(13, '0');
-  const countryCode = '5891'; // Brasil
-  const merchantName = receiverName.substring(0, 25).padEnd(25, ' ');
-  const merchantCity = receiverCity.substring(0, 15).padEnd(15, ' ');
-  const txId = (transactionId || generateTransactionId()).substring(0, 25).padEnd(25, ' ');
+  // 1. Merchant Account Information (ID 26)
+  const gui = formatTLV('00', 'BR.GOV.BCB.PIX');
+  const key = formatTLV('01', pixKey.trim());
+  const merchantAccountInfo = formatTLV('26', gui + key);
 
-  // Construir o payload
+  // 2. Additional Data Field Template (ID 62)
+  // TXID deve ser alfanumérico, sem espaços, max 25 chars. Usamos '***' se não houver ID.
+  const rawTxid = transactionId ? sanitize(transactionId.replace(/\s+/g, ""), 25) : "***";
+  const txid = formatTLV('05', rawTxid || "***");
+  const additionalData = formatTLV('62', txid);
+
+  // 3. Montagem do Payload Base
   let payload = '';
-  payload += `00${payloadFormatIndicator}`; // Payload Format Indicator
-  payload += `01${pointOfInitiationMethod}`; // Point of Initiation Method
-  payload += `26${String(merchantAccountInformation.length).padStart(2, '0')}${merchantAccountInformation}`; // Merchant Account Information
-  payload += `52${merchantCategoryCode}`; // Merchant Category Code
-  payload += `53${transactionAmount}`; // Transaction Amount
-  payload += `5802${countryCode}`; // Country Code
-  payload += `59${String(merchantName.length).padStart(2, '0')}${merchantName}`; // Merchant Name
-  payload += `60${String(merchantCity.length).padStart(2, '0')}${merchantCity}`; // Merchant City
-  payload += `62${String(txId.length).padStart(2, '0')}${txId}`; // Additional Data Field Template
+  payload += formatTLV('00', '01'); // Payload Format Indicator
+  payload += formatTLV('01', '11'); // Point of Initiation Method (11 = Estático)
+  payload += merchantAccountInfo;
+  payload += formatTLV('52', '0000'); // Merchant Category Code
+  payload += formatTLV('53', '986');  // Transaction Currency (986 = BRL)
+  
+  // Valor com exatamente 2 casas decimais e ponto separador
+  if (value > 0) {
+    payload += formatTLV('54', value.toFixed(2));
+  }
+  
+  payload += formatTLV('58', 'BR');   // Country Code
+  payload += formatTLV('59', sanitize(receiverName, 25)); // Merchant Name
+  payload += formatTLV('60', sanitize(receiverCity, 15)); // Merchant City
+  payload += additionalData;
 
-  // Calcular CRC16
-  const crcValue = crc16(payload).toString(16).toUpperCase().padStart(4, '0');
-  const brCode = `${payload}6304${crcValue}`;
-
-  return brCode;
+  // 4. Adicionar Tag de CRC e calcular valor final
+  payload += '6304';
+  const crcValue = calculateCRC16(payload);
+  
+  return payload + crcValue;
 }
