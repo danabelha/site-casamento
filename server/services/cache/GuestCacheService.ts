@@ -70,30 +70,26 @@ class GuestCacheService {
 
   public async buscar(nome: string): Promise<ConvidadoRow[]> {
     const termo = this.normalizar(nome);
-    const lista = await this.getConvidados();
+    const palavrasTermo = termo.split(" ").filter(p => p.length > 0);
     
-    const start = Date.now();
-    
-    // Busca inteligente:
-    // 1. Busca por correspondência exata (Prioridade Máxima)
-    let resultado = lista.filter(c => c.nomeNormalizado === termo);
-    
-    // 2. Se não encontrar exato, busca por partes do nome (Contém)
-    if (resultado.length === 0 && termo.length >= 3) {
-      resultado = lista.filter(c => c.nomeNormalizado.includes(termo));
-    }
-    
-    // 3. Se ainda não encontrar, busca por primeiro nome ou sobrenome (Palavras isoladas)
-    if (resultado.length === 0 && termo.length >= 3) {
-      const palavrasTermo = termo.split(" ");
-      resultado = lista.filter(c => {
-        const palavrasNome = c.nomeNormalizado.split(" ");
-        return palavrasTermo.every(p => palavrasNome.some(pn => pn.startsWith(p) || pn.endsWith(p)));
-      });
+    // RC-5.10.5: Segurança - Bloquear busca com apenas uma palavra
+    if (palavrasTermo.length < 2) {
+      return [];
     }
 
-    const duration = Date.now() - start;
+    const lista = await this.getConvidados();
+    const start = Date.now();
     
+    // Nova lógica de busca: Todas as palavras digitadas devem existir no nome cadastrado
+    const resultado = lista.filter(c => {
+      const palavrasNome = c.nomeNormalizado.split(" ").filter(p => p.length > 0);
+      // Cada palavra digitada pelo usuário deve estar presente em alguma palavra do nome cadastrado
+      return palavrasTermo.every(pt => 
+        palavrasNome.some(pn => pn === pt)
+      );
+    });
+
+    const duration = Date.now() - start;
     if (duration > 50) {
       console.warn(`[GuestCacheService] Busca complexa detectada: ${duration}ms para o termo "${nome}"`);
     }

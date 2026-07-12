@@ -55,6 +55,18 @@ const appRouter = t.router({
   searchConvidados: publicProcedure
     .input(z.object({ nome: z.string() }))
     .mutation(async ({ input }) => {
+      // RC-5.10.5: Backend Validation - Mandatory name and surname
+      const normalizar = (texto: string) => texto.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+      const termo = normalizar(input.nome);
+      const palavras = termo.split(/\s+/).filter(p => p.length > 0);
+      
+      if (palavras.length < 2) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Informe seu nome e sobrenome para localizar o convite.",
+        });
+      }
+      
       return await guestCacheService.buscar(input.nome);
     }),
 

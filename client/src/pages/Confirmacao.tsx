@@ -202,7 +202,19 @@ export default function Confirmacao() {
   }, [convidadoSelecionado]);
 
   const handleSearch = async () => {
-    if (!nomeBusca.trim() || carregandoBusca) return;
+    const nomeLimpo = nomeBusca.trim();
+    if (!nomeLimpo || carregandoBusca) return;
+    
+    // RC-5.10.5: Frontend Validation - Mandatory name and surname
+    const normalizar = (texto: string) => texto.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+    const termo = normalizar(nomeLimpo);
+    const palavras = termo.split(/\s+/).filter(p => p.length > 0);
+    
+    if (palavras.length < 2) {
+      setErroBusca("Informe seu nome e sobrenome para localizar o convite.");
+      return;
+    }
+
     const startTime = Date.now();
     setErroBusca(null);
     setCarregandoBusca(true);
@@ -261,8 +273,20 @@ export default function Confirmacao() {
       }
 
       if (resultado && (resultado as any).length > 0) {
-        const exato = (resultado as any[]).find(c => c.nome.toLowerCase() === nomeBusca.toLowerCase().trim());
-        setConvidadoSelecionado(exato || (resultado as any)[0]);
+        const lista = resultado as any[];
+        
+        // RC-5.10.5: Ambiguity handling
+        if (lista.length > 1) {
+          // Tentar encontrar correspondência exata
+          const exato = lista.find(c => normalizar(c.nome) === termo);
+          if (exato) {
+            setConvidadoSelecionado(exato);
+          } else {
+            setErroBusca("Encontramos mais de um convite com esse nome. Informe o nome completo para continuar.");
+          }
+        } else {
+          setConvidadoSelecionado(lista[0]);
+        }
       } else {
         setErroBusca(`Não encontramos o convite para "${nomeBusca}". Tente digitar apenas o primeiro nome e sobrenome, ou verifique a grafia conforme o convite.`);
       }
