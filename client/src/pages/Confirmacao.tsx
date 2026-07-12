@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { trpc } from "../lib/trpc";
 
 // Importar imagens
@@ -157,7 +158,9 @@ export default function Confirmacao() {
   const [criancas, setCriancas] = useState<{ nome: string; idade: string }[]>([]);
   const [mensagem, setMensagem] = useState("");
   const [sucesso, setSucesso] = useState(false);
+  const queryClient = useQueryClient();
   const [carregandoBusca, setCarregandoBusca] = useState(false);
+  const [mensagemCarregamento, setMensagemCarregamento] = useState("Preparando seu convite...");
   const [modalPresenteAberto, setModalPresenteAberto] = useState<number | null>(null);
   const [valorSelecionado, setValorSelecionado] = useState<number | null>(null);
   const [outroValor, setOutroValor] = useState<string>("");
@@ -202,52 +205,71 @@ export default function Confirmacao() {
     if (!nomeBusca.trim() || carregandoBusca) return;
     const startTime = Date.now();
     setErroBusca(null);
+    setCarregandoBusca(true);
+    setMensagemCarregamento("Verificando...");
     
-    // RC-5.9: Extended timeout (15s) with automatic retry for cold start mitigation
-    const makeSearchAttempt = async () => {
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("TIMEOUT")), 15000)
-      );
-      return Promise.race([
-        searchMutation.mutateAsync({ nome: nomeBusca }),
-        timeoutPromise
-      ]);
-    };
-    
+    // RC-5.10.4: Coordinated Health Check & Search
     try {
-      setCarregandoBusca(true);
+      // 1. Verificar se o Health Check (disparado no App.tsx) ainda está pendente
+      const queryState = queryClient.getQueryState(["health"]);
+      const isHealthPending = queryState?.status === "pending";
       
-      // RC-5.9: Attempt search with automatic retry on timeout
+      if (isHealthPending) {
+        setMensagemCarregamento("Preparando seu convite... 💛");
+        console.log("[RC-5.10.4] Health Check em andamento. Aguardando até 8s...");
+        
+        // Aguardar o Health Check ou timeout de 8s
+        await Promise.race([
+          queryClient.fetchQuery({ queryKey: ["health"] }),
+          new Promise(resolve => setTimeout(resolve, 8000))
+        ]).catch(() => {
+          console.log("[RC-5.10.4] Health Check falhou ou expirou. Seguindo para busca.");
+        });
+      }
+
+      // 2. Executar a busca com timeout e retry controlado
+      const makeSearchAttempt = async (attempt: number) => {
+        if (attempt > 1) setMensagemCarregamento("Finalizando preparação... ✨");
+        
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("TIMEOUT")), 15000)
+        );
+        
+        return Promise.race([
+          searchMutation.mutateAsync({ nome: nomeBusca }),
+          timeoutPromise
+        ]);
+      };
+
       let resultado;
       try {
-        resultado = await makeSearchAttempt();
-      } catch (firstAttemptError: any) {
-        if (firstAttemptError?.message === "TIMEOUT") {
-          console.log("First attempt timed out, retrying...");
-          resultado = await makeSearchAttempt();
+        resultado = await makeSearchAttempt(1);
+      } catch (error: any) {
+        if (error?.message === "TIMEOUT") {
+          console.log("[RC-5.10.4] Primeira busca falhou por TIMEOUT. Tentando retry final...");
+          resultado = await makeSearchAttempt(2);
         } else {
-          throw firstAttemptError;
+          throw error;
         }
       }
-      
+
+      // 3. Processar Resultado
       const duration = Date.now() - startTime;
-      // Feedback visual mínimo: 300ms (reduzido de 600ms para melhor UX)
       const minDuration = 300;
       if (duration < minDuration) {
         await new Promise(resolve => setTimeout(resolve, minDuration - duration));
       }
 
       if (resultado && (resultado as any).length > 0) {
-        // Se houver mais de um resultado, priorizamos o exato (ignorando case), senão pegamos o primeiro
         const exato = (resultado as any[]).find(c => c.nome.toLowerCase() === nomeBusca.toLowerCase().trim());
         setConvidadoSelecionado(exato || (resultado as any)[0]);
       } else {
         setErroBusca(`Não encontramos o convite para "${nomeBusca}". Tente digitar apenas o primeiro nome e sobrenome, ou verifique a grafia conforme o convite.`);
       }
     } catch (error: any) {
-      console.error(error);
+      console.error("[RC-5.10.4] Erro na busca:", error);
       if (error?.message === "TIMEOUT") {
-        setErroBusca("Estamos com dificuldade para localizar seu convite no momento. Tente novamente em alguns instantes.");
+        setErroBusca("Não foi possível localizar seu convite agora. Tente novamente em alguns instantes.");
       } else {
         setErroBusca("Ocorreu um erro ao buscar seu convite. Por favor, tente novamente em instantes.");
       }
@@ -468,7 +490,7 @@ export default function Confirmacao() {
               {carregandoBusca ? (
                 <>
                   <span className="animate-spin-slow text-lg">⏳</span>
-                  <span>Preparando seu convite...</span>
+                  <span>{mensagemCarregamento}</span>
                 </>
               ) : "Verificar Convite"}
             </button>

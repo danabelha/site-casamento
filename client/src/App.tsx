@@ -12,6 +12,7 @@ import { trpc } from "./lib/trpc";
 function App() {
   // RC-5.10.2: Silent server pre-warming at the root level
   // This ensures the Render server starts waking up as soon as the visitor opens the site (Home)
+  // RC-5.10.4: This query is now coordinated with the search mutation
   trpc.health.useQuery(undefined, {
     staleTime: Infinity,
     retry: false,
