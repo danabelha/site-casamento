@@ -708,11 +708,11 @@ export default function Confirmacao() {
                 ) : (
                   <div className="space-y-10">
                     <div className="space-y-6 animate-in fade-in duration-500">
-                      <div className="space-y-2">
-                        <h2 className="font-cormorant text-[36px] md:text-[42px] font-medium text-wedding-gold leading-tight">
+                      <div className="space-y-3">
+                        <h2 className="font-halimun text-[32px] md:text-[42px] font-medium text-wedding-gold leading-relaxed px-4 break-words">
                           {convidadoSelecionado.nome}
                         </h2>
-                        <p className="text-white text-base md:text-lg font-light tracking-wide">
+                        <p className="text-white text-[14px] md:text-[16px] font-light tracking-[0.1em] uppercase">
                           Por favor, confirme sua presença.
                         </p>
                       </div>
