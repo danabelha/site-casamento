@@ -580,7 +580,7 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 3. Presentes */}
-            <section className="px-4 sm:px-6 mb-10 md:mb-14 overflow-x-hidden">
+            <section className="px-4 sm:px-6 mb-4 md:mb-8 overflow-x-hidden">
               <SectionDivider title="Presentes" />
               <div className="max-w-6xl mx-auto -mt-6">
                 <p className="text-center font-montserrat text-[9px] md:text-[10px] text-wedding-gold/60 uppercase tracking-[0.25em] mb-6 md:hidden animate-in fade-in duration-1000 font-bold">
@@ -629,7 +629,7 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 4. Localização */}
-            <div className="bg-[#FDFAF6] py-8 md:py-10">
+            <div className="bg-[#FDFAF6] py-6 md:py-8">
               <FadeSection className="max-w-4xl mx-auto px-6 text-center">
                 <SectionDivider title="Localização" />
                 <div className="space-y-6">
