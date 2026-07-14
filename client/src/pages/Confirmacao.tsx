@@ -505,7 +505,7 @@ export default function Confirmacao() {
           <FadeSection className="w-full max-w-[420px] mx-auto text-center p-6 md:p-8 bg-white shadow-xl rounded-lg border border-gray-100 animate-in fade-in zoom-in-95 duration-500">
             <div className="mb-4 md:mb-6">
               <h2 className="font-montserrat text-[12px] md:text-[14px] font-bold tracking-[0.2em] text-[#462F29] uppercase mb-1">IDENTIFIQUE-SE</h2>
-              <p className="font-light text-[#888] text-[11px] md:text-[13px]">Digite seu nome completo para localizar seu convite.</p>
+              <p className="font-light text-[#888] text-[11px] md:text-[13px]">Digite seu nome e sobrenome para localizar seu convite.</p>
             </div>
             
             <input 
@@ -643,7 +643,7 @@ export default function Confirmacao() {
             <SectionSeparator />
 
             {/* 4. Localização */}
-            <div className="bg-[#FDFAF6] py-6 md:py-8">
+            <div className="bg-[#FDFAF6] pt-2 pb-6 md:pt-4 md:pb-8">
               <FadeSection className="max-w-4xl mx-auto px-6 text-center">
                 <SectionDivider title="Localização" />
                 <div className="space-y-6">
