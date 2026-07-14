@@ -155,6 +155,22 @@ export default function Confirmacao() {
   const [nomeBusca, setNomeBusca] = useState("");
   const [convidadoSelecionado, setConvidadoSelecionado] = useState<any>(null);
   const [resposta, setResposta] = useState<"Confirmado" | "Talvez" | "Não Irá" | null>(null);
+  const acompanhantesRef = useRef<HTMLDivElement>(null);
+  const mensagemRef = useRef<HTMLDivElement>(null);
+
+  // RC-5.13.2: Guided RSVP Flow (UX) - Smooth scroll to next steps
+  useEffect(() => {
+    if (resposta === "Confirmado") {
+      const delay = 300; // Aguardar animação de fade-in
+      setTimeout(() => {
+        if (convidadoSelecionado?.limite && convidadoSelecionado.limite > 0) {
+          acompanhantesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          mensagemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, delay);
+    }
+  }, [resposta, convidadoSelecionado?.limite]);
   const [adultos, setAdultos] = useState<{ nome: string }[]>([]);
   const [criancas, setCriancas] = useState<{ nome: string; idade: string }[]>([]);
   const [mensagem, setMensagem] = useState("");
@@ -762,7 +778,7 @@ export default function Confirmacao() {
 
                     {/* Seção de Acompanhantes (Apenas se Confirmado) */}
                     {resposta === "Confirmado" && convidadoSelecionado.limite > 0 && (
-                      <div className="space-y-8 pt-10 animate-in fade-in slide-in-from-top-4">
+                      <div ref={acompanhantesRef} className="space-y-8 pt-10 animate-in fade-in slide-in-from-top-4">
                         <PremiumTitle title="SEUS ACOMPANHANTES" />
                         
                         {/* Lista de Acompanhantes */}
@@ -844,7 +860,7 @@ export default function Confirmacao() {
                     {resposta && (
                       <div className="space-y-8 pt-10 animate-in fade-in duration-500">
                         {(resposta === "Confirmado" || resposta === "Não Irá") && (
-                        <div className="space-y-6">
+                        <div ref={mensagemRef} className="space-y-6">
                           <PremiumTitle title="MENSAGEM PARA OS NOIVOS" />
 	                          <p className="text-[12px] text-white/60 font-light italic text-center -mt-6">
 	                            Compartilhe uma lembrança, um conselho ou uma mensagem carinhosa para os noivos. ❤️
