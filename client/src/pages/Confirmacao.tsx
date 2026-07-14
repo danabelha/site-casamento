@@ -109,7 +109,7 @@ function SectionSeparator() {
   );
 }
 
-function FadeSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function FadeSection({ children, className = "", id }: { children: React.ReactNode; className?: string; id?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -124,6 +124,7 @@ function FadeSection({ children, className = "" }: { children: React.ReactNode; 
   return (
     <div
       ref={ref}
+      id={id}
       className={`${className} transition-all duration-1000 ease-out ${
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
       }`}
