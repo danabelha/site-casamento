@@ -10,7 +10,7 @@ interface TimeLeft {
 }
 
 function calcularTempoRestante(): TimeLeft {
-  const dataCasamento = new Date("Dec 5, 2026 19:00:00").getTime();
+  const dataCasamento = new Date("Dec 5, 2026 17:30:00").getTime();
   const agora = new Date().getTime();
   const distancia = dataCasamento - agora;
 

@@ -666,7 +666,7 @@ export default function Confirmacao() {
                   <div className="space-y-4">
                     <h3 className="font-halimun text-[35.5px] md:text-[46.5px] text-[#462F29] font-medium">Celeiro Quintal</h3>
                     <p className="font-montserrat text-[12px] md:text-[14px] text-wedding-gold uppercase tracking-[0.3em] font-bold">
-                      05 de Dezembro de 2026 • 18h
+                      05 de Dezembro de 2026 • 17h30
                     </p>
                     <div className="space-y-2">
                       <p className="font-montserrat text-[14px] md:text-[16px] text-[#462F29] font-light">R. Cônego Eugênio Leite, 1098</p>
