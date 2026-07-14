@@ -139,12 +139,14 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Link Admin */}
-      <Link href="/admin">
-        <div className="fixed bottom-4 right-4 text-[9px] text-wedding-gold/30 cursor-pointer font-montserrat tracking-widest uppercase hover:text-wedding-gold/70 transition-colors z-50">
-          admin
-        </div>
-      </Link>
+      {/* Link Admin - Oculto em produção, acessível via rota /admin */}
+      {process.env.NODE_ENV === 'development' && (
+        <Link href="/admin">
+          <div className="fixed bottom-4 right-4 text-[9px] text-wedding-gold/30 cursor-pointer font-montserrat tracking-widest uppercase hover:text-wedding-gold/70 transition-colors z-50">
+            admin
+          </div>
+        </Link>
+      )}
     </div>
   );
 }

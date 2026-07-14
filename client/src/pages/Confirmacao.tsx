@@ -228,14 +228,14 @@ export default function Confirmacao() {
       
       if (isHealthPending) {
         setMensagemCarregamento("Preparando seu convite... 💛");
-        console.log("[RC-5.10.4] Health Check em andamento. Aguardando até 8s...");
+        // Health Check em andamento. Aguardando até 8s...
         
         // Aguardar o Health Check ou timeout de 8s
         await Promise.race([
           queryClient.fetchQuery({ queryKey: ["health"] }),
           new Promise(resolve => setTimeout(resolve, 8000))
         ]).catch(() => {
-          console.log("[RC-5.10.4] Health Check falhou ou expirou. Seguindo para busca.");
+          // Health Check falhou ou expirou. Seguindo para busca.
         });
       }
 
@@ -258,7 +258,7 @@ export default function Confirmacao() {
         resultado = await makeSearchAttempt(1);
       } catch (error: any) {
         if (error?.message === "TIMEOUT") {
-          console.log("[RC-5.10.4] Primeira busca falhou por TIMEOUT. Tentando retry final...");
+          // Primeira busca falhou por TIMEOUT. Tentando retry final...
           resultado = await makeSearchAttempt(2);
         } else {
           throw error;
