@@ -406,9 +406,22 @@ export default function Confirmacao() {
         mensagem: (
           <div className="bg-[#462F29] p-8 md:p-12 rounded-sm shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/5">
             <p className="font-cormorant text-3xl md:text-4xl text-wedding-gold mb-6 tracking-wide">Que alegria ter você conosco!</p>
-            <p className="text-white/90 font-light text-lg leading-relaxed max-w-xl mx-auto">
+            <p className="text-white/90 font-light text-lg leading-relaxed max-w-xl mx-auto mb-8">
               Sua presença foi registrada com sucesso e estamos ansiosos para celebrar este dia tão especial ao seu lado.
             </p>
+            <div className="pt-4 border-t border-white/10">
+              <a 
+                href="#manual-do-convidado" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('manual-do-convidado')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="inline-flex items-center gap-2 text-wedding-gold font-montserrat text-[11px] uppercase tracking-[0.25em] font-bold hover:text-white transition-colors group"
+              >
+                Ver Manual do Convidado
+                <span className="text-lg group-hover:translate-y-1 transition-transform">↓</span>
+              </a>
+            </div>
           </div>
         )
       };
@@ -690,7 +703,7 @@ export default function Confirmacao() {
                     
                     {/* Manual do Convidado — Exibição Condicional */}
                     {resposta === "Confirmado" && (
-                      <FadeSection className="space-y-8 animate-in fade-in slide-in-from-top-8 duration-1000">
+                      <FadeSection id="manual-do-convidado" className="space-y-8 animate-in fade-in slide-in-from-top-8 duration-1000 pt-8">
                         <PremiumTitle title="MANUAL DO CONVIDADO" />
                         <div className="max-w-[500px] mx-auto bg-white p-2 rounded-sm shadow-2xl">
                           <img 
