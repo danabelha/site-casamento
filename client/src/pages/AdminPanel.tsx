@@ -163,7 +163,11 @@ export default function AdminPanel() {
       } else {
         await adicionarConvidadoMutation.mutateAsync(payload);
       }
+      
+      // RC-5.13.4: Auto-refresh cache after mutation to ensure consistency
+      await refreshCacheMutation.mutateAsync();
       await getAllConvidados.refetch();
+      await getCacheStats.refetch();
       limparForm();
     } catch (error) {
       alert("Erro ao salvar.");

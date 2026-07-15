@@ -526,7 +526,7 @@ export default function Confirmacao() {
             
             <input 
               type="text" 
-              placeholder="Nome Sobrenome" 
+              placeholder="Seu nome e sobrenome" 
               className="wedding-input mb-4 !text-[16px] !py-3 md:!py-4"
               value={nomeBusca}
               onChange={(e) => {
@@ -534,6 +534,7 @@ export default function Confirmacao() {
                 if (erroBusca) setErroBusca(null);
               }}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              disabled={carregandoBusca}
             />
             
             <button 
