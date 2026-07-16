@@ -179,29 +179,99 @@ export async function adicionarConvidado(data: {
     if (ids.length > 0) novoId = Math.max(...ids) + 1;
   }
   
-  // RC-5.10.6: Mapeamento explícito para evitar deslocamento de colunas
-  // Ordem na planilha: 0:id, 1:nome, 2:email, 3:telefone, 4:status, 5:acompanhantes, 6:criancas, 7:menores8, 8:dataConfirmacao, 9:acompanhanteDetalhes, 10:mensagem, 11:limite
+  // RC-5.13.5: Mapeamento explícito e blindado para evitar duplicação ou deslocamento
   const novaLinha = [
-    novoId.toString(),        // A: id
-    data.nome,                // B: nome
-    data.email || "",         // C: email
-    data.telefone || "",      // D: telefone
-    "Pendente",               // E: status
-    "0",                      // F: acompanhantes
-    "0",                      // G: criancas
-    "0",                      // H: menores8
-    "",                       // I: dataConfirmacao
-    "",                       // J: acompanhanteDetalhes
-    "",                       // K: mensagem
-    (data.limite || 0).toString() // L: limite
+    novoId.toString(),               // A: ID
+    data.nome || "",                 // B: NOME COMPLETO
+    data.email || "",                // C: EMAIL
+    data.telefone || "",             // D: TELEFONE
+    "Pendente",                      // E: STATUS (Sempre "Pendente" na criação)
+    "0",                             // F: ACOMPANHANTES
+    "0",                             // G: CRIANCAS
+    "0",                             // H: MENORES 8
+    "",                              // I: DATA CONFIRMACAO
+    "",                              // J: ACOMPANHANTE DETALHES
+    "",                              // K: MENSAGEM
+    (data.limite || 0).toString()    // L: LIMITE
   ];
 
+  // Gravação dos dados
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
     range: `${SHEET_NAME}!A:L`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [novaLinha] },
   });
+
+  // RC-5.13.5: Correção de Validação e Formatação na Planilha (BatchUpdate)
+  try {
+    const sheetIdStr = getSheetId();
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: sheetIdStr });
+    const sheet = spreadsheet.data.sheets?.find(s => s.properties?.title === SHEET_NAME);
+    const sheetIdNum = sheet?.properties?.sheetId;
+
+    if (sheetIdNum !== undefined) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: sheetIdStr,
+        requestBody: {
+          requests: [
+            // 1. Remover validação de dados da coluna D (TELEFONE)
+            {
+              setDataValidation: {
+                range: {
+                  sheetId: sheetIdNum,
+                  startRowIndex: 1,
+                  startColumnIndex: 3, // D
+                  endColumnIndex: 4
+                }
+              }
+            },
+            // 2. Aplicar formato de texto simples na coluna D (TELEFONE) para preservar zeros
+            {
+              repeatCell: {
+                range: {
+                  sheetId: sheetIdNum,
+                  startRowIndex: 1,
+                  startColumnIndex: 3, // D
+                  endColumnIndex: 4
+                },
+                cell: {
+                  userEnteredFormat: { numberFormat: { type: "TEXT" } }
+                },
+                fields: "userEnteredFormat.numberFormat"
+              }
+            },
+            // 3. Aplicar lista suspensa na coluna E (STATUS)
+            {
+              setDataValidation: {
+                range: {
+                  sheetId: sheetIdNum,
+                  startRowIndex: 1,
+                  startColumnIndex: 4, // E
+                  endColumnIndex: 5
+                },
+                rule: {
+                  condition: {
+                    type: "ONE_OF_LIST",
+                    values: [
+                      { userEnteredValue: "Pendente" },
+                      { userEnteredValue: "Confirmado" },
+                      { userEnteredValue: "Talvez" },
+                      { userEnteredValue: "Não Irá" }
+                    ]
+                  },
+                  showCustomUi: true,
+                  strict: true
+                }
+              }
+            }
+          ]
+        }
+      });
+    }
+  } catch (err) {
+    console.warn("[GoogleSheets] Erro ao atualizar validações da planilha:", err);
+  }
 
   return true;
 }
