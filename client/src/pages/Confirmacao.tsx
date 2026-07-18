@@ -15,13 +15,14 @@ import camisaTimeImg from "../assets/images/camisa_time.jpg";
 import poolPartyImg from "../assets/images/pool_party.png";
 import planoSaudeImg from "../assets/images/plano_saude.jpg";
 import cavacoImg from "../assets/images/cavaco.jpg";
+import inicioTudoImg from "../assets/images/inicio_tudo.jpg";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
   {
-    url: "https://i.pinimg.com/736x/c0/bc/f8/c0bcf84c9b1f88e70d63f72a3ab87f44.jpg",
+    url: inicioTudoImg,
     titulo: "Como tudo começou",
-    texto: "Era um dia comum que se tornou extraordinário. Nosso primeiro encontro foi o início de uma jornada que mudaria nossas vidas para sempre."
+    texto: "Essa foto guarda o início de tudo. Ainda não éramos um casal, mas já existia uma conexão que nenhum dos dois conseguia esconder. Sem perceber, estávamos escrevendo o primeiro capítulo da história que, hoje, temos a alegria de celebrar com vocês."
   },
   {
     url: "https://i.pinimg.com/736x/d6/31/ae/d631aeb49b7fb2104f804c9f4da05042.jpg",
