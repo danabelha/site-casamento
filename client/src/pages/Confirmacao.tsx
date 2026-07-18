@@ -16,6 +16,7 @@ import poolPartyImg from "../assets/images/pool_party.png";
 import planoSaudeImg from "../assets/images/plano_saude.jpg";
 import cavacoImg from "../assets/images/cavaco.jpg";
 import inicioTudoImg from "../assets/images/inicio_tudo.jpg";
+import novoCapituloImg from "../assets/images/novo_capitulo.jpg";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
@@ -25,9 +26,9 @@ const GALLERY_ITEMS = [
     texto: "Essa foto guarda o início de tudo. Ainda não éramos um casal, mas já existia uma conexão que nenhum dos dois conseguia esconder. Sem perceber, estávamos escrevendo o primeiro capítulo da história que, hoje, temos a alegria de celebrar com vocês."
   },
   {
-    url: "https://i.pinimg.com/736x/d6/31/ae/d631aeb49b7fb2104f804c9f4da05042.jpg",
-    titulo: "Nossas Aventuras",
-    texto: "Entre viagens, risadas e descobertas, cada quilômetro percorrido ao seu lado reforçou a certeza de que fomos feitos um para o outro."
+    url: novoCapituloImg,
+    titulo: "UM NOVO CAPÍTULO",
+    texto: "A vida sempre encontra uma forma de nos surpreender. Entre tantos sonhos realizados, nasceu o mais especial de todos: nossa família."
   },
   {
     url: "https://i.pinimg.com/736x/25/40/70/254070ff05550f897f4a850e6786c884.jpg",
