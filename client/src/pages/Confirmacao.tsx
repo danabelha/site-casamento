@@ -17,6 +17,7 @@ import planoSaudeImg from "../assets/images/plano_saude.jpg";
 import cavacoImg from "../assets/images/cavaco.jpg";
 import inicioTudoImg from "../assets/images/inicio_tudo.jpg";
 import novoCapituloImg from "../assets/images/novo_capitulo.jpg";
+import pedidoImg from "../assets/images/pedido.jpg";
 
 // ===== CONSTANTES =====
 const GALLERY_ITEMS = [
@@ -31,9 +32,9 @@ const GALLERY_ITEMS = [
     texto: "A vida sempre encontra uma forma de nos surpreender. Entre tantos sonhos realizados, nasceu o mais especial de todos: nossa família."
   },
   {
-    url: "https://i.pinimg.com/736x/25/40/70/254070ff05550f897f4a850e6786c884.jpg",
+    url: pedidoImg,
     titulo: "O Pedido",
-    texto: "Um 'sim' que ecoará pela eternidade. Sob o céu que testemunhou nosso amor, decidimos trilhar o mesmo caminho de mãos dadas."
+    texto: "Nem todos os pedidos precisam acontecer diante de multidões. O nosso aconteceu em um momento simples, cercado de amor e significado. Foi aí que fizemos a pergunta que transformaria aquele dia em uma lembrança eterna: ‘Mamãe, quer casar com a gente?’ E, com um sorriso emocionado, ela disse sim."
   },
   {
     url: "https://i.pinimg.com/736x/a3/94/f2/a394f25f3491c43b14e44cee714aae35.jpg",
