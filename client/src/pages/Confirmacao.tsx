@@ -1003,7 +1003,7 @@ export default function Confirmacao() {
                     <div className="flex justify-between items-start">
                       <div>
                         <p className="text-[9px] font-montserrat text-[#462F29]/40 mb-1 uppercase tracking-[0.2em] font-bold">Recebedor</p>
-                        <p className="text-[15px] font-bold text-[#462F29]">Daniel Abelha Torres</p>
+                        <p className="text-[15px] font-bold text-[#462F29]">Mariana Brito</p>
                       </div>
                       <span className="bg-green-100 text-green-700 text-[8px] px-2.5 py-1 rounded-full font-bold uppercase tracking-widest">PIX Gerado</span>
                     </div>
